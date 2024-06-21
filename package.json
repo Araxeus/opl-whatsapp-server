@@ -8,9 +8,11 @@
   "scripts": {
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
     "_build": "rm -rf dist && bun ./build.ts",
-    "check": "bun run biome check && tsc --noEmit",
+    "check": "bun run biome check && tsc --noEmit && bun check_up",
     "lint": "bun run biome check --write",
     "fix": "bun lint",
+    "updates": "bun update --latest",
+    "check_up": "bunx npm-check-updates --format group",
     "try": "bun _build test && node --env-file=.env ./dist/test.js"
   },
   "author": "",

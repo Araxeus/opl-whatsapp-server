@@ -75,8 +75,8 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/healthcheck')) return response('Healthy!');
 
-    log.info(`Request: ${req.url}`);
-    log.info(`Path: ${path.string}, Query: ${query.toString()}`);
+    log.info(`Got request for: ${req.url}`);
+    //log.info(`Path: ${path.string}, Query: ${query.toString()}`);
 
     if (path.is('/keepalive')) return response('ty');
 

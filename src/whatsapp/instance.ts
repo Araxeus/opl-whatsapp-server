@@ -132,7 +132,7 @@ export class WhatsappInstance extends EventEmitter {
                         (lastDisconnect?.error as Boom)?.output?.statusCode !==
                             DisconnectReason.loggedOut;
                     log.info(
-                        `connection closed due to\n${lastDisconnect?.error?.toString()}\n...reconnecting: ${shouldReconnect}`,
+                        `connection closed due to: ${lastDisconnect?.error?.toString()} ...reconnecting: ${shouldReconnect}`,
                     );
                     // reconnect if not logged out
                     if (shouldReconnect) {
