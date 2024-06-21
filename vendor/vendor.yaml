@@ -1,0 +1,5 @@
+- qrcode:
+  version: https://github.com/soldair/node-qrcode/commit/e09b913a65fc63da049a5577e5ac0eca22abac85
+  npm: https://www.npmjs.com/package/qrcode
+  git: https://github.com/soldair/node-qrcode
+

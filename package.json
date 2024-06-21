@@ -1,0 +1,36 @@
+{
+  "name": "opl-whatsapp-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/server.js",
+  "module": "./dist/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
+    "_build": "rm -rf dist && bun ./build",
+    "check": "bun run biome check && tsc --noEmit",
+    "lint": "bun run biome check --write",
+    "fix": "bun lint",
+    "try": "bun _build test && node --env-file=.env ./dist/test.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.5",
+    "cookie": "^0.6.0",
+    "mongoose": "^8.4.3",
+    "pino": "^9.2.0",
+    "pino-pretty": "^11.2.1",
+    "qrcode": "^1.5.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.2",
+    "@types/bun": "^1.1.5",
+    "@types/cookie": "^0.6.0",
+    "@types/node": "^20.14.7",
+    "@types/qrcode": "^1.5.5",
+    "typescript": "^5.5.2"
+  },
+  "trustedDependencies": ["@biomejs/biome", "protobufjs"]
+}

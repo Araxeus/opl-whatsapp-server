@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#007BFF">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="apple-touch-icon" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="shortcut icon" type="image/jpeg" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
+    <title dir="rtl">אופרייט דיווחים</title>
+
+    <meta property="og:title" content="אופרייט דיווחים" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://operate.onrender.com/login" />
+    <meta property="og:image" content="https://operate.onrender.com/opl-960x960.jpg">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            margin: 20px auto;
+            padding-left: 0;
+            padding-right: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .login-container button {
+            position: relative;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+
+        .button_text {
+            transition: all 0.2s;
+        }
+
+        .button-loading .button_text {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .button-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 4px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+
+            to {
+                transform: rotate(1turn);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container" class="container" style="display: none;">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="login-container" class="login-container">
+        <h1 dir="rtl">התחברות עם מספר זיהוי</h1>
+        <form id="loginForm" action="" method="post">
+            <label dir="rtl" for="browser-friendly-login-field-location" style="display:none">Username</label>
+            <!-- This is a hidden field to help browsers auto-fill the form -->
+            <input id="browser-friendly-login-field-location" type="text" autocomplete="username" placeholder="Username"
+                style="display:none">
+            <label dir="rtl" for="userID" style="display:none">מספר משתמש</label>
+            <input type="password" autofocus id="userID" name="userID" autocomplete="current-password" required>
+            <button type="submit"><span dir="rtl" class="button_text">התחבר</span></button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
+        // onSuccess - redirect to /
+
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const userID = document.getElementById('userID').value;
+            const button = document.querySelector('button[type="submit"]');
+            button.classList.add('button-loading');
+            button.disabled = true;
+            const stopLoading = () => {
+                button.classList.remove('button-loading');
+                button.disabled = false;
+            };
+            fetchAndQr({
+                path: '/login',
+                data: { userID },
+                mainContainerSelector: '#login-container',
+                onError: (error) => {
+                    stopLoading();
+                    console.error(error);
+                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`);
+                },
+                onSuccess: () => {
+                    window.location.pathname = '/';
+                },
+                // onQrSuccess - we didnt get auth cookie, so POST /login?skipqr=true
+                onQrSuccess: async () => {
+                    const res = await fetch('/login?skipqr=true', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userID }),
+                    });
+
+                    if (!res.ok) {
+                        stopLoading();
+                        console.error(res);
+                        alertSoon(`Error in server: ${res.status}`);
+                    }
+                    try {
+                        const data = await res.json();
+                        if (data.error) {
+                            stopLoading();
+                            console.error(data.error);
+                            alertSoon(`Error: ${data.error}`);
+                            return;
+                        }
+                        if (data.success) {
+                            console.log('Login successful');
+                            window.location.pathname = '/';
+                            return;
+                        }
+                        stopLoading();
+                        console.error('Unknown error, no success or error in response');
+                    } catch (error) {
+                        stopLoading();
+                        console.error(error);
+                        alertSoon(`Error in client: ${error}`);
+                    }
+                },
+            });
+        })
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#007BFF">
+    <meta property="og:image" content="/opl-960x960.jpg">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="apple-touch-icon" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="shortcut icon" type="image/jpeg" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
+    <title dir="rtl">מסירת רכב חליפי</title>
+
+    <style>
+        body {
+            visibility: hidden;
+        }
+    </style>
+    <link rel="stylesheet" href="/form.css">
+</head>
+
+<body>
+    <div id="canvas-container" class="container" style="display: none;">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="form-container" class="container">
+        <a href="/" class="back-button" dir="rtl">חזרה</a>
+        <h2 dir="rtl">מסירת רכב חליפי</h2>
+        <form id="carForm">
+            <label dir="rtl" for="clientCarID">מספר רכב מקורי</label>
+            <input dir="rtl" type="text" id="clientCarID" name="clientCarID" required>
+            <span dir="rtl" id="clientCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
+                12345678.</span>
+            <label dir="rtl" for="replacementCarID">מספר רכב חלופי</label>
+            <input dir="rtl" type="text" id="replacementCarID" name="replacementCarID" required>
+            <span dir="rtl" id="replacementCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
+                12345678.</span>
+            <label dir="rtl" for="replacementCarKM">ק"מ ברכב החלופי</label>
+            <input dir="rtl" type="number" id="replacementCarKM" name="replacementCarKM" dir="rtl" placeholder="אחרון">
+
+            <button type="submit"><span dir="rtl" class="button_text">שלח</span></button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
+
+        const $ = document.getElementById.bind(document);
+        $('carForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const carIDRegex = /^\d{3}-?\d{2}-?\d{3}$/;
+
+            const clientCarID = $('clientCarID').value;
+            const clientCarIDError = $('clientCarIDError');
+
+            const replacementCarID = $('replacementCarID').value;
+            const replacementCarIDError = $('replacementCarIDError');
+
+            let hasError = false;
+
+            if (!carIDRegex.test(clientCarID)) {
+                clientCarIDError.style.display = 'block';
+                hasError = true;
+            }
+            if (!carIDRegex.test(replacementCarID)) {
+                replacementCarIDError.style.display = 'block';
+                hasError = true;
+            }
+            if (hasError) return;
+
+            clientCarIDError.style.display = 'none';
+            replacementCarIDError.style.display = 'none';
+
+            const button = document.querySelector('button[type="submit"]');
+            button.classList.add('button-loading');
+            button.disabled = true;
+            const stopLoading = () => {
+                button.classList.remove('button-loading');
+                button.disabled = false;
+            };
+
+            const replacementCarKM = $('replacementCarKM').value;
+
+            const data = {
+                clientCarID,
+                replacementCarID,
+                replacementCarKM: replacementCarKM ? Number(replacementCarKM) : undefined
+            };
+
+            fetchAndQr({
+                path: '/api/replace-client-car',
+                data,
+                mainContainerSelector: '#form-container',
+                onError: (error) => {
+                    stopLoading();
+                    console.error(error);
+                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`);
+                },
+                onSuccess: () => {
+                    stopLoading();
+                    event.target.reset(); // form.reset();
+                    alertSoon('הבקשה הוגשה בהצלחה');
+                },
+            });
+        });
+    </script>
+
+</body>
+
+</html>
