@@ -103,7 +103,7 @@ const server = http.createServer(async (req, res) => {
             return response(
                 JSON.stringify(result),
                 ContentType.JSON,
-                'error' in result ? 400 : 200,
+                'error' in result ? 401 : 200,
                 headers,
             );
         } catch (error) {

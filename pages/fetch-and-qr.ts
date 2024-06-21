@@ -69,7 +69,9 @@ export async function fetchAndQr({
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch ${path}: ${response.status}`);
+            throw new Error(
+                `${path} failed: ${response.statusText} - ${response.status}`,
+            );
         }
 
         const json = (await response.json()) as SavedRequest['response'];

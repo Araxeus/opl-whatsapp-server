@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
-    "_build": "rm -rf dist && bun ./build",
+    "_build": "rm -rf dist && bun ./build.ts",
     "check": "bun run biome check && tsc --noEmit",
     "lint": "bun run biome check --write",
     "fix": "bun lint",
