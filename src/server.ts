@@ -71,13 +71,14 @@ const server = http.createServer(async (req, res) => {
         createReadStream(path).pipe(res);
     }
 
-    log.info(`Request: ${req.url}`);
-
     const { path, query } = pathOfRequest(req);
 
+    if (path.is('/healthcheck')) return response('Healthy!');
+
+    log.info(`Request: ${req.url}`);
     log.info(`Path: ${path.string}, Query: ${query.toString()}`);
 
-    if (path.is('/healthcheck')) return response('Healthy!');
+    if (path.is('/keepalive')) return response('ty');
 
     if (path.oneOf(assets)) {
         return streamResponse(`./assets${path.string}`);
@@ -125,12 +126,19 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    const userID = await userIDFromReqHeader(req);
+    const isUserValid = userID && (await validateUserID(userID));
+
     if (path.is('/login')) {
+        if (isUserValid) {
+            return response('Already Logged In', ContentType.TEXT, 302, {
+                location: '/',
+            });
+        }
         return fileResponse('./pages/login.html', ContentType.HTML);
     }
 
-    const userID = await userIDFromReqHeader(req);
-    if (!userID || !(await validateUserID(userID))) {
+    if (!isUserValid) {
         return response('Unauthorized', ContentType.TEXT, 302, {
             location: '/login',
         });
