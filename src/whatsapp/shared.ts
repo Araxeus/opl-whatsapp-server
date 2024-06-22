@@ -10,7 +10,7 @@ export const CarId = z
     });
 
 if (!process.env.OPERATE_PHONE_NUMBER) {
-    throw new Error('env.OPERATE_PPHONE_NUMBER must be defined');
+    throw new Error('env.OPERATE_PHONE_NUMBER must be defined');
 }
 export const OPERATE_PHONE_NUMBER = process.env.OPERATE_PHONE_NUMBER;
 

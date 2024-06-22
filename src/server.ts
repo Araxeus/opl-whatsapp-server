@@ -75,9 +75,11 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/healthcheck')) return response('Healthy!');
 
-    log.info(`Got request for: ${req.url}`);
-    log.info(req.headers); // DELETE
-    //log.info(`Path: ${path.string}, Query: ${query.toString()}`);
+    const userAgent = req.headers['user-agent'];
+    const ip = req.headers['true-client-ip'];
+    const ipCountry = req.headers['cf-ipcountry']; //req.url
+    log.info(`Got request for: ${path.string} ${query.size ? `| ${query.toString()}` : ''}
+    user-agent: ${userAgent}\n\tip: ${ip}\n\tcountry: ${ipCountry}`);
 
     if (path.is('/keepalive')) return response('ty');
 
