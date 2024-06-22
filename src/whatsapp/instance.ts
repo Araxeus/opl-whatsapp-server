@@ -157,16 +157,18 @@ export class WhatsappInstance extends EventEmitter {
         );
     }
 
-    readMessages(messages: WAProto.IMessageKey[]) {
+    async readMessage(message: WAProto.IMessageKey) {
         if (!activeInstances.has(this.user.userID))
             throw new Error('Instance not active');
-        this.sock.readMessages(messages);
+        return await this.sock.readMessages([message]);
     }
 
-    sendMessage(message: string) {
+    async sendMessage(message: string) {
         if (!activeInstances.has(this.user.userID))
             throw new Error('Instance not active');
-        this.sock.sendMessage(OPERATE_PHONE_NUMBER, { text: message });
+        return await this.sock.sendMessage(OPERATE_PHONE_NUMBER, {
+            text: message,
+        });
     }
 
     close(msg?: string) {
@@ -202,6 +204,8 @@ export class WhatsappInstance extends EventEmitter {
 
             log.info('Sending initial message'); // DELETE
 
+            // Bindings are needed for handleOperateMessage() below
+            const readMessage = this.readMessage.bind(this);
             const sendMessage = this.sendMessage.bind(this);
             sendMessage('.');
 
@@ -220,10 +224,6 @@ export class WhatsappInstance extends EventEmitter {
             };
 
             msgTimeout.start();
-
-            const handledMessages: WAProto.IMessageKey[] = [];
-            const readAllHandledMessages = () =>
-                this.readMessages(handledMessages);
 
             function handleOperateMessage(msg: WAProto.IWebMessageInfo) {
                 if (msg.key.remoteJid !== OPERATE_PHONE_NUMBER)
@@ -246,7 +246,7 @@ export class WhatsappInstance extends EventEmitter {
                 ) {
                     sendMessage(answers[chatState]);
                     chatState++;
-                    handledMessages.push(msg.key);
+                    readMessage(msg.key);
                 } else {
                     log.error({
                         msg: 'Missmatch error in chatState',
@@ -263,11 +263,9 @@ export class WhatsappInstance extends EventEmitter {
                 const shouldEnd = TEST_MODE
                     ? chatState >= questionsLength // if env.TEST_MODE !== 'off': we skip the final question
                     : chatState > questionsLength; // else: We answer the final question
-                // TODO: make this a test variable (env?)
                 if (shouldEnd) {
                     log.info('Finished routine');
                     msgTimeout.clear();
-                    readAllHandledMessages();
                     unsubscribeFromMessages();
                     resolve({ success: true });
                 }
