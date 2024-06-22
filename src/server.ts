@@ -53,6 +53,12 @@ const server = http.createServer(async (req, res) => {
     ) {
         res.writeHead(status, { 'Content-Type': type, ...headers });
         res.end(message);
+        if (status === 200 && type === ContentType.TEXT) return;
+        log.info(
+            `Response: ${status} | ${type}${
+                message.length < 200 ? ` | ${message}` : ''
+            }`,
+        );
     }
 
     async function fileResponse(
@@ -154,6 +160,8 @@ const server = http.createServer(async (req, res) => {
     const user = await getUser(userID);
     const loginCookie = encryptedCookieHeader(userID);
 
+    log.info(`Request from authenticated from ${user.name}`);
+
     if (path.is('/'))
         return response(await getIndexHtml(user.name), ContentType.HTML);
 
@@ -180,9 +188,7 @@ const server = http.createServer(async (req, res) => {
             const body = validator.parse(await getRequestBody(req)) as
                 | CarParkingInfo
                 | ReplaceClientCarInfo;
-            log.info(
-                `Got POST request from ${user.name}:\n${JSON.stringify(body, null, 2)}`,
-            );
+            log.info(`POST request body:\n${JSON.stringify(body, null, 2)}`);
             const result = await handleWhatsappRoutine(user, body);
             return response(
                 JSON.stringify(result),
