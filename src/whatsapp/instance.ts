@@ -156,6 +156,12 @@ export class WhatsappInstance extends EventEmitter {
         );
     }
 
+    readMessages(messages: WAProto.IMessageKey[]) {
+        if (!activeInstances.has(this.user.userID))
+            throw new Error('Instance not active');
+        this.sock.readMessages(messages);
+    }
+
     sendMessage(message: string) {
         if (!activeInstances.has(this.user.userID))
             throw new Error('Instance not active');
@@ -214,6 +220,10 @@ export class WhatsappInstance extends EventEmitter {
 
             msgTimeout.start();
 
+            const handledMessages: WAProto.IMessageKey[] = [];
+            const readAllHandledMessages = () =>
+                this.readMessages(handledMessages);
+
             function handleOperateMessage(msg: WAProto.IWebMessageInfo) {
                 if (msg.key.remoteJid !== OPERATE_PHONE_NUMBER)
                     throw new Error('FATAL ERROR not OPERATE_PHONE_NUMBER');
@@ -235,6 +245,7 @@ export class WhatsappInstance extends EventEmitter {
                 ) {
                     sendMessage(answers[chatState]);
                     chatState++;
+                    handledMessages.push(msg.key);
                 } else {
                     log.error({
                         msg: 'Missmatch error in chatState',
@@ -253,6 +264,7 @@ export class WhatsappInstance extends EventEmitter {
                     // DELETE change >= to just >
                     log.info('Finished routine');
                     msgTimeout.clear();
+                    readAllHandledMessages();
                     unsubscribeFromMessages();
                     resolve({ success: true });
                 }
