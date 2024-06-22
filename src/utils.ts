@@ -54,3 +54,6 @@ export async function getRequestBody(req: IncomingMessage) {
         });
     });
 }
+
+// We are in test mode unless explicitly turned off
+export const TEST_MODE = process.env.TEST_MODE !== 'off';

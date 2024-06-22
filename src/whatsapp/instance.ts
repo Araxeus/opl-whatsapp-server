@@ -11,6 +11,7 @@ import {
 import type { User } from 'auth';
 import logger from 'logger';
 import { Connection } from 'sse/connections-manager';
+import { TEST_MODE } from 'utils';
 import {
     type CarParkingInfo,
     type QuestionType as QuestionType_ParkCar,
@@ -250,7 +251,7 @@ export class WhatsappInstance extends EventEmitter {
                     log.error({
                         msg: 'Missmatch error in chatState',
                         expected: questions[chatState],
-                    }); // DELETE
+                    });
                     msgTimeout.clear();
                     unsubscribeFromMessages();
                     reject({
@@ -259,9 +260,11 @@ export class WhatsappInstance extends EventEmitter {
                     });
                 }
 
+                const shouldEnd = TEST_MODE
+                    ? chatState >= questionsLength // if env.TEST_MODE !== 'off': we skip the final question
+                    : chatState > questionsLength; // else: We answer the final question
                 // TODO: make this a test variable (env?)
-                if (chatState >= questionsLength) {
-                    // DELETE change >= to just >
+                if (shouldEnd) {
                     log.info('Finished routine');
                     msgTimeout.clear();
                     readAllHandledMessages();
