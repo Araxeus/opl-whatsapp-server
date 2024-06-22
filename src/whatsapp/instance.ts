@@ -59,7 +59,7 @@ export class WhatsappInstance extends EventEmitter {
     }
 
     async #connect() {
-        const { state, saveState } = await getAuthFromDatabase(
+        const { state, saveState, clearState } = await getAuthFromDatabase(
             this.user.userID,
         );
 
@@ -127,10 +127,12 @@ export class WhatsappInstance extends EventEmitter {
                 }
                 if (connection === 'close') {
                     activeInstances.delete(this.user.userID);
+                    const isLoggedOut =
+                        (lastDisconnect?.error as Boom)?.output?.statusCode ===
+                        DisconnectReason.loggedOut;
                     const shouldReconnect =
-                        lastDisconnect?.error?.message !== 'instance.close()' &&
-                        (lastDisconnect?.error as Boom)?.output?.statusCode !==
-                            DisconnectReason.loggedOut;
+                        !isLoggedOut &&
+                        lastDisconnect?.error?.message !== 'instance.close()';
                     log.info(
                         `connection closed due to: ${lastDisconnect?.error?.toString()} ...reconnecting: ${shouldReconnect}`,
                     );
@@ -140,6 +142,9 @@ export class WhatsappInstance extends EventEmitter {
                     } else {
                         this.emit('close');
                         this.removeAllListeners();
+                        if (isLoggedOut) {
+                            clearState();
+                        }
                         //this.sock.ev.flush();
                     }
                 } else if (connection === 'open') {
