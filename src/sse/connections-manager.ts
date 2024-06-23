@@ -1,10 +1,10 @@
 import { getUser } from 'auth';
-import logger from 'logger';
+//import logger from 'logger';
 import type { SSE_Controller } from 'sse';
 
 import { elapsedTimeSince } from 'utils';
 
-const log = logger.child({ module: 'connection-manager' });
+//const log = logger.child({ module: 'connection-manager' });
 
 type ConnectionDataConstructor = {
     userID: string;
@@ -56,9 +56,9 @@ export class Connection {
     }
 
     close() {
-        log.info('called Connection<>.close()'); // DELETE
+        //log.info('called Connection<>.close()'); // DELETE
         if (!connections[this.#userID]) {
-            log.info('Connection does not exist'); // DELETE
+            //log.info('Connection does not exist'); // DELETE
             return false;
         }
         connections[this.#userID].onAbort?.();
@@ -68,7 +68,7 @@ export class Connection {
     }
 
     setOnAbort(onAbort: () => void) {
-        log.info('called Connection<>.setOnAbort()'); // DELETE
+        //log.info('called Connection<>.setOnAbort()'); // DELETE
         this.#checkConnectionExists('set onAbort');
         connections[this.#userID].onAbort = onAbort;
     }
@@ -80,13 +80,13 @@ export class Connection {
     }
 
     send(data: string) {
-        log.info('called Connection<>.broadcast()'); // DELETE
+        //log.info('called Connection<>.broadcast()'); // DELETE
         this.#checkConnectionExists('broadcast');
         connections[this.#userID].controller.write(data);
     }
 
     emit(event: string, data = 'NODATA') {
-        log.info('called Connection<>.emit()'); // DELETE
+        //log.info('called Connection<>.emit()'); // DELETE
         this.#checkConnectionExists('emit');
         connections[this.#userID].controller.write(event, data);
     }

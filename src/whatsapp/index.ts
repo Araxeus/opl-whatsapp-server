@@ -5,9 +5,9 @@ import { WhatsappInstance } from './instance';
 import type { CarParkingInfo } from './park-car';
 import type { ReplaceClientCarInfo } from './replace-client-car';
 
-const log = logger.child({ module: 'whatsapp' });
-
 export async function startWhatsappTest(user: User) {
+    const log = logger.child({ module: `startWhatsappTest of ${user.name}` });
+
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 
@@ -35,6 +35,8 @@ export type WhatsappLoginResult =
     | { qrCode: string; tempToken: string };
 
 export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
+    const log = logger.child({ module: `whatsappLogin of ${user.name}` });
+
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 
@@ -68,6 +70,10 @@ export async function handleWhatsappRoutine(
     user: User,
     data: CarParkingInfo | ReplaceClientCarInfo,
 ): Promise<WhatsappRoutineResult> {
+    const log = logger.child({
+        module: `handleWhatsappRoutine of ${user.name}`,
+    });
+
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 

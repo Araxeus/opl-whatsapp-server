@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import http from 'node:http';
 import {
@@ -17,7 +18,7 @@ import {
     getIndexHtml,
     getRandom404,
 } from 'cache';
-import log from 'logger';
+import logger from 'logger';
 import mongoose from 'mongoose';
 import { sse } from 'sse';
 import { getRequestBody, pathOfRequest } from 'utils';
@@ -33,11 +34,11 @@ if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI must be defined');
 }
 
-log.info('connecting to mongo');
+logger.info('connecting to mongo');
 await mongoose.connect(process.env.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
-log.info(
+logger.info(
     `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
 );
 
@@ -45,6 +46,7 @@ const HOST = process.env.HOST || '127.0.0.1'; // || 0.0.0.0 || 'localhost';
 const PORT = Number(process.env.PORT) || 3000;
 
 const server = http.createServer(async (req, res) => {
+    let log = logger.child({ reqID: randomUUID() });
     function response(
         message: string,
         type = ContentType.TEXT,
@@ -161,6 +163,7 @@ const server = http.createServer(async (req, res) => {
     const loginCookie = encryptedCookieHeader(userID);
 
     log.info(`Request authenticated as from ${user.name}`);
+    log = log.child({ user: user.name });
 
     if (path.is('/'))
         return response(await getIndexHtml(user.name), ContentType.HTML);
@@ -228,5 +231,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-    console.log(`Server running at http://${HOST}:${PORT}/`);
+    logger.info(`Server running at http://${HOST}:${PORT}/`);
 });

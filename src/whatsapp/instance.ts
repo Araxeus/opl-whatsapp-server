@@ -6,13 +6,14 @@ import {
     type WAProto,
     type WAVersion,
     fetchLatestBaileysVersion,
-    makeWASocket,
     isJidBroadcast,
-    isJidStatusBroadcast,
     isJidGroup,
+    isJidStatusBroadcast,
+    makeWASocket,
 } from '@whiskeysockets/baileys';
 import type { User } from 'auth';
 import logger from 'logger';
+import type { Logger } from 'pino';
 import { Connection } from 'sse/connections-manager';
 import { TEST_MODE } from 'utils';
 import {
@@ -36,8 +37,6 @@ import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';
 
-const log = logger.child({ module: 'whatsapp/instance' });
-
 type UserID = string;
 const activeInstances = new Map<UserID, WhatsappInstance>();
 
@@ -50,14 +49,21 @@ export class WhatsappInstance extends EventEmitter {
     user: User;
     sock!: ReturnType<typeof makeWASocket>;
     version!: WAVersion;
+    log: Logger;
 
     constructor(user: User) {
         super();
         this.user = user;
 
+        this.log = logger.child({
+            module: `whatsapp/instance of ${user.name}`,
+        });
+
         fetchLatestBaileysVersion().then(({ version, isLatest }) => {
             this.version = version;
-            log.info(`using WA v${version.join('.')}, isLatest: ${isLatest}`);
+            this.log.info(
+                `using WA v${version.join('.')}, isLatest: ${isLatest}`,
+            );
             this.#connect();
         });
     }
@@ -72,7 +78,9 @@ export class WhatsappInstance extends EventEmitter {
             printQRInTerminal: false,
             auth: state,
             // @ts-expect-error baileys types are wrong
-            logger: logger.child({ module: 'baileys', userID: this.userID }),
+            logger: logger.child({
+                module: `baileys instance of ${this.user.name}`,
+            }),
             shouldIgnoreJid(jid) {
                 return (
                     isJidBroadcast(jid) ||
@@ -89,21 +97,21 @@ export class WhatsappInstance extends EventEmitter {
         activeInstances.set(this.user.userID, this);
 
         this.sock.ev.on('creds.update', () => {
-            log.info('creds updated');
+            this.log.info('creds updated');
             saveState().then(() => {
                 this.emit('save');
-                log.info('state saved');
+                this.log.info('state saved');
             });
         });
 
         this.sock.ev.on('messages.upsert', (messages) => {
             if (!messages || messages.type !== 'notify') return;
-            // log.info(
+            // this.log.info(
             //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
             // );
             for (const message of messages.messages) {
                 if (message.key.remoteJid !== OPERATE_PHONE_NUMBER) return;
-                log.info(
+                this.log.info(
                     `received message: ${JSON.stringify(message, null, 2)}`,
                 );
                 this.emit('message', message);
@@ -115,11 +123,11 @@ export class WhatsappInstance extends EventEmitter {
         this.sock.ev.on(
             'connection.update',
             async ({ connection, lastDisconnect, qr }) => {
-                log.info(
+                this.log.info(
                     `connection update: ${JSON.stringify(connection, null, 2)}`,
                 );
                 if (qr) {
-                    log.info('qr code received');
+                    this.log.info('qr code received');
                     this.emit('qr', qr);
                     //qrcodeTerminal.generate(qr, { small: true });
                     const sseConnection = Connection.get(this.user.userID);
@@ -146,7 +154,7 @@ export class WhatsappInstance extends EventEmitter {
                     }
                     const shouldReconnect =
                         lastDisconnect?.error?.message !== 'instance.close()';
-                    log.info(
+                    this.log.info(
                         `connection closed due to: ${lastDisconnect?.error?.toString()} ...reconnecting: ${shouldReconnect}`,
                     );
                     // reconnect if not logged out
@@ -159,7 +167,7 @@ export class WhatsappInstance extends EventEmitter {
                         //this.sock.ev.flush();
                     }
                 } else if (connection === 'open') {
-                    log.info('opened connection');
+                    this.log.info('opened connection');
                     this.emit('open');
                     Connection.get(this.user.userID)?.emit('authenticated');
                 }
@@ -212,11 +220,13 @@ export class WhatsappInstance extends EventEmitter {
 
             let chatState = QuestionType.GREETING;
 
-            log.info('Sending initial message'); // DELETE
-
             // Bindings are needed for handleOperateMessage() below
             const readMessage = this.readMessage.bind(this);
             const sendMessage = this.sendMessage.bind(this);
+            const log = this.log;
+
+            log.info('Sending initial message'); // DELETE
+
             sendMessage('.');
 
             log.info(`Waiting for ${questions[chatState]}`);
@@ -226,7 +236,7 @@ export class WhatsappInstance extends EventEmitter {
                 start: () => {
                     msgTimeout.clear();
                     msgTimeout.timer = setTimeout(() => {
-                        log.error('Message timeout');
+                        this.log.error('Message timeout');
                         reject({ success: false, error: 'Message timeout' });
                     }, 1000 * 60); // 1 minute
                 },

@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { User } from 'auth';
-import logger from 'logger';
+import log from 'logger';
 import { Connection } from './connections-manager';
 
-const log = logger.child({ module: 'sse' });
+//const log = logger.child({ module: 'sse' });
 
 export type SSE_Controller = {
     close: () => void;

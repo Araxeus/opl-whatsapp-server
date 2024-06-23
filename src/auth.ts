@@ -101,7 +101,6 @@ export async function setLastAuth(userID: User['userID']) {
 
 export async function userIDFromReqHeader(req: IncomingMessage) {
     const c = req.headers.cookie;
-    //console.log(`cookie found: "${c}"`); // DELETE
     if (!c) {
         return undefined;
     }
