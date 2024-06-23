@@ -7,6 +7,9 @@ import {
     type WAVersion,
     fetchLatestBaileysVersion,
     makeWASocket,
+    isJidBroadcast,
+    isJidStatusBroadcast,
+    isJidGroup,
 } from '@whiskeysockets/baileys';
 import type { User } from 'auth';
 import logger from 'logger';
@@ -70,9 +73,13 @@ export class WhatsappInstance extends EventEmitter {
             auth: state,
             // @ts-expect-error baileys types are wrong
             logger: logger.child({ module: 'baileys', userID: this.userID }),
-            // shouldIgnoreJid(jid) {
-            //     return jid !== OPERATE_PHONE_NUMBER; // isJidBroadcast(jid) || isJidGroup(jid);
-            // },
+            shouldIgnoreJid(jid) {
+                return (
+                    isJidBroadcast(jid) ||
+                    isJidGroup(jid) ||
+                    isJidStatusBroadcast(jid)
+                ); // return jid !== OPERATE_PHONE_NUMBER;
+            },
             // shouldSyncHistoryMessage(_msg) {
             //     return false;
             // },
@@ -95,9 +102,10 @@ export class WhatsappInstance extends EventEmitter {
             //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
             // );
             for (const message of messages.messages) {
-                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER)
-                    return;
-                log.info(`received message: ${JSON.stringify(message, null, 2)}`);
+                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER) return;
+                log.info(
+                    `received message: ${JSON.stringify(message, null, 2)}`,
+                );
                 this.emit('message', message);
             }
         });
