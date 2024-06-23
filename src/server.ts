@@ -160,7 +160,7 @@ const server = http.createServer(async (req, res) => {
     const user = await getUser(userID);
     const loginCookie = encryptedCookieHeader(userID);
 
-    log.info(`Request from authenticated from ${user.name}`);
+    log.info(`Request authenticated as from ${user.name}`);
 
     if (path.is('/'))
         return response(await getIndexHtml(user.name), ContentType.HTML);
