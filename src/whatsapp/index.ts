@@ -54,7 +54,10 @@ export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
             log.info('Instance opened');
             resolve({ success: true });
             instance.once('save', () => {
-                instance.close();
+                setTimeout(() => {
+                    setLastAuth(user.userID);
+                    instance.close();
+                }, 5000);
             });
         });
     });

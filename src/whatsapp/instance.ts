@@ -70,12 +70,12 @@ export class WhatsappInstance extends EventEmitter {
             auth: state,
             // @ts-expect-error baileys types are wrong
             logger: logger.child({ module: 'baileys', userID: this.userID }),
-            shouldIgnoreJid(jid) {
-                return jid !== OPERATE_PHONE_NUMBER; // isJidBroadcast(jid) || isJidGroup(jid);
-            },
-            shouldSyncHistoryMessage(_msg) {
-                return false;
-            },
+            // shouldIgnoreJid(jid) {
+            //     return jid !== OPERATE_PHONE_NUMBER; // isJidBroadcast(jid) || isJidGroup(jid);
+            // },
+            // shouldSyncHistoryMessage(_msg) {
+            //     return false;
+            // },
             syncFullHistory: false,
         });
 
@@ -91,11 +91,13 @@ export class WhatsappInstance extends EventEmitter {
 
         this.sock.ev.on('messages.upsert', (messages) => {
             if (!messages || messages.type !== 'notify') return;
-            log.info(
-                `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
-            );
-            this.emit('messages', messages.messages);
+            // log.info(
+            //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
+            // );
             for (const message of messages.messages) {
+                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER)
+                    return;
+                log.info(`received message: ${JSON.stringify(message, null, 2)}`);
                 this.emit('message', message);
             }
         });
