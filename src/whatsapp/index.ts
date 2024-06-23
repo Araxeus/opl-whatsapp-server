@@ -57,7 +57,7 @@ export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
                 setTimeout(() => {
                     setLastAuth(user.userID);
                     instance.close();
-                }, 5000);
+                }, 1000 * 60);
             });
         });
     });
