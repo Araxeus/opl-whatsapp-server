@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import http from 'node:http';
 import {
@@ -20,6 +19,7 @@ import {
 } from 'cache';
 import logger from 'logger';
 import mongoose from 'mongoose';
+import { nanoid } from 'nanoid';
 import { sse } from 'sse';
 import { getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine } from 'whatsapp';
@@ -46,7 +46,7 @@ const HOST = process.env.HOST || '127.0.0.1'; // || 0.0.0.0 || 'localhost';
 const PORT = Number(process.env.PORT) || 3000;
 
 const server = http.createServer(async (req, res) => {
-    let log = logger.child({ reqID: randomUUID() });
+    let log = logger.child({ reqID: nanoid(5) });
     function response(
         message: string,
         type = ContentType.TEXT,
