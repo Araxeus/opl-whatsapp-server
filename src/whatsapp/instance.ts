@@ -123,7 +123,12 @@ export class WhatsappInstance extends EventEmitter {
 
         this.sock.ev.on(
             'connection.update',
-            async ({ connection, lastDisconnect, qr }) => {
+            async ({
+                connection,
+                lastDisconnect,
+                qr,
+                receivedPendingNotifications,
+            }) => {
                 this.log.info(
                     `connection update: ${JSON.stringify(connection, null, 2)}`,
                 );
@@ -144,6 +149,12 @@ export class WhatsappInstance extends EventEmitter {
                         this.close();
                     }
                     sentFirstQR ||= true;
+                }
+                if (receivedPendingNotifications) {
+                    this.log.info(
+                        'received pending notifications, emitting "open" event',
+                    );
+                    this.emit('open');
                 }
                 if (connection === 'close') {
                     activeInstances.delete(this.user.userID);
@@ -168,8 +179,6 @@ export class WhatsappInstance extends EventEmitter {
                         //this.sock.ev.flush();
                     }
                 } else if (connection === 'open') {
-                    this.log.info('opened connection');
-                    this.emit('open');
                     Connection.get(this.user.userID)?.emit('authenticated');
                 }
             },
