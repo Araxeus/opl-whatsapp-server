@@ -12,7 +12,7 @@
     "lint": "bun run biome check --write",
     "fix": "bun lint",
     "updates": "bun update --latest",
-    "check_up": "bunx npm-check-updates --format group",
+    "check_up": "bunx npm-check-updates -p bun --format group",
     "try": "bun _build test && node --env-file=.env ./dist/test.js"
   },
   "author": "",

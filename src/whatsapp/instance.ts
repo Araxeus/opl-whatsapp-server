@@ -85,7 +85,8 @@ export class WhatsappInstance extends EventEmitter {
                 return (
                     isJidBroadcast(jid) ||
                     isJidGroup(jid) ||
-                    isJidStatusBroadcast(jid)
+                    isJidStatusBroadcast(jid) ||
+                    (typeof jid === 'string' && jid.endsWith('@newsletter'))
                 ); // return jid !== OPERATE_PHONE_NUMBER;
             },
             // shouldSyncHistoryMessage(_msg) {

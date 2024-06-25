@@ -23,6 +23,7 @@ if (test) {
     });
     console.log('server.js build complete');
     console.log(serverRes);
+
     console.log('building fetch-and-qr.js');
     const frontRes = await Bun.build({
         entrypoints: ['./pages/fetch-and-qr.ts'],

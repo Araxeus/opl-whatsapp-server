@@ -1,27 +1,27 @@
 # opl-whatsapp-server
 
- To disable testing mode set the environment variable `TESTING` to `false` aka:
+ To disable testing mode set the environment variable `TESTING` to `off` aka:
 
 Bash:
 
 ```bash
-export TESTING=false
+export TESTING=off
 ```
 
 Dockerfile:
 
 ```dockerfile
-ENV TESTING=false
+ENV TESTING=off
 ```
 
 Powershell:
 
 ```powershell
-$env:TESTING = "false"
+$env:TESTING = "off"
 ```
 
 CMD:
 
 ```cmd
-set TESTING=false
+set TESTING=off
 ```
