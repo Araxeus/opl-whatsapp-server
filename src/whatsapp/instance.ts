@@ -52,6 +52,9 @@ export class WhatsappInstance extends EventEmitter {
     log: Logger;
 
     constructor(user: User) {
+        if (activeInstances.has(user.userID))
+            throw new Error('Instance already active, check instanceExists()');
+
         super();
         this.user = user;
 
@@ -305,6 +308,10 @@ export class WhatsappInstance extends EventEmitter {
 
     static getInstance(userID: UserID) {
         return activeInstances.get(userID);
+    }
+
+    static instanceExists(userID: UserID) {
+        return activeInstances.has(userID);
     }
 }
 

@@ -37,6 +37,14 @@ export type WhatsappLoginResult =
 export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
     const log = logger.child({ module: `whatsappLogin of ${user.name}` });
 
+    if (WhatsappInstance.instanceExists(user.userID)) {
+        log.error('Instance already exists');
+        return {
+            success: false,
+            error: 'החיבור נכשל כי המערכת מחוברת לוואצאפ של המשתמש, אנא נסה שנית עוד דקה',
+        };
+    }
+
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 
@@ -73,6 +81,11 @@ export async function handleWhatsappRoutine(
     const log = logger.child({
         module: `handleWhatsappRoutine of ${user.name}`,
     });
+
+    if (WhatsappInstance.instanceExists(user.userID)) {
+        log.error('Instance already exists');
+        return { success: false, error: 'המערכת כבר בתהליך דיווח' };
+    }
 
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
