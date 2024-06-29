@@ -225,7 +225,8 @@ const server = http.createServer(async (req, res) => {
         try {
             const body = await getRequestBody(req, true);
             log.info(`POST request body:\n${body}`);
-            const result = await speech.inferCarData(body);
+            const { result, usage } = await speech.inferCarData(body);
+            log.info(`Completion usage:\n${JSON.stringify(usage, null, 2)}`);
             return response(result, ContentType.JSON);
         } catch (error) {
             return response(

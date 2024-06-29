@@ -41,8 +41,20 @@ After creating the output, check it to ensure it adheres to the JSON rules above
 If the input is invalid or incomplete, return an empty JSON object: {}.
 `;
 
-function inferCarData(text: string, parse: true): Promise<CarData>;
-function inferCarData(text: string, parse?: false): Promise<string>;
+function inferCarData(
+    text: string,
+    parse: true,
+): Promise<{
+    result: CarData;
+    usage: OpenAI.Completions.CompletionUsage;
+}>;
+function inferCarData(
+    text: string,
+    parse?: false,
+): Promise<{
+    result: string;
+    usage: OpenAI.Completions.CompletionUsage;
+}>;
 async function inferCarData(text: string, parse = false) {
     try {
         const completion = await openai.chat.completions.create({
@@ -56,15 +68,13 @@ async function inferCarData(text: string, parse = false) {
                     content: text,
                 },
             ],
-            model: 'gpt-4o',//'gpt-3.5-turbo',
+            model: 'gpt-4o', //'gpt-3.5-turbo',
             response_format: { type: 'json_object' },
         });
-
         const output = completion.choices[0].message.content?.trim() || '';
 
         // Try to parse the response as JSON
         // const jsonResponse: CarData = output ? JSON.parse(output) : {};
-
         // Additional validation to ensure carID format if present
         // if (
         //     jsonResponse.carID &&
@@ -74,7 +84,10 @@ async function inferCarData(text: string, parse = false) {
         //     console.error('Invalid carID format');
         // }
 
-        return parse ? (JSON.parse(output) as CarData) : output;
+        return {
+            result: parse ? (JSON.parse(output) as CarData) : output,
+            usage: completion.usage,
+        };
     } catch (error) {
         console.error('Error parsing or fetching data:', error?.toString());
         return {};
