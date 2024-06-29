@@ -20,7 +20,7 @@ const openai = new OpenAI({
 const systemPrompt = `
 You will act as an interpreter between the output of a hebrew speech recognition, and a program that receive json data with the following fields:
 {
-  carID: string, // MUST BE of format 123-45-678
+  carID: string, // MUST BE of format 123-45-678 (can be missing numbers but must have the dashes after the first 3 and 5 digits)
   km: number
   startingPoint: string
   destination: string
