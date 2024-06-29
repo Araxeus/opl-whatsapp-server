@@ -20,22 +20,25 @@ const openai = new OpenAI({
 const systemPrompt = `
 You will act as an interpreter between the output of a hebrew speech recognition, and a program that receive json data with the following fields:
 {
-    carID: string, // MUST BE of format 123-45-678 
-    km: number 
-    startingPoint: string 
-    destination: string 
+  carID: string, // MUST BE of format 123-45-678
+  km: number
+  startingPoint: string
+  destination: string
 }
 
-you will try to infer this data from the input in hebrew, if one of the fields isn't present in the input then do not include it in the json output
+You will try to infer this data from the input in hebrew, USE ONLY EXISTING DATA - if the user didn't specify a key then don't include it.
+(for example user might only provide startingPoint, or he might only provide km and destination, etc..)
 
-do not include prefixes, infer the name of the place - for example:
+Simplify the name of places and remove prefixes - for example:
 "מהכוננות" should become "כוננות"
 "מאילן קארגלאס" should become "אילן קארגלאס"
 "הביתה" should become "בית"
 
-output only valid parsable json in the format specified above! - output starts with { and ends with }
+Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
 
-after creating the output, check it again to make sure it adheres to the json rules above - especially the car number format 
+After creating the output, check it to ensure it adheres to the JSON rules above, especially the car number format.
+
+If the input is invalid or incomplete, return an empty JSON object: {}.
 `;
 
 function inferCarData(text: string, parse: true): Promise<CarData>;
@@ -53,7 +56,7 @@ async function inferCarData(text: string, parse = false) {
                     content: text,
                 },
             ],
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o',//'gpt-3.5-turbo',
             response_format: { type: 'json_object' },
         });
 
