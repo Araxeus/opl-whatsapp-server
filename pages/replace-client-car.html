@@ -37,11 +37,11 @@
         <h2 dir="rtl">מסירת רכב חליפי</h2>
         <form id="carForm">
             <label dir="rtl" for="clientCarID">מספר רכב מקורי</label>
-            <input dir="rtl" type="text" id="clientCarID" name="clientCarID" required>
+            <input dir="rtl" id="clientCarID" name="clientCarID" class="carID" type="tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required>
             <span dir="rtl" id="clientCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
             <label dir="rtl" for="replacementCarID">מספר רכב חלופי</label>
-            <input dir="rtl" type="text" id="replacementCarID" name="replacementCarID" required>
+            <input dir="rtl" id="replacementCarID" name="replacementCarID" class="carID" type="tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required>
             <span dir="rtl" id="replacementCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
             <label dir="rtl" for="replacementCarKM">ק"מ ברכב החלופי</label>

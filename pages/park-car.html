@@ -37,7 +37,7 @@
         <form id="carForm">
             <a href="/" class="back-button" dir="rtl">חזרה</a>
             <label dir="rtl" for="carID">מספר רכב</label>
-            <input dir="rtl" type="text" id="carID" name="carID" required>
+            <input dir="rtl" id="carID" name="carID" class="carID" type="tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required>
             <span dir="rtl" id="carIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
             <label dir="rtl" for="km">קמ נוכחי</label>
@@ -57,6 +57,7 @@
         import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
 
         const $ = document.getElementById.bind(document);
+
         $('carForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 

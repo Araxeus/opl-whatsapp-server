@@ -21,6 +21,39 @@ const $ = document.querySelector.bind(document) as (
     selector: string,
 ) => HTMLElement | null;
 
+// biome-ignore lint/complexity/noForEach: forEach is better for NodeList
+document.querySelectorAll('.carID').forEach((input) => {
+    input.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const cursorPosition = target.selectionStart || 0;
+        const originalValue = target.value;
+        const x =
+            target.value
+                .replace(/\D/g, '')
+                .match(/(\d{0,3})(\d{0,2})(\d{0,3})/) || [];
+        target.value = !x[2]
+            ? x[1]
+            : `${x[1]}-${!x[3] ? x[2] : `${x[2]}-${x[3]}`}`;
+
+        // Calculate the new cursor position
+        let newCursorPosition = cursorPosition;
+        if (originalValue.length > target.value.length) {
+            // If a character was deleted, adjust the cursor position accordingly
+            if (cursorPosition === 4 || cursorPosition === 8) {
+                newCursorPosition--;
+            }
+        } else if (originalValue.length < target.value.length) {
+            // If a character was added, adjust the cursor position accordingly
+            if (cursorPosition === 4 || cursorPosition === 7) {
+                newCursorPosition++;
+            }
+        }
+
+        // Set the cursor position
+        target.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+});
+
 type FetchAndQrOptions = {
     path: string;
     data: FetchAndQrData;

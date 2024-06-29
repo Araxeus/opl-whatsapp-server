@@ -46,7 +46,8 @@ label {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[type="tel"] {
   width: 95%;
   padding: 10px;
   margin: 5px 0 10px;
