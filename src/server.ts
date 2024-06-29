@@ -229,7 +229,9 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && path.is('/speech')) {
         try {
             const body = await getRequestBody(req, true);
+            log.info(`POST request body:\n${body}`);
             const result = await speech.inferCarData(body);
+            log.info(`Speech result:\n${JSON.stringify(result, null, 2)}`);
             return response(result, ContentType.JSON);
         } catch (error) {
             return response(

@@ -288,6 +288,7 @@
 
         function output(input) {
             transform(input).then(data => {
+                console.log(data); // DELETE
                 for (const key of Object.keys(data)) {
                     const element = $(key);
                     if (element) {
