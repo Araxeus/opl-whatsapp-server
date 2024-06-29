@@ -221,11 +221,6 @@ const server = http.createServer(async (req, res) => {
         return sse(req, res, user);
     }
 
-    if (path.is('/speech')) {
-        // DELETE this and the file
-        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
-    }
-
     if (req.method === 'POST' && path.is('/speech')) {
         try {
             const body = await getRequestBody(req, true);
@@ -240,6 +235,11 @@ const server = http.createServer(async (req, res) => {
                 400,
             );
         }
+    }
+
+    if (path.is('/speech')) {
+        // DELETE this and the file
+        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
     }
 
     if (path.is('/logout')) {
