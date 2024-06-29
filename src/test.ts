@@ -29,11 +29,18 @@ if (!process.env.TEST_USERID || !validateUserID(process.env.TEST_USERID)) {
 
 const testUser = await getUser(process.env.TEST_USERID);
 
+import speech from 'speech';
+
 rl.on('line', async (_line) => {
     const line = _line.trim();
     if (['q', 'quit', 'exit'].includes(line)) {
         return rl.close();
     }
+
+    const carData = await speech.inferCarData(line, true);
+    console.log(carData);
+
+    if (line) return; // DELETE
 
     if (line === 'start') {
         log.info('Starting whatsapp instance...');

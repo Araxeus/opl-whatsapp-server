@@ -20,6 +20,7 @@ import {
 import logger from 'logger';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
+import speech from 'speech';
 import { sse } from 'sse';
 import { getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine } from 'whatsapp';
@@ -135,6 +136,24 @@ const server = http.createServer(async (req, res) => {
         }
         sse(req, res, user);
         return;
+    }
+
+    if (req.method === 'POST' && path.is('/speech')) {
+        try {
+            const body = await getRequestBody(req, true);
+            const result = await speech.inferCarData(body);
+            return response(result, ContentType.JSON);
+        } catch (error) {
+            return response(
+                error?.toString?.() || 'Unknown Error while parsing POST',
+                ContentType.TEXT,
+                400,
+            );
+        }
+    }
+
+    if (path.is('/speech')) {
+        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
     }
 
     const userID = await userIDFromReqHeader(req);

@@ -8,7 +8,7 @@ if (test) {
         target: 'node',
         //minify: true,
         sourcemap: 'inline', //external',
-        external: ['@whiskeysockets/baileys'],
+        external: ['@whiskeysockets/baileys', 'openai'],
     });
     console.log('test.js build complete');
 } else {
@@ -19,7 +19,7 @@ if (test) {
         target: 'node',
         minify: true,
         sourcemap: 'external', // external
-        external: ['@whiskeysockets/baileys'],
+        external: ['@whiskeysockets/baileys', 'openai'],
     });
     console.log('server.js build complete');
     console.log(serverRes);

@@ -34,11 +34,19 @@ export const isValidJsonPOST = (req: IncomingMessage) =>
         // biome-ignore lint/suspicious/noGlobalIsNan: typecast is expected
         !isNaN(req.headers['content-length']));
 
-export async function getRequestBody(req: IncomingMessage) {
-    if (!isValidJsonPOST(req)) {
+export function getRequestBody(
+    req: IncomingMessage,
+    raw?: false,
+): Promise<object>;
+export function getRequestBody(
+    req: IncomingMessage,
+    raw: true,
+): Promise<string>;
+export async function getRequestBody(req: IncomingMessage, raw = false) {
+    if (!raw && !isValidJsonPOST(req)) {
         throw new Error('Invalid POST request');
     }
-    return new Promise<string>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let data = '';
         req.on('error', reject);
         //req.on('close', () => reject(new Error('Connection closed')));
@@ -47,7 +55,7 @@ export async function getRequestBody(req: IncomingMessage) {
         });
         req.on('end', () => {
             try {
-                resolve(JSON.parse(data));
+                resolve(raw ? data : JSON.parse(data));
             } catch (e) {
                 reject(e);
             }
