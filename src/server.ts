@@ -138,32 +138,6 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'POST' && path.is('/speech')) {
-        try {
-            const body = await getRequestBody(req, true);
-            const result = await speech.inferCarData(body);
-            return response(result, ContentType.JSON);
-        } catch (error) {
-            return response(
-                error?.toString?.() || 'Unknown Error while parsing POST',
-                ContentType.TEXT,
-                400,
-            );
-        }
-    }
-
-    if (path.is('/speech')) {
-        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
-    }
-
-    if (path.is('/park-car')) {
-        return fileResponse(
-            './pages/park-car.html',
-            ContentType.HTML,
-            200, // DELETE
-        );
-    }
-
     const userID = await userIDFromReqHeader(req);
     const isUserValid = userID && (await validateUserID(userID));
 
@@ -245,6 +219,25 @@ const server = http.createServer(async (req, res) => {
     //Server Sent Events
     if (path.is('/sse')) {
         return sse(req, res, user);
+    }
+
+    if (path.is('/speech')) {
+        // DELETE this and the file
+        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
+    }
+
+    if (req.method === 'POST' && path.is('/speech')) {
+        try {
+            const body = await getRequestBody(req, true);
+            const result = await speech.inferCarData(body);
+            return response(result, ContentType.JSON);
+        } catch (error) {
+            return response(
+                error?.toString?.() || 'Unknown Error while parsing POST',
+                ContentType.TEXT,
+                400,
+            );
+        }
     }
 
     if (path.is('/logout')) {
