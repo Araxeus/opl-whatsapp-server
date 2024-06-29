@@ -156,6 +156,14 @@ const server = http.createServer(async (req, res) => {
         return fileResponse('./pages/speech.html', ContentType.HTML, 200);
     }
 
+    if (path.is('/park-car')) {
+        return fileResponse(
+            './pages/park-car.html',
+            ContentType.HTML,
+            200, // DELETE
+        );
+    }
+
     const userID = await userIDFromReqHeader(req);
     const isUserValid = userID && (await validateUserID(userID));
 

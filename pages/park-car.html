@@ -23,6 +23,87 @@
         body {
             visibility: hidden;
         }
+
+        #wave #mic {
+            height: 70px;
+            width: 70px;
+            fill: white;
+        }
+
+        #Line_1 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.15s;
+        }
+
+        #Line_2 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.3s;
+        }
+
+        #Line_3 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.45s;
+        }
+
+        #Line_4 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.6s;
+        }
+
+        #Line_5 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.75s;
+        }
+
+        #Line_6 {
+            animation: pulse 1s infinite;
+            animation-delay: 0.9s;
+        }
+
+        #Line_7 {
+            animation: pulse 1s infinite;
+            animation-delay: 1.05s;
+        }
+
+        #Line_8 {
+            animation: pulse 1s infinite;
+            animation-delay: 1.2s;
+        }
+
+        #Line_9 {
+            animation: pulse 1s infinite;
+            animation-delay: 1.35s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scaleY(1);
+                transform-origin: 50% 50%;
+            }
+
+            50% {
+                transform: scaleY(0.7);
+                transform-origin: 50% 50%;
+            }
+
+            100% {
+                transform: scaleY(1);
+                transform-origin: 50% 50%;
+            }
+        }
+
+        #audioButton {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 10px;
+            top: 15px;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
     </style>
     <link rel="stylesheet" href="/form.css">
 </head>
@@ -35,6 +116,34 @@
     <div id="form-container" class="container">
         <h2 dir="rtl">דיווח חנייה</h2>
         <form id="carForm">
+            <div id="audioButton">
+                <svg id="wave" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 38.05"
+                    style="display: none;">
+                    <title>Audio Wave</title>
+                    <path id="Line_1" data-name="Line 1"
+                        d="M0.91,15L0.78,15A1,1,0,0,0,0,16v6a1,1,0,1,0,2,0s0,0,0,0V16a1,1,0,0,0-1-1H0.91Z" />
+                    <path id="Line_2" data-name="Line 2"
+                        d="M6.91,9L6.78,9A1,1,0,0,0,6,10V28a1,1,0,1,0,2,0s0,0,0,0V10A1,1,0,0,0,7,9H6.91Z" />
+                    <path id="Line_3" data-name="Line 3"
+                        d="M12.91,0L12.78,0A1,1,0,0,0,12,1V37a1,1,0,1,0,2,0s0,0,0,0V1a1,1,0,0,0-1-1H12.91Z" />
+                    <path id="Line_4" data-name="Line 4"
+                        d="M18.91,10l-0.12,0A1,1,0,0,0,18,11V27a1,1,0,1,0,2,0s0,0,0,0V11a1,1,0,0,0-1-1H18.91Z" />
+                    <path id="Line_5" data-name="Line 5"
+                        d="M24.91,15l-0.12,0A1,1,0,0,0,24,16v6a1,1,0,0,0,2,0s0,0,0,0V16a1,1,0,0,0-1-1H24.91Z" />
+                    <path id="Line_6" data-name="Line 6"
+                        d="M30.91,10l-0.12,0A1,1,0,0,0,30,11V27a1,1,0,1,0,2,0s0,0,0,0V11a1,1,0,0,0-1-1H30.91Z" />
+                    <path id="Line_7" data-name="Line 7"
+                        d="M36.91,0L36.78,0A1,1,0,0,0,36,1V37a1,1,0,1,0,2,0s0,0,0,0V1a1,1,0,0,0-1-1H36.91Z" />
+                    <path id="Line_8" data-name="Line 8"
+                        d="M42.91,9L42.78,9A1,1,0,0,0,42,10V28a1,1,0,1,0,2,0s0,0,0,0V10a1,1,0,0,0-1-1H42.91Z" />
+                    <path id="Line_9" data-name="Line 9"
+                        d="M48.91,15l-0.12,0A1,1,0,0,0,48,16v6a1,1,0,1,0,2,0s0,0,0,0V16a1,1,0,0,0-1-1H48.91Z" />
+                </svg>
+                <svg id="mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                    <path
+                        d="M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z" />
+                </svg>
+            </div>
             <a href="/" class="back-button" dir="rtl">חזרה</a>
             <label dir="rtl" for="carID">מספר רכב</label>
             <input dir="rtl" id="carID" name="carID" class="carID" type="text" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
@@ -103,6 +212,90 @@
                 },
             });
         });
+
+        let { SpeechRecognition } = globalThis;
+        if (!SpeechRecognition)
+            SpeechRecognition = webkitSpeechRecognition;
+
+        const listen = (options = void 0) => new Promise((resolve, reject) => {
+            let t = 0, ended = false;
+            const stop = event => {
+                if (event) reject(event);
+                clearTimeout(t);
+                ended = true;
+                sr.stop();
+            };
+            const result = ({ results }) => {
+                stop();
+                console.log(results);
+                for (let i = results.length - 1; i >= 0; i--) {
+                    const result = results[i];
+                    if (result.isFinal) {
+                        for (const { transcript } of result) {
+                            resolve(transcript);
+                            return;
+                        }
+                    }
+                }
+            };
+            const sr = Object.assign(new SpeechRecognition, options, { interimResults: true, continuous: true });
+            sr.addEventListener('error', stop, { once: true });
+            sr.addEventListener('nomatch', stop, { once: true });
+            sr.addEventListener('audioend', () => stop(), { once: true });
+            sr.addEventListener('result', event => {
+                if (ended) {
+                    result(event);
+                    clearTimeout(t);
+                }
+                else {
+                    clearTimeout(t);
+                    t = setTimeout(result, 2000, event);
+                }
+            });
+            sr.start();
+        });
+
+        const audioButton = $('audioButton');
+
+        audioButton.addEventListener('click', async () => {
+            const wave = $('wave');
+            const mic = $('mic');
+            mic.style.display = 'none';
+            wave.style.display = 'flex';
+
+            // avoid clicks while listenings
+            audioButton.disabled = true;
+            listen({
+                lang: 'he-IL'
+            }).then(transcript => {
+                console.log(transcript); // DELETE
+                output(transcript);
+            }).catch(console.error).finally(() => {
+                audioButton.disabled = false;
+                wave.style.display = 'none';
+                mic.style.display = 'flex';
+            });
+        });
+
+        async function transform(text) {
+            const response = await fetch(`/speech`, {
+                method: 'POST',
+                body: text
+            });
+            return await response.json();
+        }
+
+        function output(input) {
+            transform(input).then(data => {
+                for (const key of Object.keys(data)) {
+                    const element = $(key);
+                    if (element) {
+                        element.value = data[key];
+                    }
+                }
+            });
+        }
+
     </script>
 
 </body>

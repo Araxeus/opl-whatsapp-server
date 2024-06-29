@@ -265,25 +265,6 @@
             output(input);
         })
 
-        async function transform(text) {
-            const response = await fetch(`/speech`, {
-                method: 'POST',
-                body: text
-            });
-            const data = await response.json();
-            return Object.entries(data).map(([key, value]) => `${key}: ${value}`).join('\n');
-            //return JSON.stringify(data, null, 2);
-        }
-
-        function output(input) {
-            //const product = "ok";
-            //const text = input.toLowerCase().replace(/[^\w\s\d]/gi, "");
-            transform(input).then(data => {
-                addChat(input, data);
-            });
-            //addChat(input, "ok");
-        }
-
         function addChat(input, product) {
             const messageContainer = document.getElementById("messages");
             const userDiv = document.createElement('div');
@@ -307,9 +288,24 @@
             }, 500)
         }
 
-        const { assign } = Object;
-        const interimResults = { interimResults: true, continuous: true };
-        const once = { once: true };
+        async function transform(text) {
+            const response = await fetch(`/speech`, {
+                method: 'POST',
+                body: text
+            });
+            const data = await response.json();
+            return Object.entries(data).map(([key, value]) => `${key}: ${value}`).join('\n');
+            //return JSON.stringify(data, null, 2);
+        }
+
+        function output(input) {
+            //const product = "ok";
+            //const text = input.toLowerCase().replace(/[^\w\s\d]/gi, "");
+            transform(input).then(data => {
+                addChat(input, data);
+            });
+            //addChat(input, "ok");
+        }
 
         let { SpeechRecognition } = globalThis;
         if (!SpeechRecognition)
@@ -336,25 +332,16 @@
                     }
                 }
             };
-            const sr = assign(new SpeechRecognition, options, interimResults);
-            sr.addEventListener('error', () => {
-                console.log('error');
-                stop();
-            }, once);
-            sr.addEventListener('nomatch', () => {
-                console.log('nomatch');
-                stop();
-            }, once);
-            sr.addEventListener('audioend', () => {
-                console.log('audioend');
-                stop();
-            }, once);
+            const sr = Object.assign(new SpeechRecognition, options, { interimResults: true, continuous: true });
+            sr.addEventListener('error', stop, { once: true });
+            sr.addEventListener('nomatch', stop, { once: true });
+            sr.addEventListener('audioend', () => stop(), { once: true });
             sr.addEventListener('result', event => {
-                console.log('result');
-                if (ended)
+                if (ended){
                     result(event);
+                    clearTimeout(t);
+                }
                 else {
-                    console.log('result timeout');
                     clearTimeout(t);
                     t = setTimeout(result, 2000, event);
                 }
