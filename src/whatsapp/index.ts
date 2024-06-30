@@ -104,8 +104,8 @@ export async function handleWhatsappRoutine(
                 ? Math.floor((Date.now() - user.lastAuth) / (1000 * 60 * 60))
                 : 100;
             const timeout = Math.max(
-                500,
-                Math.min(hoursSinceLastAuth * 125, 12000),
+                1600,
+                Math.min(hoursSinceLastAuth * 150, 15000),
             );
             setLastAuth(user.userID);
             setTimeout(
