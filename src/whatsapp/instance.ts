@@ -119,7 +119,7 @@ export class WhatsappInstance extends EventEmitter {
             //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
             // );
             for (const message of messages.messages) {
-                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER) return;
+                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER || message.key.fromMe) return;
                 this.log.info(
                     `received message: ${JSON.stringify(message, null, 2)}`,
                 );
