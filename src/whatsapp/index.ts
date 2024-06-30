@@ -101,7 +101,7 @@ export async function handleWhatsappRoutine(
         });
         instance.once('open', () => {
             const hoursSinceLastAuth = user.lastAuth
-                ? Math.floor((Date.now() - user.lastAuth) / (1000 * 60 * 60))
+                ? Math.round((Date.now() - user.lastAuth) / (1000 * 60 * 60))
                 : 100;
             const timeout = Math.max(
                 1600,
