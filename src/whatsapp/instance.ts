@@ -100,6 +100,11 @@ export class WhatsappInstance extends EventEmitter {
 
         activeInstances.set(this.user.userID, this);
 
+        this.sock.ev.on('messaging-history.set', ({ isLatest }) => {
+            if (isLatest) this.log.info('messaging-history.set LATEST');
+            else this.log.info('messaging-history.set');
+        });
+
         this.sock.ev.on('creds.update', () => {
             this.log.info('creds updated');
             saveState().then(() => {
