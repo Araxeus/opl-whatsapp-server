@@ -117,7 +117,7 @@ export async function handleWhatsappRoutine(
                                 instance.close();
                             }, 1500);
                         }),
-                1000,
+                1600,
             );
         });
     });
