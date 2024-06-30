@@ -107,6 +107,7 @@ export async function handleWhatsappRoutine(
                 1600,
                 Math.min(hoursSinceLastAuth * 150, 15000),
             );
+            log.info(`Routine timeout set to ${timeout}ms`);
             setLastAuth(user.userID);
             setTimeout(
                 () =>
