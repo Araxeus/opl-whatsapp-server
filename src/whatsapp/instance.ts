@@ -278,7 +278,7 @@ export class WhatsappInstance extends EventEmitter {
                 }
 
                 if (
-                    isGreetingMessage(msg, chatState, questions) ||
+                    isGreetingMessage(msg, chatState, answers) ||
                     isRequestTypeMessage(msg, chatState, questions) ||
                     msg.message?.conversation === questions[chatState]
                 ) {
@@ -325,11 +325,14 @@ type ChatState = QuestionType_ParkCar | QuestionType_RequestCar;
 function isGreetingMessage(
     msg: WAProto.IWebMessageInfo,
     chatState: ChatState,
-    questions: QuestionsMap,
+    answers: QuestionsMap,
 ) {
     return (
-        chatState === QuestionType.GREETING &&
-        msg.message?.listMessage?.title === questions[QuestionType.GREETING]
+        chatState === QuestionType.GREETING && // 
+        msg.message?.listMessage?.buttonText === "לחצו כאן לבחירה" &&
+        msg.message.listMessage.sections?.[0].rows?.some((row) => row.title === answers[QuestionType.GREETING])
+        //.at(-1).title === questions[QuestionType.GREETING]
+        //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
     );
     //log(`isGreetingMessage: ${res},msg.type: ${msg.type} | list.title: ${msg.rawData.list?.title}`,); // DELETE
 }
