@@ -100,6 +100,13 @@ export async function handleWhatsappRoutine(
             resolve({ qrCode });
         });
         instance.once('open', () => {
+            const hoursSinceLastAuth = user.lastAuth
+                ? Math.floor((Date.now() - user.lastAuth) / (1000 * 60 * 60))
+                : 100;
+            const timeout = Math.max(
+                500,
+                Math.min(hoursSinceLastAuth * 125, 12000),
+            );
             setLastAuth(user.userID);
             setTimeout(
                 () =>
@@ -117,7 +124,7 @@ export async function handleWhatsappRoutine(
                                 instance.close();
                             }, 1500);
                         }),
-                1600,
+                timeout,
             );
         });
     });
