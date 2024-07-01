@@ -226,7 +226,9 @@ const server = http.createServer(async (req, res) => {
             const body = await getRequestBody(req, true);
             log.info(`POST request body:\n${body}`);
             const { result, usage } = await speech.inferCarData(body);
-            log.info(`Completion usage:\n${JSON.stringify(usage, null, 2)}`);
+            log.info(
+                `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
+            );
             return response(result, ContentType.JSON);
         } catch (error) {
             return response(

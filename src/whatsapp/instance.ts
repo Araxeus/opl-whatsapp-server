@@ -115,27 +115,17 @@ export class WhatsappInstance extends EventEmitter {
 
         this.sock.ev.on('messages.upsert', (messages) => {
             if (!messages) return; // || messages.type !== 'notify'
-            // this.log.info(
-            //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
-            // );
+
             const isNotify = messages.type === 'notify';
             //timestamp is in seconds not ms - so we divide by 1000 to get unix seconds timestamp
-            const maxTimestampAge = Math.round(Date.now()/1000) - 1000 * 20; // 20 seconds
+            const maxTimestampAge = Math.round(Date.now() / 1000) - 1000 * 20; // 20 seconds
             for (const message of messages.messages) {
                 if (
                     message.key.fromMe ||
                     message.key.remoteJid !== OPERATE_PHONE_NUMBER
-                    // || (isNotify &&
-                    //      Number(message.messageTimestamp) < maxTimestampAge)
+                    || (isNotify &&
+                         Number(message.messageTimestamp) < maxTimestampAge)
                 ) {
-                    return;
-                }
-                if (
-                    isNotify &&
-                    Number(message.messageTimestamp) < maxTimestampAge
-                ) {
-                    this.log.info('skipping old message');
-                    this.log.info(message);
                     return;
                 }
                 this.log.info(
