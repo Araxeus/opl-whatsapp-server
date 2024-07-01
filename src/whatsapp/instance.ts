@@ -114,14 +114,32 @@ export class WhatsappInstance extends EventEmitter {
         });
 
         this.sock.ev.on('messages.upsert', (messages) => {
-            if (!messages || messages.type !== 'notify') return;
+            if (!messages) return; // || messages.type !== 'notify'
             // this.log.info(
             //     `received messages:\n${JSON.stringify(messages.messages, null, 2)}`,
             // );
+            const isNotify = messages.type === 'notify';
+            //timestamp is in seconds not ms - so we divide by 1000 to get unix seconds timestamp
+            const maxTimestampAge = Math.round(Date.now()/1000) - 1000 * 20; // 20 seconds
             for (const message of messages.messages) {
-                if (message.key.remoteJid !== OPERATE_PHONE_NUMBER || message.key.fromMe) return;
+                if (
+                    message.key.fromMe ||
+                    message.key.remoteJid !== OPERATE_PHONE_NUMBER
+                    // || (isNotify &&
+                    //      Number(message.messageTimestamp) < maxTimestampAge)
+                ) {
+                    return;
+                }
+                if (
+                    isNotify &&
+                    Number(message.messageTimestamp) < maxTimestampAge
+                ) {
+                    this.log.info('skipping old message');
+                    this.log.info(message);
+                    return;
+                }
                 this.log.info(
-                    `received message: ${JSON.stringify(message, null, 2)}`,
+                    `received message${isNotify ? ' (isNotify)' : ''}: ${JSON.stringify(message, null, 2)}`,
                 );
                 this.emit('message', message);
             }
@@ -328,9 +346,11 @@ function isGreetingMessage(
     answers: QuestionsMap,
 ) {
     return (
-        chatState === QuestionType.GREETING && // 
-        msg.message?.listMessage?.buttonText === "לחצו כאן לבחירה" &&
-        msg.message.listMessage.sections?.[0].rows?.some((row) => row.title === answers[QuestionType.GREETING])
+        chatState === QuestionType.GREETING && //
+        msg.message?.listMessage?.buttonText === 'לחצו כאן לבחירה' &&
+        msg.message.listMessage.sections?.[0].rows?.some(
+            (row) => row.title === answers[QuestionType.GREETING],
+        )
         //.at(-1).title === questions[QuestionType.GREETING]
         //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
     );

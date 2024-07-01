@@ -100,33 +100,33 @@ export async function handleWhatsappRoutine(
             resolve({ qrCode });
         });
         instance.once('open', () => {
-            const hoursSinceLastAuth = user.lastAuth
-                ? Math.round((Date.now() - user.lastAuth) / (1000 * 60 * 60))
-                : 100;
-            const timeout = Math.max(
-                1600,
-                Math.min(hoursSinceLastAuth * 150, 15000),
-            );
-            log.info(`Routine timeout set to ${timeout}ms`);
+            // const hoursSinceLastAuth = user.lastAuth
+            //     ? Math.round((Date.now() - user.lastAuth) / (1000 * 60 * 60))
+            //     : 100;
+            // const timeout = Math.max(
+            //     1600,
+            //     Math.min(hoursSinceLastAuth * 150, 15000),
+            // );
+            // log.info(`Routine timeout set to ${timeout}ms`);
             setLastAuth(user.userID);
-            setTimeout(
-                () =>
-                    instance
-                        .routine(data)
-                        .then((res) => {
-                            resolve(res);
-                        })
-                        .catch((e) => {
-                            log.error(`Error: ${JSON.stringify(e, null, 2)}`);
-                            resolve({ success: false, error: e });
-                        })
-                        .finally(() => {
-                            setTimeout(() => {
-                                instance.close();
-                            }, 1500);
-                        }),
-                timeout,
-            );
+            // setTimeout(
+            //     () =>
+            instance
+                .routine(data)
+                .then((res) => {
+                    resolve(res);
+                })
+                .catch((e) => {
+                    log.error(`Error: ${JSON.stringify(e, null, 2)}`);
+                    resolve({ success: false, error: e });
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        instance.close();
+                    }, 1500);
+                });
+            //     ,timeout,
+            // );
         });
     });
 }
