@@ -23,13 +23,19 @@ import { nanoid } from 'nanoid';
 import speech from 'speech';
 import { sse } from 'sse';
 import { getRequestBody, pathOfRequest } from 'utils';
-import { handleWhatsappRoutine } from 'whatsapp';
+import { handleWhatsappRoutine, refreshAllInstances } from 'whatsapp';
 import { type CarParkingInfo, CarParkingInfoSchema } from 'whatsapp/park-car';
 import {
     type ReplaceClientCarInfo,
     ReplaceClientCarSchema,
 } from 'whatsapp/replace-client-car';
 import type { z } from 'zod';
+
+if (!process.env.REFRESH_KEY) {
+    throw new Error('REFRESH_KEY must be defined');
+}
+
+const REFRESH_KEY = process.env.REFRESH_KEY;
 
 if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI must be defined');
@@ -136,6 +142,17 @@ const server = http.createServer(async (req, res) => {
         }
         sse(req, res, user);
         return;
+    }
+
+    // API call to refresh user sessions
+    if (
+        path.is('/refresh-active-user-sessions') &&
+        query.get('refresh_key') === REFRESH_KEY
+    ) {
+        refreshAllInstances();
+        return response(
+            'Refreshing user sessions that have been active in the last 10 days',
+        );
     }
 
     const userID = await userIDFromReqHeader(req);

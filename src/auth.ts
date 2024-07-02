@@ -95,6 +95,12 @@ export async function getUser(userID: User['userID']) {
     return user;
 }
 
+export async function getUsersWithFreshLastAuth() {
+    return await Users.find({
+        lastAuth: { $gt: Date.now() - 1000 * 60 * 60 * 24 * 10 }, // 10 days
+    });
+}
+
 export async function setLastAuth(userID: User['userID']) {
     return await Users.updateOne({ userID }, { lastAuth: Date.now() });
 }

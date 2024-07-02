@@ -126,8 +126,10 @@ export class WhatsappInstance extends EventEmitter {
                 ) {
                     return;
                 }
-                if (isAppend &&
-                    Number(message.messageTimestamp) < maxTimestampAge) {
+                if (
+                    isAppend &&
+                    Number(message.messageTimestamp) < maxTimestampAge
+                ) {
                     this.log.info('skipping old message');
                     this.log.info(message);
                     return;

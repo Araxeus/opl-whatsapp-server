@@ -7,7 +7,7 @@ if (test) {
         outdir: './dist',
         target: 'node',
         //minify: true,
-        sourcemap: 'inline', //external',
+        sourcemap: 'linked', //external',
         external: ['@whiskeysockets/baileys', 'openai'],
     });
     console.log('test.js build complete');
