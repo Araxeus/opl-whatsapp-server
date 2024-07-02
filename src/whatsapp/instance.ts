@@ -21,12 +21,14 @@ import {
     type CarParkingInfo,
     type QuestionType as QuestionType_ParkCar,
     answersMap as answersMapParkCar,
+    customAnswerParkCar,
     questions as questionsParkCar,
 } from 'whatsapp/park-car';
 import {
     type QuestionType as QuestionType_RequestCar,
     type ReplaceClientCarInfo,
     answersMap as answersMapReplaceClientCar,
+    customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
 import {
@@ -247,18 +249,18 @@ export class WhatsappInstance extends EventEmitter {
     async routine(data: CarParkingInfo | ReplaceClientCarInfo) {
         if (!activeInstances.has(this.user.userID))
             throw new Error('Instance not active');
-        const { questions, answersMap } = isCarParkingInfo(data)
+        const { questions, answers, customAnswer } = isCarParkingInfo(data)
             ? {
                   questions: questionsParkCar,
-                  answersMap: answersMapParkCar,
+                  answers: answersMapParkCar(this.user, data),
+                  customAnswer: customAnswerParkCar(this.user, data),
               }
             : {
                   questions: questionsReplaceClientCar,
-                  answersMap: answersMapReplaceClientCar,
+                  answers: answersMapReplaceClientCar(this.user, data),
+                  customAnswer: customAnswerReplaceClientCar(this.user, data),
               };
 
-        // @ts-expect-error plz send help
-        const answers: QuestionsMap = answersMap(this.user, data);
         const questionsLength = Object.keys(questions).length;
 
         return new Promise<{ success: true }>((resolve, reject) => {
@@ -293,6 +295,9 @@ export class WhatsappInstance extends EventEmitter {
 
             msgTimeout.start();
 
+            const userPhoneNumber = this.user.phoneNumber;
+            let gotAlternativeMessage = false;
+
             function handleOperateMessage(msg: WAProto.IWebMessageInfo) {
                 if (msg.key.remoteJid !== OPERATE_PHONE_NUMBER)
                     throw new Error('FATAL ERROR not OPERATE_PHONE_NUMBER');
@@ -308,13 +313,36 @@ export class WhatsappInstance extends EventEmitter {
                 }
 
                 if (
+                    !gotAlternativeMessage &&
+                    isAlternativeMessage(msg, chatState)
+                ) {
+                    if (TEST_MODE) {
+                        reject({
+                            success: false,
+                            error: 'Got alternative message in TEST_MODE',
+                        });
+                        msgTimeout.clear();
+                        unsubscribeFromMessages();
+                        return;
+                    }
+                    gotAlternativeMessage = true;
+                    readMessage(msg.key);
+                    sendMessage(userPhoneNumber.replace('-', ''));
+                    return;
+                }
+
+                if (gotAlternativeMessage && isAgentGreeting(msg)) {
+                    readMessage(msg.key);
+                    sendMessage(customAnswer);
+                    chatState = questionsLength + 1;
+                } else if (
                     isGreetingMessage(msg, chatState, answers) ||
                     isRequestTypeMessage(msg, chatState, questions) ||
                     msg.message?.conversation === questions[chatState]
                 ) {
+                    readMessage(msg.key);
                     sendMessage(answers[chatState]);
                     chatState++;
-                    readMessage(msg.key);
                 } else {
                     log.error({
                         msg: 'Missmatch error in chatState',
@@ -367,6 +395,26 @@ function isGreetingMessage(
         //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
     );
     //log(`isGreetingMessage: ${res},msg.type: ${msg.type} | list.title: ${msg.rawData.list?.title}`,); // DELETE
+}
+
+function isAlternativeMessage(
+    msg: WAProto.IWebMessageInfo,
+    chatState: ChatState,
+) {
+    return (
+        chatState === QuestionType.REQUEST_TYPE &&
+        msg.message?.conversation ===
+            'מה מספר הטלפון שלך לצורכי זיהוי שרשומה במערכת'
+    );
+}
+
+function isAgentGreeting(msg: WAProto.IWebMessageInfo) {
+    const conv = msg.message?.conversation;
+    return (
+        typeof conv === 'string' &&
+        conv.startsWith('היי') &&
+        conv.endsWith('ואני אטפל בקריאתך.')
+    );
 }
 
 function isRequestTypeMessage(

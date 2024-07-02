@@ -54,3 +54,13 @@ export const answersMap: AnswerMapParkCar = (
     [QuestionType.DESTINATION]: destination,
     [QuestionType.TIME]: 'עכשיו',
 });
+
+export const customAnswerParkCar = (
+    user: User,
+    { carID, km, startingPoint, destination }: CarParkingInfo,
+) => `דיווח חנייה:
+${carID}
+מקור: ${startingPoint}
+יעד: ${destination}
+ק"מ: ${km}
+${user.name} ${user.companyID}`;

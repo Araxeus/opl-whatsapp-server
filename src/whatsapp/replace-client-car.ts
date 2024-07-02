@@ -41,7 +41,7 @@ export type AnswerMapReplaceClientCar = (
 
 export const answersMap: AnswerMapReplaceClientCar = (
     user,
-    { clientCarID, replacementCarID, replacementCarKM }: ReplaceClientCarInfo,
+    { clientCarID, replacementCarID, replacementCarKM },
 ) => ({
     [QuestionType.GREETING]: 'אני עובד אופרייט',
     [QuestionType.REQUEST_TYPE]: 'מסירת רכב חלופי',
@@ -53,3 +53,11 @@ export const answersMap: AnswerMapReplaceClientCar = (
     [QuestionType.replacementCarID]: replacementCarID,
     [QuestionType.replacementCarKM]: replacementCarKM?.toString() || 'אחרון',
 });
+
+export const customAnswerReplaceClientCar = (
+    user: User,
+    { clientCarID, replacementCarID }: ReplaceClientCarInfo,
+) => `אני צריך בבקשה לפתוח רכב חליפי:
+מקורי: ${clientCarID}
+חליפי: ${replacementCarID}
+${user.name} ${user.companyID}`;
