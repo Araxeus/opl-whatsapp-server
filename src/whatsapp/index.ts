@@ -101,20 +101,22 @@ export async function handleWhatsappRoutine(
         });
         instance.once('open', () => {
             setLastAuth(user.userID);
-            instance
-                .routine(data)
-                .then((res) => {
-                    resolve(res);
-                })
-                .catch((e) => {
-                    log.error(`Error: ${JSON.stringify(e, null, 2)}`);
-                    resolve({ success: false, error: e });
-                })
-                .finally(() => {
-                    setTimeout(() => {
-                        instance.close();
-                    }, 1500);
-                });
+            setTimeout(() => {
+                instance
+                    .routine(data)
+                    .then((res) => {
+                        resolve(res);
+                    })
+                    .catch((e) => {
+                        log.error(`Error: ${JSON.stringify(e, null, 2)}`);
+                        resolve({ success: false, error: e });
+                    })
+                    .finally(() => {
+                        setTimeout(() => {
+                            instance.close();
+                        }, 1500);
+                    });
+            }, 1000);
         });
     });
 }
