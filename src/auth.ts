@@ -17,12 +17,14 @@ export interface User {
     name: string;
     companyID: string;
     userID: string;
+    phoneNumber: string;
     lastAuth?: ReturnType<typeof Date.now>;
 }
 const mUser = new Schema<User>({
     userID: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     companyID: { type: String, required: true, unique: true },
+    phoneNumber: { type: String, required: true },
     lastAuth: { type: Number, required: false, expires: 60 * 60 * 24 * 7 * 3 },
 });
 const Users = model<User>('User', mUser);

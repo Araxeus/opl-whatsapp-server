@@ -9,6 +9,7 @@ import {
     isJidBroadcast,
     isJidGroup,
     isJidStatusBroadcast,
+    isJidUser,
     makeWASocket,
 } from '@whiskeysockets/baileys';
 import type { User } from 'auth';
@@ -50,13 +51,15 @@ export class WhatsappInstance extends EventEmitter {
     sock!: ReturnType<typeof makeWASocket>;
     version!: WAVersion;
     log: Logger;
+    loginOnly: boolean;
 
-    constructor(user: User) {
+    constructor(user: User, loginOnly = false) {
         if (activeInstances.has(user.userID))
             throw new Error('Instance already active, check instanceExists()');
 
         super();
         this.user = user;
+        this.loginOnly = loginOnly;
 
         this.log = logger.child({
             module: `whatsapp/instance of ${user.name}`,
@@ -76,6 +79,14 @@ export class WhatsappInstance extends EventEmitter {
             this.user.userID,
         );
 
+        const userPhoneNumber = `${
+            this.user.phoneNumber.startsWith('0')
+                ? `972${this.user.phoneNumber.slice(1)}`
+                : this.user.phoneNumber
+        }@s.whatsapp.net`.replace('-', ''); //.replace('+', '')
+
+        const loginOnly = this.loginOnly;
+
         this.sock = makeWASocket({
             version: this.version,
             printQRInTerminal: false,
@@ -86,6 +97,10 @@ export class WhatsappInstance extends EventEmitter {
             }),
             shouldIgnoreJid(jid) {
                 return (
+                    (!loginOnly &&
+                        isJidUser(jid) &&
+                        jid !== OPERATE_PHONE_NUMBER &&
+                        jid !== userPhoneNumber) ||
                     isJidBroadcast(jid) ||
                     isJidGroup(jid) ||
                     isJidStatusBroadcast(jid) ||

@@ -51,7 +51,7 @@ export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
     }
 
     log.info('Starting whatsapp instance...');
-    const instance = new WhatsappInstance(user);
+    const instance = new WhatsappInstance(user, true);
 
     instance.on('error', (e) => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
