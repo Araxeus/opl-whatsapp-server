@@ -327,7 +327,7 @@ export class WhatsappInstance extends EventEmitter {
                     }
                     gotAlternativeMessage = true;
                     readMessage(msg.key);
-                    sendMessage(userPhoneNumber.replace('-', ''));
+                    sendMessage(userPhoneNumber.replaceAll('-', ''));
                     return;
                 }
 
