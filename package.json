@@ -20,9 +20,9 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.5",
     "cookie": "^0.6.0",
-    "mongoose": "^8.4.4",
+    "mongoose": "^8.5.0",
     "nanoid": "^5.0.7",
-    "openai": "^4.52.2",
+    "openai": "^4.52.5",
     "pino": "^9.2.0",
     "pino-pretty": "^11.2.1",
     "qrcode": "^1.5.3",
@@ -32,7 +32,7 @@
     "@biomejs/biome": "1.8.3",
     "@types/bun": "^1.1.6",
     "@types/cookie": "^0.6.0",
-    "@types/node": "^20.14.9",
+    "@types/node": "^20.14.10",
     "@types/qrcode": "^1.5.5",
     "typescript": "^5.5.3"
   },
