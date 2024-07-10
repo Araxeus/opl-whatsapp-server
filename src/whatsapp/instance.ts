@@ -135,7 +135,7 @@ export class WhatsappInstance extends EventEmitter {
 
             const isAppend = messages.type === 'append';
             //timestamp is in seconds not ms - so we divide by 1000 to get unix seconds timestamp
-            const maxTimestampAge = Math.round(Date.now() / 1000) - 1000 * 20; // 20 seconds
+            const maxTimestampAge = Math.round(Date.now() / 1000) - 30; // 30 seconds
             for (const message of messages.messages) {
                 if (
                     message.key.fromMe ||
