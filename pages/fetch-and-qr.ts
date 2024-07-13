@@ -147,14 +147,18 @@ function handleQrResponse() {
     if ('QRCode' in window) {
         showQrCode();
     } else {
-        const script = document.createElement('script');
-        script.src = '/vendor/qrcode.js';
-        script.onload = () => {
+        import('./vendor/qrcode.js').then(() => {
             console.log('qrcode.js loaded'); // DELETE
             showQrCode();
-        };
-        document.head.appendChild(script);
-        console.log('qrcode.js injected to doc.head'); // DELETE
+        });
+        // const script = document.createElement('script');
+        // script.src = '/vendor/qrcode.js';
+        // script.onload = () => {
+        //     console.log('qrcode.js loaded'); // DELETE
+        //     showQrCode();
+        // };
+        // document.head.appendChild(script);
+        // console.log('qrcode.js injected to doc.head'); // DELETE
     }
 
     return;

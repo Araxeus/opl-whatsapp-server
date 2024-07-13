@@ -31,6 +31,7 @@ if (test) {
         target: 'browser',
         minify: true,
         sourcemap: 'external', // external
+        external: ['./vendor/qrcode.js'],
     });
     console.log('fetch-and-qr.js build complete');
     console.log(frontRes);
