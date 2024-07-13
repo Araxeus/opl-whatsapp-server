@@ -17,6 +17,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - uses: actions/checkout@v4
       - uses: mongolyy/reviewdog-action-biome@v1
         with:
@@ -25,6 +26,7 @@ jobs:
   tsc:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - uses: actions/checkout@v4
       - run: bun install
       - uses: EPMatt/reviewdog-action-tsc@v1
@@ -34,6 +36,7 @@ jobs:
   misspell:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - name: Check out code.
         uses: actions/checkout@v4
       - name: misspell
@@ -42,12 +45,14 @@ jobs:
   typos:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - uses: actions/checkout@v4
       - uses: reviewdog/action-typos@v1
 
   stylelint:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - uses: actions/checkout@v4
       - run: bun add stylelint stylelint-config-recommended -D
       - name: stylelint
@@ -58,10 +63,31 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
       - uses: actions/checkout@v4
       - uses: reviewdog/action-actionlint@v1
         with:
           reporter: github-pr-review
+
+  bearer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cycodelabs/cimon-action@v0
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-setup@v1
+      - name: Run Report
+        id: report
+        uses: bearer/bearer-action@v2
+        with:
+          format: rdjson
+          output: rd.json
+          diff: true
+      - name: Run reviewdog
+        if: always()
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat rd.json | reviewdog -f=rdjson -reporter=github-pr-review
 
 # check:
 #   runs-on: ubuntu-latest
