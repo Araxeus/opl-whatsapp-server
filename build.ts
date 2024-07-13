@@ -34,6 +34,17 @@ if (test) {
     });
     console.log('fetch-and-qr.js build complete');
     console.log(frontRes);
+
+    console.log('building vad.js');
+    const vadRes = await Bun.build({
+        entrypoints: ['./pages/vad.ts'],
+        outdir: './dist',
+        target: 'browser',
+        minify: true,
+        sourcemap: 'external', // external
+    });
+    console.log('vad.js build complete');
+    console.log(vadRes);
 }
 
 //console.log(`Build result:\n${JSON.stringify(result, null, 2)}`);

@@ -11,11 +11,11 @@ import {
 } from 'auth';
 import {
     ContentType,
-    assets,
     getAssetType,
     getFile,
     getIndexHtml,
     getRandom404,
+    serveFolder,
 } from 'cache';
 import logger from 'logger';
 import mongoose from 'mongoose';
@@ -142,9 +142,17 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/keepalive')) return response('ty');
 
-    if (path.oneOf(assets)) {
+    if (await serveFolder('assets', path)) {
         return streamResponse(`./assets${path.string}`);
     }
+
+    if (await serveFolder('vendor/vad', path)) {
+        return streamResponse(`./vendor/vad${path.string}`);
+    } // TODO move this to after auth
+
+    if (path.is('/vad.js')) {
+        return cachedFileResponse('./dist/vad.js', ContentType.JS);
+    } // TODO move this to after auth
 
     if (path.is('/vendor/qrcode.js'))
         return cachedFileResponse('./vendor/qrcode-updated.js', ContentType.JS);
@@ -152,7 +160,7 @@ const server = http.createServer(async (req, res) => {
     if (path.is('/form.css'))
         return cachedFileResponse('./pages/form.css', ContentType.CSS);
 
-    if (path.is('/fetch-and-qr.ts')) {
+    if (path.is('/fetch-and-qr.js')) {
         return cachedFileResponse('./dist/fetch-and-qr.js', ContentType.JS);
     }
 
@@ -290,6 +298,22 @@ const server = http.createServer(async (req, res) => {
             const body = await getRequestBody(req, true);
             log.info(`POST request body:\n${body}`);
             const { result, usage } = await speech.inferCarData(body);
+            log.info(
+                `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
+            );
+            return response(result, ContentType.JSON);
+        } catch (error) {
+            return response(
+                error?.toString?.() || 'Unknown Error while parsing POST',
+                ContentType.TEXT,
+                400,
+            );
+        }
+    }
+
+    if (req.method === 'POST' && path.is('/speech-v2')) {
+        try {
+            const { result, usage } = await speech.v2(req);
             log.info(
                 `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
             );

@@ -7,17 +7,19 @@
   "type": "module",
   "scripts": {
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
-    "_build": "rm -rf dist && bun ./build.ts",
+    "_build": "rm -rf dist && bun ./build.ts && bun copy_vad",
     "check": "bun run biome check && tsc --noEmit && bun check_up",
     "lint": "bun run biome check --write",
     "fix": "bun lint",
     "updates": "bun update --latest",
     "check_up": "bunx npm-check-updates -p bun --format group",
-    "try": "bun _build test && node --env-file=.env ./dist/test.js"
+    "try": "bun _build test && node --env-file=.env ./dist/test.js",
+    "copy_vad": "mkdir -p vendor/vad && cp node_modules/@ricky0123/vad-web/dist/silero_vad.onnx node_modules/@ricky0123/vad-web/dist/vad.worklet.bundle.min.js node_modules/onnxruntime-web/dist/*.wasm vendor/vad"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@ricky0123/vad-web": "^0.0.18",
     "@whiskeysockets/baileys": "^6.7.5",
     "cookie": "^0.6.0",
     "mongoose": "^8.5.1",

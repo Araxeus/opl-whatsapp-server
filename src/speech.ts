@@ -1,4 +1,6 @@
-import OpenAI from 'openai';
+import type { IncomingMessage } from 'node:http';
+import OpenAI, { toFile } from 'openai';
+import { parseAudioWavRequest } from 'utils';
 
 // Define an interface for the expected JSON output
 interface CarData {
@@ -94,6 +96,20 @@ async function inferCarData(text: string, parse = false) {
     }
 }
 
+async function v2(req: IncomingMessage) {
+    const transcription = await openai.audio.transcriptions.create({
+        file: await toFile(parseAudioWavRequest(req)),
+        model: 'whisper-1',
+        language: 'he',
+        response_format: 'text',
+    });
+
+    console.log('Transcription:\n', transcription.text); // DELETE or use logger
+
+    return await inferCarData(transcription.text);
+}
+
 export default {
     inferCarData,
+    v2,
 };
