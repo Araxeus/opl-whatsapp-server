@@ -1,6 +1,7 @@
 import type { IncomingMessage } from 'node:http';
 import OpenAI, { toFile } from 'openai';
-import { parseAudioWavRequest } from 'utils';
+import type { FileLike } from 'openai/uploads.mjs';
+import { audioWavPostToBuffer } from 'utils';
 
 // Define an interface for the expected JSON output
 interface CarData {
@@ -97,8 +98,15 @@ async function inferCarData(text: string, parse = false) {
 }
 
 async function v2(req: IncomingMessage) {
+    let file: FileLike;
+    try {
+        file = await toFile(audioWavPostToBuffer(req));
+    } catch (error) {
+        console.error('Error converting audio to file:', error?.toString());
+        throw error;
+    }
     const transcription = await openai.audio.transcriptions.create({
-        file: await toFile(parseAudioWavRequest(req)),
+        file,
         model: 'whisper-1',
         language: 'he',
         response_format: 'text',
