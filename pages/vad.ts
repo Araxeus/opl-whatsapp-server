@@ -12,6 +12,9 @@ export const listen = async () => {
             // submitUserSpeechOnPause: true,
             workletURL: '/vad.worklet.bundle.min.js',
             modelURL: '/silero_vad.onnx',
+            ortConfig: (ort) => {
+                ort.env.wasm.wasmPaths = '/';
+            },
             onSpeechStart: () => {
                 console.log('Speech start');
             },
