@@ -12,6 +12,7 @@ export enum ContentType {
     PNG = 'image/png',
     JPG = 'image/jpeg',
     ICO = 'image/x-icon',
+    WASM = 'application/wasm',
 }
 
 const files = new Map<string, { content: string; type: ContentType }>();
@@ -68,6 +69,8 @@ export async function getAssetType(path: string) {
             return ContentType.CSS;
         case '.js':
             return ContentType.JS;
+        case '.wasm':
+            return ContentType.WASM;
         default:
             return ContentType.TEXT;
     }
