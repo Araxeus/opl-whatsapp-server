@@ -49,8 +49,8 @@ logger.info(
     `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
 );
 
-const HOST = process.env.HOST || '127.0.0.1'; // || 0.0.0.0 || 'localhost';
-const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';
+const PORT = Number(process.env.PORT) ?? 3000;
 
 const server = http.createServer(async (req, res) => {
     let log = logger.child({ reqID: nanoid(5) });

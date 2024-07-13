@@ -71,7 +71,7 @@ async function inferCarData(text: string, parse = false) {
             model: 'gpt-4o', //'gpt-3.5-turbo',
             response_format: { type: 'json_object' },
         });
-        const output = completion.choices[0].message.content?.trim() || '';
+        const output = completion.choices[0].message.content?.trim() ?? '';
 
         // Try to parse the response as JSON
         // const jsonResponse: CarData = output ? JSON.parse(output) : {};
