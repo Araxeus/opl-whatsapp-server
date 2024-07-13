@@ -48,6 +48,15 @@ Output only valid parsable JSON in the specified format. The JSON must start wit
 After creating the output, check it to ensure it adheres to the JSON rules above, especially the car number format.
 
 If the input is invalid or incomplete, return an empty JSON object: {}.
+
+Complete example:
+input: "רכב מספר 720 458 0 3 מאילן קרגלס ירושלים לדרך בית לחם 142 קילומטר 703-27"
+output: {
+  "carID": "720-45-803",
+  "km": 70327,
+  "startingPoint": "אילן קארגלס, ירושלים",
+  "destination": "דרך בית לחם 142"
+}
 `;
 
 function inferCarDataFromText(
