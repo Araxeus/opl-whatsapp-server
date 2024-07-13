@@ -57,6 +57,8 @@ const defaultHeaders: http.OutgoingHttpHeaders = {
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cache-Control': 'private',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Embedder-Policy': 'require-corp',
     'Content-Security-Policy': CSPfromObj({
         'default-src': ['self'],
         'script-src': ['self', 'unsafe-inline', 'unsafe-eval'],
