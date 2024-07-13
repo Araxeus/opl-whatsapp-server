@@ -1,10 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 import OpenAI, { toFile } from 'openai';
-import type { FileLike } from 'openai/uploads.mjs';
-import {
-    //audioWavPostToBuffer,
-    parseAudioWavRequest,
-} from 'utils';
+import { isValidAudioWavRequest } from 'utils';
 
 // Define an interface for the expected JSON output
 interface CarData {
@@ -40,7 +36,12 @@ Simplify the name of places and remove prefixes - for example:
 "מאילן קארגלאס" should become "אילן קארגלאס"
 "הביתה" should become "בית"
 
-Infer the correct way to write the car number, for example 327-50-42-3 becomes 327-50-423, 1234-56-7 becomes 123-45-67, etc..
+Infer the correct way to write the car number, for example:
+327-50-42-3 becomes 327-50-423,
+1234-56-7 becomes 123-45-67,
+123.56.432 becomes 123-56-432,
+1 2 34 5 67 becomes 123-45-67,
+etc..
 
 Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
 
@@ -49,21 +50,21 @@ After creating the output, check it to ensure it adheres to the JSON rules above
 If the input is invalid or incomplete, return an empty JSON object: {}.
 `;
 
-function inferCarData(
+function inferCarDataFromText(
     text: string,
     parse: true,
 ): Promise<{
     result: CarData;
     usage: OpenAI.Completions.CompletionUsage;
 }>;
-function inferCarData(
+function inferCarDataFromText(
     text: string,
     parse?: false,
 ): Promise<{
     result: string;
     usage: OpenAI.Completions.CompletionUsage;
 }>;
-async function inferCarData(text: string, parse = false) {
+async function inferCarDataFromText(text: string, parse = false) {
     try {
         const completion = await openai.chat.completions.create({
             messages: [
@@ -79,7 +80,12 @@ async function inferCarData(text: string, parse = false) {
             model: 'gpt-4o', //'gpt-3.5-turbo',
             response_format: { type: 'json_object' },
         });
+
+        console.log('Completion:\n', JSON.stringify(completion, null, 2)); // DELETE or use logger
+
         const output = completion.choices[0].message.content?.trim() ?? '';
+
+        console.log(`Output:\n${output}`); // DELETE or use logger
 
         // Try to parse the response as JSON
         // const jsonResponse: CarData = output ? JSON.parse(output) : {};
@@ -102,36 +108,19 @@ async function inferCarData(text: string, parse = false) {
     }
 }
 
-async function v2(req: IncomingMessage) {
-    let file: FileLike;
-    try {
-        file = await toFile(parseAudioWavRequest(req), 'audio.wav', {
-            type: 'audio/wav',
-        });
-        // const file = new File([await audioWavPostToBuffer(req)], 'audio.wav', {
-        //     type: 'audio/wav',
-        // });
-    } catch (error) {
-        console.error('Error converting audio to file:', error?.toString());
-        throw error;
+export async function speechToCarData(req: IncomingMessage) {
+    if (!isValidAudioWavRequest(req)) {
+        throw new Error('Invalid request: Content-Type is not audio/wav');
     }
-    console.log(
-        // DELETE or use logger
-        `file created. name: ${file.name}, type: ${file.type}, size: ${file.size}`,
-    );
     const transcription = await openai.audio.transcriptions.create({
-        file,
+        file: await toFile(req, 'audio.wav', {
+            type: 'audio/wav',
+        }),
         model: 'whisper-1',
         language: 'he',
-        //response_format: 'text',
     });
 
     console.log('Transcription:\n', JSON.stringify(transcription, null, 2)); // DELETE or use logger
 
-    return await inferCarData(transcription.text);
+    return await inferCarDataFromText(transcription.text);
 }
-
-export default {
-    inferCarData,
-    v2,
-};

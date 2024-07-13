@@ -1,5 +1,4 @@
 import type { IncomingMessage } from 'node:http';
-import type { Readable } from 'node:stream';
 
 export const elapsedTimeSince = (since: number) => {
     const diff = Date.now() - since;
@@ -65,43 +64,8 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
-/**
- * Checks if the incoming request is of type audio/wav.
- * @param req IncomingMessage - The incoming HTTP request.
- * @returns boolean - True if the content type is audio/wav, false otherwise.
- */
-const isValidAudioWavRequest = (req: IncomingMessage): boolean =>
+export const isValidAudioWavRequest = (req: IncomingMessage): boolean =>
     req.headers['content-type'] === 'audio/wav';
-
-/**
- * Parses an IncomingMessage with content type audio/wav into a Readable stream.
- * @param req IncomingMessage - The incoming HTTP request.
- * @returns Readable - A readable stream of the audio data.
- * @throws Error if the request does not have the correct content type.
- */
-export const parseAudioWavRequest = (req: IncomingMessage): Readable => {
-    if (!isValidAudioWavRequest(req)) {
-        throw new Error('Invalid request: Content-Type is not audio/wav');
-    }
-
-    // The IncomingMessage itself is a readable stream, so we can return it directly
-    // if it's a valid audio/wav request.
-    return req;
-};
-
-export const audioWavPostToBuffer = async (
-    // DELETE
-    req: IncomingMessage,
-): Promise<Buffer> => {
-    if (!isValidAudioWavRequest(req)) {
-        throw new Error('Invalid request: Content-Type is not audio/wav');
-    }
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of req) {
-        chunks.push(chunk);
-    }
-    return Buffer.concat(chunks);
-};
 
 export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)

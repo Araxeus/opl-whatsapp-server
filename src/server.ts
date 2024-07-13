@@ -20,7 +20,7 @@ import {
 import logger from 'logger';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
-import speech from 'speech';
+import { speechToCarData } from 'speech';
 import { sse } from 'sse';
 import { CSPfromObj, getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine, refreshAllInstances } from 'whatsapp';
@@ -298,25 +298,7 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && path.is('/speech')) {
         try {
-            const body = await getRequestBody(req, true);
-            log.info(`POST request body:\n${body}`);
-            const { result, usage } = await speech.inferCarData(body);
-            log.info(
-                `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
-            );
-            return response(result, ContentType.JSON);
-        } catch (error) {
-            return response(
-                error?.toString?.() || 'Unknown Error while parsing POST',
-                ContentType.TEXT,
-                400,
-            );
-        }
-    }
-
-    if (req.method === 'POST' && path.is('/speech-v2')) {
-        try {
-            const { result, usage } = await speech.v2(req);
+            const { result, usage } = await speechToCarData(req);
             log.info(
                 `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
             );

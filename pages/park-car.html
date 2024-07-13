@@ -227,24 +227,23 @@
 
             // avoid clicks while listenings
             audioButton.disabled = true;
-            listen().then(data => {
-                console.log(data); // DELETE
-                output(data);
-            }).catch(console.error).finally(() => {
+
+            const speechEndCallback = () => {
                 audioButton.disabled = false;
                 wave.style.display = 'none';
                 mic.style.display = 'flex';
-            });
-        });
+            };
 
-        function output(input) {
-            for (const key of Object.keys(data)) {
-                const element = $(key);
-                if (element) {
-                    element.value = data[key];
+            listen(speechEndCallback).then(data => {
+                console.log(data); // DELETE
+                for (const key of Object.keys(data)) {
+                    const element = $(key);
+                    if (element) {
+                        element.value = data[key];
+                    }
                 }
-            }
-        };
+            }).catch(console.error).finally(speechEndCallback);
+        });
     </script>
 
 </body>
