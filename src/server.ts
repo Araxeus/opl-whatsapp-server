@@ -22,7 +22,7 @@ import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import speech from 'speech';
 import { sse } from 'sse';
-import { getRequestBody, pathOfRequest } from 'utils';
+import { CSPfromObj, getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine, refreshAllInstances } from 'whatsapp';
 import { type CarParkingInfo, CarParkingInfoSchema } from 'whatsapp/park-car';
 import {
@@ -52,6 +52,27 @@ logger.info(
 const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';
 const PORT = Number(process.env.PORT) ?? 3000;
 
+const defaultHeaders: http.OutgoingHttpHeaders = {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Content-Security-Policy': CSPfromObj({
+        'default-src': ['self'],
+        'script-src': ['self', 'unsafe-inline'],
+        'style-src': [
+            'self',
+            'https://fonts.googleapis.com',
+            'https://fonts.gstatic.com',
+            'unsafe-inline',
+        ],
+        'font-src': [
+            'self',
+            'https://fonts.googleapis.com',
+            'https://fonts.gstatic.com',
+        ],
+    }),
+};
+
 const server = http.createServer(async (req, res) => {
     let log = logger.child({ reqID: nanoid(5) });
     function response(
@@ -60,7 +81,11 @@ const server = http.createServer(async (req, res) => {
         status = 200,
         headers: http.OutgoingHttpHeaders = {},
     ) {
-        res.writeHead(status, { 'Content-Type': type, ...headers });
+        res.writeHead(status, {
+            'Content-Type': type,
+            ...defaultHeaders,
+            ...headers,
+        });
         res.end(message);
         if (status === 200 && type === ContentType.TEXT) return;
         log.info(

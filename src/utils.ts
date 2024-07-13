@@ -63,5 +63,13 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
+export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
+    Object.entries(obj)
+        .map(
+            ([k, v]) =>
+                `${k} ${v.map((vv) => (vv.startsWith('http') ? vv : `'${vv}'`)).join(' ')}`,
+        )
+        .join('; ');
+
 // We are in test mode unless explicitly turned off
 export const TEST_MODE = process.env.TEST_MODE !== 'off';
