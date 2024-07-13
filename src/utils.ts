@@ -89,7 +89,8 @@ export const parseAudioWavRequest = (req: IncomingMessage): Readable => {
     return req;
 };
 
-export const audioWavPostToBuffer = async ( // DELETE
+export const audioWavPostToBuffer = async (
+    // DELETE
     req: IncomingMessage,
 ): Promise<Buffer> => {
     if (!isValidAudioWavRequest(req)) {

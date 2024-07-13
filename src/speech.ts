@@ -40,6 +40,8 @@ Simplify the name of places and remove prefixes - for example:
 "מאילן קארגלאס" should become "אילן קארגלאס"
 "הביתה" should become "בית"
 
+Infer the correct way to write the car number, for example 327-50-42-3 becomes 327-50-423, 1234-56-7 becomes 123-45-67, etc..
+
 Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
 
 After creating the output, check it to ensure it adheres to the JSON rules above, especially the car number format.

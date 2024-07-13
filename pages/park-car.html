@@ -229,7 +229,7 @@
             audioButton.disabled = true;
             listen().then(data => {
                 console.log(data); // DELETE
-                output(transcript);
+                output(data);
             }).catch(console.error).finally(() => {
                 audioButton.disabled = false;
                 wave.style.display = 'none';

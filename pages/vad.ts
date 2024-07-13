@@ -52,12 +52,13 @@ console.log('VAD loaded');
 // }
 
 export const listen = async () => {
-    return new Promise((resolve, reject) => {
-        MicVAD.new({
+    // biome-ignore lint/suspicious/noAsyncPromiseExecutor: Promise executor is needed
+    return new Promise(async (resolve, reject) => {
+        const vad = await MicVAD.new({
             // submitUserSpeechOnPause: true,
             workletURL: '/vad.worklet.bundle.min.js',
             modelURL: '/silero_vad.onnx',
-            redemptionFrames: 10, // default is 8
+            redemptionFrames: 16, // default is 8
             ortConfig: (ort) => {
                 ort.env.wasm.wasmPaths = '/';
             },
@@ -69,6 +70,7 @@ export const listen = async () => {
                 const wavBuffer = encodeWAV(arr);
                 const blob = new Blob([wavBuffer], { type: 'audio/wav' });
                 console.log(blob);
+                vad?.destroy();
                 fetch('/speech-v2', {
                     method: 'POST',
                     headers: {
@@ -93,6 +95,7 @@ export const listen = async () => {
         })
             .then((vad) => {
                 vad.start();
+                return vad;
             })
             .catch(reject);
     });
