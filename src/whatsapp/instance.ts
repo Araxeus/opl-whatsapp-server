@@ -54,6 +54,7 @@ export class WhatsappInstance extends EventEmitter {
     version!: WAVersion;
     log: Logger;
     loginOnly: boolean;
+    isConnected = false;
 
     constructor(user: User, loginOnly = false) {
         if (activeInstances.has(user.userID))
@@ -181,7 +182,7 @@ export class WhatsappInstance extends EventEmitter {
                         sseConnection.emit('qr', qr);
                         if (!sseConnection.hasOnAbort()) {
                             sseConnection.setOnAbort(() => {
-                                this.close();
+                                if(!this.isConnected) this.close();
                             });
                         }
                     } else if (sentFirstQR) {
@@ -219,6 +220,7 @@ export class WhatsappInstance extends EventEmitter {
                         //this.sock.ev.flush();
                     }
                 } else if (connection === 'open') {
+                    this.isConnected = true;
                     Connection.get(this.user.userID)?.emit('authenticated');
                 }
             },
