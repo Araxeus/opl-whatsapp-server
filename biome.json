@@ -1,14 +1,14 @@
 {
-  "$schema": "file:///C:/Users/Araxeus/.bun/install/global/node_modules/@biomejs/biome/configuration_schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "organizeImports": {
     "enabled": true
   },
   "files": {
     "ignore": [
+      "./node_modules/**",
       "./vendor/**",
       "./package.json",
-      "./dist/**",
-      "./baileys_auth_info/**"
+      "./dist/**"
     ]
   },
   "javascript": {

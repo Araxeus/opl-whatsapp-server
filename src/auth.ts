@@ -147,7 +147,7 @@ export async function handleLogin(
         return [{ success: false, error: 'Invalid userID' }];
     }
     const user = await getUser(data.userID);
-    log.info(`user ${user.name} is trying to login`); // DELETE
+    log.info(`user ${user.name} is attempting to login`);
     // check that lastAuth exist and is not older than 3 weeks
     if (
         skipQr ||
@@ -156,20 +156,19 @@ export async function handleLogin(
     ) {
         log.info(
             `skipQr: ${skipQr}, lastAuth exist and is < 3 weeks: ${user.lastAuth && Date.now() - user.lastAuth < 1000 * 60 * 60 * 24 * 7 * 3}`,
-        ); // DELETE
+        );
         return [{ success: true }, encryptedCookieHeader(data.userID)];
     }
-    log.info(`user ${user.name} is re-authenticating`); // DELETE
+    log.info(`user ${user.name} is re-authenticating`);
     // else re-authenticate
     const res = await whatsappLogin(user);
     // success means user was already logged in
     if ('success' in res && res.success) {
-        log.info(`user ${user.name} was found to be already authenticated`); // DELETE
+        log.info(`user ${user.name} was found to be already authenticated`);
         return [res, encryptedCookieHeader(data.userID)];
     }
     log.info(
         `res from (${user.name}) login req: ${JSON.stringify(res, null, 2)}`,
-    ); // DELETE
-    // { success: false, error } | { qrCode, tempToken }
+    );
     return [res];
 }

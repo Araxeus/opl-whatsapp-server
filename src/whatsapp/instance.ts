@@ -275,7 +275,7 @@ export class WhatsappInstance extends EventEmitter {
             const sendMessage = this.sendMessage.bind(this);
             const log = this.log;
 
-            log.info('Sending initial message'); // DELETE
+            log.info('Sending initial message');
 
             sendMessage('.');
 
@@ -430,12 +430,11 @@ function isRequestTypeMessage(
 }
 
 function isGreetingImage(msg: WAProto.IWebMessageInfo, chatState: ChatState) {
-    //log(`isGreetingImage: ${res} | chatstate: ${chatState} type: ${msg.type}`); // DELETE
     return isGreetingOrRequestType(chatState) && !!msg.message?.imageMessage;
 }
 
 function isNotificationTemplate(
-    // TODO implement
+    // TODO implement better when more info is available
     msg: WAProto.IWebMessageInfo,
     chatState: ChatState,
 ) {
@@ -443,12 +442,11 @@ function isNotificationTemplate(
         isGreetingOrRequestType(chatState) &&
         //msg.type === 'notification_template' &&
         msg.messageStubType === WAMessageStubType.BIZ_PRIVACY_MODE_TO_FB;
-    //log(`isNotificationTemplate: ${res}`); // DELETE
     return res;
 }
 
 function isE2ENotification(
-    // TODO implement
+    // TODO implement when more info is available
     _msg: WAProto.IWebMessageInfo,
     _chatState: ChatState,
 ) {

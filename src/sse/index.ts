@@ -50,7 +50,7 @@ export function sse(
     });
 
     req.on('close', () => {
-        log.info(`SSE connection closed by user ${user.name}`); // DELETE
+        log.info(`SSE connection closed by user ${user.name}`);
         connection.close();
     });
 }
