@@ -182,7 +182,7 @@ export class WhatsappInstance extends EventEmitter {
                         sseConnection.emit('qr', qr);
                         if (!sseConnection.hasOnAbort()) {
                             sseConnection.setOnAbort(() => {
-                                if(!this.isConnected) this.close();
+                                if (!this.isConnected) this.close();
                             });
                         }
                     } else if (sentFirstQR) {
