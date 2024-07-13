@@ -59,7 +59,7 @@ const defaultHeaders: http.OutgoingHttpHeaders = {
     'Cache-Control': 'private',
     'Content-Security-Policy': CSPfromObj({
         'default-src': ['self'],
-        'script-src': ['self', 'unsafe-inline'],
+        'script-src': ['self', 'unsafe-inline', 'unsafe-eval'],
         'style-src': [
             'self',
             'https://fonts.googleapis.com',
