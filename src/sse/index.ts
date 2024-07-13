@@ -7,7 +7,9 @@ import { Connection } from './connections-manager';
 
 export type SSE_Controller = {
     close: () => void;
-    write: (messageOrEvent: string, message?: string) => void;
+    write:
+        | ((message: string) => void)
+        | ((event: string, message?: string) => void);
 };
 
 export function sse(
@@ -31,11 +33,10 @@ export function sse(
 
     const closeSSE = () => res.end();
     const writeSSE = (messageOrEvent: string, message?: string) => {
-        const msg = message || messageOrEvent;
         if (message) {
             res.write(`event: ${messageOrEvent}\n`);
         }
-        res.write(`data: ${JSON.stringify(msg)}\n\n`);
+        res.write(`data: ${JSON.stringify(message || messageOrEvent)}\n\n`);
     };
 
     //res.write('\n');
