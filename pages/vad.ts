@@ -57,6 +57,7 @@ export const listen = async () => {
             // submitUserSpeechOnPause: true,
             workletURL: '/vad.worklet.bundle.min.js',
             modelURL: '/silero_vad.onnx',
+            redemptionFrames: 10, // default is 8
             ortConfig: (ort) => {
                 ort.env.wasm.wasmPaths = '/';
             },

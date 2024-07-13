@@ -1,7 +1,10 @@
 import type { IncomingMessage } from 'node:http';
 import OpenAI, { toFile } from 'openai';
 import type { FileLike } from 'openai/uploads.mjs';
-import { audioWavPostToBuffer } from 'utils';
+import {
+    //audioWavPostToBuffer,
+    parseAudioWavRequest,
+} from 'utils';
 
 // Define an interface for the expected JSON output
 interface CarData {
@@ -100,19 +103,28 @@ async function inferCarData(text: string, parse = false) {
 async function v2(req: IncomingMessage) {
     let file: FileLike;
     try {
-        file = await toFile(audioWavPostToBuffer(req));
+        file = await toFile(parseAudioWavRequest(req), 'audio.wav', {
+            type: 'audio/wav',
+        });
+        // const file = new File([await audioWavPostToBuffer(req)], 'audio.wav', {
+        //     type: 'audio/wav',
+        // });
     } catch (error) {
         console.error('Error converting audio to file:', error?.toString());
         throw error;
     }
+    console.log(
+        // DELETE or use logger
+        `file created. name: ${file.name}, type: ${file.type}, size: ${file.size}`,
+    );
     const transcription = await openai.audio.transcriptions.create({
         file,
         model: 'whisper-1',
         language: 'he',
-        response_format: 'text',
+        //response_format: 'text',
     });
 
-    console.log('Transcription:\n', transcription.text); // DELETE or use logger
+    console.log('Transcription:\n', JSON.stringify(transcription, null, 2)); // DELETE or use logger
 
     return await inferCarData(transcription.text);
 }
