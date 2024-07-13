@@ -228,10 +228,11 @@
             // avoid clicks while listenings
             audioButton.disabled = true;
 
-            const speechEndCallback = () => {
+            const speechEndCallback = (gotResponse = false) => {
                 audioButton.disabled = false;
                 wave.style.display = 'none';
                 mic.style.display = 'flex';
+                audioButton.classList[gotResponse ? 'remove' : 'add']('button-loading');
             };
 
             listen(speechEndCallback).then(data => {
@@ -242,7 +243,7 @@
                         element.value = data[key];
                     }
                 }
-            }).catch(console.error).finally(speechEndCallback);
+            }).catch(console.error).finally(() => speechEndCallback(true));
         });
     </script>
 

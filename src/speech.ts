@@ -81,11 +81,7 @@ async function inferCarDataFromText(text: string, parse = false) {
             response_format: { type: 'json_object' },
         });
 
-        console.log('Completion:\n', JSON.stringify(completion, null, 2)); // DELETE or use logger
-
         const output = completion.choices[0].message.content?.trim() ?? '';
-
-        console.log(`Output:\n${output}`); // DELETE or use logger
 
         // Try to parse the response as JSON
         // const jsonResponse: CarData = output ? JSON.parse(output) : {};
@@ -120,7 +116,7 @@ export async function speechToCarData(req: IncomingMessage) {
         language: 'he',
     });
 
-    console.log('Transcription:\n', JSON.stringify(transcription, null, 2)); // DELETE or use logger
+    console.log(`Transcription:\n${JSON.stringify(transcription, null, 2)}`); // DELETE or use logger
 
     return await inferCarDataFromText(transcription.text);
 }
