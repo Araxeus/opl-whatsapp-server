@@ -98,7 +98,7 @@ const server = http.createServer(async (req, res) => {
 
     async function fileResponse(
         path: string,
-        type?: ContentType,
+        type: ContentType,
         status = 200,
         headers?: http.OutgoingHttpHeaders,
     ) {
@@ -106,11 +106,16 @@ const server = http.createServer(async (req, res) => {
         response(file.content, file.type, status, headers);
     }
 
-    async function cachedFileResponse(path: string, type?: ContentType) {
+    async function cachedFileResponse(
+        path: string,
+        type: ContentType,
+        headers: http.OutgoingHttpHeaders = {},
+        privateCache = false,
+    ) {
         await fileResponse(path, type, 200, {
-            // 1 hour then stale for 5 days
-            'Cache-Control':
-                'public max-age=3600, stale-while-revalidate=432000',
+            // 5 minutes then stale for 5 days
+            'Cache-Control': `${privateCache ? 'private' : 'public'} max-age=300, stale-while-revalidate=432000`,
+            ...headers,
         });
     }
 
@@ -203,7 +208,7 @@ const server = http.createServer(async (req, res) => {
                 location: '/',
             });
         }
-        return fileResponse('./pages/login.html', ContentType.HTML);
+        return cachedFileResponse('./pages/login.html', ContentType.HTML);
     }
 
     if (!isUserValid) {
@@ -223,23 +228,26 @@ const server = http.createServer(async (req, res) => {
     log = log.child({ user: user.name });
 
     if (path.is('/'))
-        return response(await getIndexHtml(user.name), ContentType.HTML);
+        return response(await getIndexHtml(user.name), ContentType.HTML, 200, {
+            // 5 minutes then stale for 30 minutes
+            'Cache-Control': 'private max-age=300, stale-while-revalidate=1800',
+        });
 
     if (path.is('/park-car')) {
-        return fileResponse(
+        return cachedFileResponse(
             './pages/park-car.html',
             ContentType.HTML,
-            200,
             loginCookie,
+            true,
         );
     }
 
     if (path.is('/replace-client-car')) {
-        return fileResponse(
+        return cachedFileResponse(
             './pages/replace-client-car.html',
             ContentType.HTML,
-            200,
             loginCookie,
+            true,
         );
     }
 
@@ -297,7 +305,7 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/speech')) {
         // DELETE this and the file
-        return fileResponse('./pages/speech.html', ContentType.HTML, 200);
+        return cachedFileResponse('./pages/speech.html', ContentType.HTML);
     }
 
     if (path.is('/logout')) {
