@@ -93,7 +93,16 @@ export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)
         .map(
             ([k, v]) =>
-                `${k} ${v.map((vv) => (vv.startsWith('http') ? vv : `'${vv}'`)).join(' ')}`,
+                `${k} ${v
+                    .map((vv) =>
+                        vv.startsWith('http') ||
+                        vv.endsWith(':') ||
+                        vv === '*' ||
+                        vv.startsWith('/')
+                            ? vv
+                            : `'${vv}'`,
+                    )
+                    .join(' ')}`,
         )
         .join('; ');
 
