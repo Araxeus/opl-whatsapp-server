@@ -56,6 +56,7 @@ const defaultHeaders: http.OutgoingHttpHeaders = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
+    'Cache-Control': 'private',
     'Content-Security-Policy': CSPfromObj({
         'default-src': ['self'],
         'script-src': ['self', 'unsafe-inline'],
@@ -105,9 +106,22 @@ const server = http.createServer(async (req, res) => {
         response(file.content, file.type, status, headers);
     }
 
+    async function cachedFileResponse(path: string, type?: ContentType) {
+        await fileResponse(path, type, 200, {
+            // 1 hour then stale for 5 days
+            'Cache-Control':
+                'public max-age=3600, stale-while-revalidate=432000',
+        });
+    }
+
     async function streamResponse(path: string, status = 200) {
         const assetType = await getAssetType(path);
-        res.writeHead(status, { 'Content-Type': assetType });
+        res.writeHead(status, {
+            'Content-Type': assetType,
+            // 1 day then stale for 30 days
+            'Cache-Control':
+                'public max-age=86400, stale-while-revalidate=2592000',
+        });
         createReadStream(path).pipe(res);
     }
 
@@ -128,13 +142,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (path.is('/vendor/qrcode.js'))
-        return fileResponse('./vendor/qrcode-updatedeps.js', ContentType.JS);
+        return cachedFileResponse('./vendor/qrcode-updated.js', ContentType.JS);
 
     if (path.is('/form.css'))
-        return fileResponse('./pages/form.css', ContentType.CSS);
+        return cachedFileResponse('./pages/form.css', ContentType.CSS);
 
     if (path.is('/fetch-and-qr.ts')) {
-        return fileResponse('./dist/fetch-and-qr.js', ContentType.JS);
+        return cachedFileResponse('./dist/fetch-and-qr.js', ContentType.JS);
     }
 
     if (req.method === 'POST' && path.is('/login')) {
