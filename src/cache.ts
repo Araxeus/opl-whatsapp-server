@@ -37,7 +37,7 @@ export async function getFile(path: string, contentType?: ContentType) {
 }
 
 const folders = new Map<string, string[]>();
-export async function serveFolder(folder: string, path: PathOfRequest['path']) {
+export async function isInFolder(folder: string, path: PathOfRequest['path']) {
     if (!folders.has(folder)) {
         folders.set(
             folder,

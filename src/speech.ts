@@ -1,6 +1,7 @@
 import type { IncomingMessage } from 'node:http';
+import logger from 'logger';
 import OpenAI, { toFile } from 'openai';
-import { isValidAudioWavRequest } from 'utils';
+import type { Logger } from 'pino';
 
 // Define an interface for the expected JSON output
 interface CarData {
@@ -59,21 +60,13 @@ output: {
 }
 `;
 
-function inferCarDataFromText(
+async function inferCarDataFromText(
     text: string,
-    parse: true,
-): Promise<{
-    result: CarData;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-function inferCarDataFromText(
-    text: string,
-    parse?: false,
+    log: Logger,
 ): Promise<{
     result: string;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-async function inferCarDataFromText(text: string, parse = false) {
+    usage?: OpenAI.Completions.CompletionUsage;
+}> {
     try {
         const completion = await openai.chat.completions.create({
             messages: [
@@ -90,33 +83,21 @@ async function inferCarDataFromText(text: string, parse = false) {
             response_format: { type: 'json_object' },
         });
 
-        const output = completion.choices[0].message.content?.trim() ?? '';
-
-        // Try to parse the response as JSON
-        // const jsonResponse: CarData = output ? JSON.parse(output) : {};
-        // Additional validation to ensure carID format if present
-        // if (
-        //     jsonResponse.carID &&
-        //     !/^\d{3}-\d{2}-\d{3}$/.test(jsonResponse.carID)
-        // ) {
-        //     // throw new Error('Invalid carID format');
-        //     console.error('Invalid carID format');
-        // }
-
         return {
-            result: parse ? (JSON.parse(output) as CarData) : output,
-            usage: completion.usage,
+            result: completion.choices[0].message.content?.trim() ?? '',
+            usage: completion.usage as OpenAI.Completions.CompletionUsage,
         };
     } catch (error) {
-        console.error('Error parsing or fetching data:', error?.toString());
-        return {};
+        log.error('Error parsing or fetching data:', error?.toString());
+        return { result: '{}' };
     }
 }
 
-export async function speechToCarData(req: IncomingMessage) {
-    if (!isValidAudioWavRequest(req)) {
+export async function speechToCarData(req: IncomingMessage, username: string) {
+    if (req.headers['content-type'] !== 'audio/wav') {
         throw new Error('Invalid request: Content-Type is not audio/wav');
     }
+
     const transcription = await openai.audio.transcriptions.create({
         file: await toFile(req, 'audio.wav', {
             type: 'audio/wav',
@@ -125,7 +106,12 @@ export async function speechToCarData(req: IncomingMessage) {
         language: 'he',
     });
 
-    console.log(`Transcription:\n${JSON.stringify(transcription, null, 2)}`); // DELETE or use logger
+    const log = logger.child({
+        module: 'speechToCarData',
+        user: username,
+    });
 
-    return await inferCarDataFromText(transcription.text);
+    log.info(transcription);
+
+    return await inferCarDataFromText(transcription.text, log);
 }

@@ -15,7 +15,7 @@ import {
     getFile,
     getIndexHtml,
     getRandom404,
-    serveFolder,
+    isInFolder,
 } from 'cache';
 import logger from 'logger';
 import mongoose from 'mongoose';
@@ -145,17 +145,9 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/keepalive')) return response('ty');
 
-    if (await serveFolder('assets', path)) {
+    if (await isInFolder('assets', path)) {
         return streamResponse(`./assets${path.string}`);
     }
-
-    if (await serveFolder('vendor/vad', path)) {
-        return streamResponse(`./vendor/vad${path.string}`);
-    } // TODO move this to after auth
-
-    if (path.is('/vad.js')) {
-        return cachedFileResponse('./dist/vad.js', ContentType.JS);
-    } // TODO move this to after auth
 
     if (path.is('/vendor/qrcode.js'))
         return cachedFileResponse('./vendor/qrcode-updated.js', ContentType.JS);
@@ -291,17 +283,30 @@ const server = http.createServer(async (req, res) => {
         return await handleRoutine(ReplaceClientCarSchema);
     }
 
-    //Server Sent Events
+    // Server Sent Events
     if (path.is('/sse')) {
         return sse(req, res, user);
     }
 
+    // VAD
+
+    if (await isInFolder('vendor/vad', path)) {
+        return streamResponse(`./vendor/vad${path.string}`);
+    }
+
+    if (path.is('/vad.js')) {
+        return cachedFileResponse('./dist/vad.js', ContentType.JS);
+    }
+
     if (req.method === 'POST' && path.is('/speech')) {
         try {
-            const { result, usage } = await speechToCarData(req);
-            log.info(
-                `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
-            );
+            const { result, usage } = await speechToCarData(req, user.name);
+            if (usage)
+                setImmediate(() =>
+                    log.info(
+                        `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
+                    ),
+                );
             return response(result, ContentType.JSON);
         } catch (error) {
             return response(

@@ -64,9 +64,6 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
-export const isValidAudioWavRequest = (req: IncomingMessage): boolean =>
-    req.headers['content-type'] === 'audio/wav';
-
 export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)
         .map(
