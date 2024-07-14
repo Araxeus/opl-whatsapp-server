@@ -110,6 +110,7 @@ export async function speechToCarData(req: IncomingMessage, username: string) {
             }),
             model: 'whisper-1',
             language: 'he',
+            prompt: '"רכב 320-43-702 מאילן קארגלס לדרך בית לחם 164, קילומטר 43720" "123-45-678" "דיווח על 876-54-321 חונה ביסמין, מקור צריפין"',
         })) || {};
 
     const log = logger.child({
