@@ -347,14 +347,14 @@ export class WhatsappInstance extends EventEmitter {
                     chatState++;
                 } else {
                     log.error({
-                        msg: 'Missmatch error in chatState',
+                        msg: 'Mismatch error in chatState',
                         expected: questions[chatState],
                     });
                     msgTimeout.clear();
                     unsubscribeFromMessages();
                     reject({
                         success: false,
-                        error: 'Missmatch error in chatState',
+                        error: 'Mismatch error in chatState',
                     });
                 }
 

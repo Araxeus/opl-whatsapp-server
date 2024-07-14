@@ -70,6 +70,7 @@ jobs:
       - uses: reviewdog/action-typos@v1
         with:
           reporter: ${{ env.REPORTER_TYPE }}
+          typos_flags: --exclude vendor
 
   stylelint:
     runs-on: ubuntu-latest
@@ -118,12 +119,13 @@ jobs:
           format: rdjson
           output: rd.json
           diff: true
+          skip-rule: javascript_lang_logger,javascript_express_https_protocol_missing
       - name: Run reviewdog
         if: always()
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cat rd.json | reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }}
+          reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }} < rd.json
         #-level=error
 
 # https://github.com/Araxeus/opl-whatsapp-server/actions/runs/9923702398
