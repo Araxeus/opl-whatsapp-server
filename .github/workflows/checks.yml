@@ -16,11 +16,12 @@ env:
 jobs:
   biome:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: mongolyy/reviewdog-action-biome@v1
         with:
@@ -31,6 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
@@ -42,6 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - name: Check out code.
         uses: actions/checkout@v4
       - name: misspell
@@ -53,6 +62,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - uses: actions/checkout@v4
       - uses: reviewdog/action-typos@v1
         with:
@@ -62,6 +75,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun add stylelint stylelint-config-recommended -D
@@ -74,6 +91,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: reviewdog/action-actionlint@v1
         with:
@@ -83,6 +104,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - uses: actions/checkout@v4
       - uses: reviewdog/action-setup@v1
       - name: Run Report
@@ -100,9 +125,12 @@ jobs:
           cat rd.json | reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }}
         #-level=error
 
+# https://github.com/Araxeus/opl-whatsapp-server/actions/runs/9923702398
+
 # check:
 #   runs-on: ubuntu-latest
 #   steps:
 #     - uses: actions/checkout@v4
 #     - uses: oven-sh/setup-bun@v2
 #     - run: bun ci
+
