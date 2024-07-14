@@ -23,6 +23,7 @@ You will act as an interpreter between the output of a hebrew speech recognition
 
 You will try to infer this data from the input in hebrew, USE ONLY EXISTING DATA - if the user didn't specify a key then don't include it.
 (for example user might only provide startingPoint, or he might only provide km and destination, etc..)
+input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
 
 Simplify the name of places and remove prefixes - for example:
 "מהכוננות" should become "כוננות"

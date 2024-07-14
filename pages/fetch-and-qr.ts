@@ -21,12 +21,12 @@ const $ = document.querySelector.bind(document) as (
     selector: string,
 ) => HTMLElement | null;
 
-$('a.back-button')?.addEventListener('click', (e) => {
-    if (document.referrer === (e.target as HTMLAnchorElement).href) {
-        e.preventDefault();
-        history.back();
-    }
-});
+// $('a.back-button')?.addEventListener('click', (e) => {
+//     if (document.referrer === (e.target as HTMLAnchorElement).href) {
+//         e.preventDefault();
+//         history.back();
+//     }
+// });
 
 // biome-ignore lint/complexity/noForEach: forEach is better for NodeList
 document.querySelectorAll('.carID').forEach((input) => {
