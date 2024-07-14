@@ -89,15 +89,15 @@ export async function userFromTempToken(token: string | null) {
     return getUser(userID);
 }
 
-export async function validateUserID(userID: User['userID']) {
+export async function validateUserID(userID: string) {
     return await Users.exists({ userID }).setOptions({
         sanitizeFilter: true,
     });
 }
 
 // [IMPORTANT] should only be called with validated userID (from validateUserID(id))
-export async function getUser(userID: User['userID']) {
-    const user = await Users.findOne({ userID }).setOptions({
+export async function getUser(userID: string) {
+    const user = await Users.findOne<User>({ userID }).setOptions({
         sanitizeFilter: true,
     });
     if (!user) {
