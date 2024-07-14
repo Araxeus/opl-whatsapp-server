@@ -73,7 +73,7 @@ export class WhatsappInstance extends EventEmitter {
             this.log.info(
                 `using WA v${version.join('.')}, isLatest: ${isLatest}`,
             );
-            this.#connect();
+            void this.#connect();
         });
     }
 
@@ -212,7 +212,7 @@ export class WhatsappInstance extends EventEmitter {
                     );
                     // reconnect if not logged out
                     if (shouldReconnect) {
-                        this.#connect();
+                        void this.#connect();
                     } else {
                         this.emit('close');
                         this.removeAllListeners();

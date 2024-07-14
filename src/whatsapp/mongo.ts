@@ -109,7 +109,7 @@ export const getAuthFromDatabase = async (userID: string) => {
                             );
                         }
                     }
-                    saveState();
+                    void saveState();
                 },
             } as SignalKeyStore,
         },
