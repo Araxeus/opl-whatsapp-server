@@ -36,7 +36,7 @@ export function sse(
         if (message) {
             res.write(`event: ${messageOrEvent}\n`);
         }
-        res.write(`data: ${JSON.stringify(message || messageOrEvent)}\n\n`);
+        res.write(`data: ${JSON.stringify(message ?? messageOrEvent)}\n\n`);
     };
 
     //res.write('\n');

@@ -32,7 +32,7 @@ $('a.back-button')?.addEventListener('click', (e) => {
 document.querySelectorAll('.carID').forEach((input) => {
     input.addEventListener('input', (e) => {
         const target = e.target as HTMLInputElement;
-        const cursorPosition = target.selectionStart || 0;
+        const cursorPosition = target.selectionStart ?? 0;
         const originalValue = target.value;
         const x =
             target.value
