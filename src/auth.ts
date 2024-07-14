@@ -12,6 +12,7 @@ import logger from 'logger';
 import { Schema, model } from 'mongoose';
 const log = logger.child({ module: 'auth' });
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
+import { getDateToday } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';
 import { z } from 'zod';
 
@@ -47,21 +48,23 @@ function encryptUserID(userID: string): string {
         cipher.final(),
     ]);
     const authTag = cipher.getAuthTag();
-    // Concatenate salt, iv, authTag, and encrypted data into a single string
-    const res = `${salt.toString('base64')}|${iv.toString('base64')}|${authTag.toString('base64')}|${encrypted.toString('base64')}`;
+    const res = `${getDateToday()}|${salt.toString('base64')}|${iv.toString('base64')}|${authTag.toString('base64')}|${encrypted.toString('base64')}`;
     return encodeURIComponent(res);
 }
 
-function decryptUserID(encryptedData: string): string | undefined {
+function decryptUserID(encryptedData: string): {
+    userID?: string;
+    encryptDate?: string;
+} {
     try {
         const decryptedUserID = decodeURIComponent(encryptedData);
         const parts = decryptedUserID.split('|');
-        if (parts.length !== 4) {
+        if (parts.length !== 5) {
             log.error('Invalid encrypted data format');
-            return undefined;
+            return {};
         }
-        const [salt, iv, authTag, encryptedText] = parts.map((part) =>
-            Buffer.from(part, 'base64'),
+        const [encryptDate, salt, iv, authTag, encryptedText] = parts.map(
+            (part) => Buffer.from(part, 'base64'),
         );
         // biome-ignore lint/style/noNonNullAssertion: it was already checked above
         const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
@@ -71,10 +74,13 @@ function decryptUserID(encryptedData: string): string | undefined {
             decipher.update(encryptedText),
             decipher.final(),
         ]);
-        return decrypted.toString('utf8');
+        return {
+            userID: decrypted.toString('utf8'),
+            encryptDate: encryptDate.toString('utf8'),
+        };
     } catch (e) {
         log.error(`Error decrypting userID: ${(e as Error)?.message ?? e}`);
-        return undefined;
+        return {};
     }
 }
 
@@ -138,13 +144,13 @@ export async function setLastAuth(userID: User['userID']) {
 export async function userIDFromReqHeader(req: IncomingMessage) {
     const c = req.headers.cookie;
     if (!c) {
-        return undefined;
+        return {};
     }
     const parsedUserID = cookie.parse(c)['__Host-userID'];
     if (parsedUserID) {
         return decryptUserID(parsedUserID);
     }
-    return undefined;
+    return {};
 }
 
 function userIDtoCookie(userID: User['userID'], deleteCookie = false) {
