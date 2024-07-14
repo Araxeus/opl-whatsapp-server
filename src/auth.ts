@@ -1,8 +1,10 @@
 import cookie from 'cookie';
 
 import {
+    type CipherGCMTypes,
     createCipheriv,
     createDecipheriv,
+    randomBytes,
     randomUUID,
     scryptSync,
 } from 'node:crypto';
@@ -31,32 +33,44 @@ const Users = model<User>('User', mUser);
 
 if (!process.env.USERID_SECRET)
     throw new Error('USERID_SECRET env variable must be defined');
-if (!process.env.USERID_IV) throw new Error('IV env variable must be defined');
 
-const encryptionAlgorithm = 'AES-256-GCM';
-const key = scryptSync(process.env.USERID_SECRET, 'salt', 32);
-const iv = Buffer.from(process.env.USERID_IV, 'hex');
+const encryptionAlgorithm: CipherGCMTypes = 'aes-256-gcm';
 
-function encryptUserID(userID: string) {
-    if (!/^[a-fA-F0-9]+$/.test(userID)) {
-        throw new Error(`Invalid userID format: ${userID}`);
-    }
+function encryptUserID(userID: string): string {
+    const salt = randomBytes(16);
+    const iv = randomBytes(16);
+    const key = scryptSync(process.env.USERID_SECRET as string, salt, 32);
     const cipher = createCipheriv(encryptionAlgorithm, key, iv);
-    return cipher.update(userID, 'utf8', 'hex') + cipher.final('hex');
+    const encrypted = Buffer.concat([
+        cipher.update(userID, 'utf8'),
+        cipher.final(),
+    ]);
+    const authTag = cipher.getAuthTag();
+    // Concatenate salt, iv, authTag, and encrypted data into a single string
+    return encodeURIComponent(
+        `${salt.toString('hex')}|${iv.toString('hex')}|${authTag.toString('hex')}|${encrypted.toString('hex')}`,
+    );
 }
 
-function decryptUserID(encryptedText: string) {
+function decryptUserID(encryptedData: string): string | undefined {
     try {
-        // Ensure the encryptedText is properly sanitized before using it in the decipher
-        if (!/^[a-fA-F0-9]+$/.test(encryptedText)) {
-            throw new Error(`Invalid encrypted text format: ${encryptedText}`);
+        const parts = decodeURIComponent(encryptedData).split('|');
+        if (parts.length !== 4) {
+            log.error('Invalid encrypted data format');
+            return undefined;
         }
+        const [salt, iv, authTag, encryptedText] = parts.map((part) =>
+            Buffer.from(part, 'hex'),
+        );
+        const key = scryptSync(process.env.USERID_SECRET as string, salt, 32);
         const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
+        decipher.setAuthTag(authTag);
         return (
-            decipher.update(encryptedText, 'hex', 'utf8') +
+            decipher.update(encryptedText.toString(), 'hex', 'utf8') +
             decipher.final('utf8')
         );
     } catch (e) {
+        log.error(e);
         return undefined;
     }
 }
