@@ -3,14 +3,6 @@ import logger from 'logger';
 import OpenAI, { toFile } from 'openai';
 import type { Logger } from 'pino';
 
-// Define an interface for the expected JSON output
-interface CarData {
-    carID?: string; // Optional field
-    km?: number; // Optional field
-    startingPoint?: string; // Optional field
-    destination?: string; // Optional field
-}
-
 if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY must be defined');
 }

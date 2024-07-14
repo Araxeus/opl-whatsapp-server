@@ -8,7 +8,8 @@
   "scripts": {
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
     "_build": "rm -rf dist && bun ./build.ts && bun copy_vad",
-    "check": "bun run biome check && tsc --noEmit && bun check_up",
+    "ci": "bun install && bun run biome check && tsc --noEmit && bun _build",
+    "check": "bun ci && bun check_up",
     "lint": "bun run biome check --write",
     "fix": "bun lint",
     "updates": "bun update --latest",
