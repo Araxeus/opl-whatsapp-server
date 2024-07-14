@@ -20,7 +20,7 @@ export const listen = async (speechEndCallback = () => {}) => {
             onSpeechStart: () => {
                 console.log('Speech start');
             },
-            onSpeechEnd: async (arr) => {
+            onSpeechEnd: (arr) => {
                 console.log('Speech end');
                 const wavBuffer = encodeWAV(arr);
                 const blob = new Blob([wavBuffer], { type: 'audio/wav' });
