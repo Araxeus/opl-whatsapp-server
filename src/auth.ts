@@ -1,8 +1,10 @@
 import cookie from 'cookie';
 
 import {
+    type CipherGCMTypes,
     createCipheriv,
     createDecipheriv,
+    randomBytes,
     randomUUID,
     scryptSync,
 } from 'node:crypto';
@@ -10,6 +12,7 @@ import logger from 'logger';
 import { Schema, model } from 'mongoose';
 const log = logger.child({ module: 'auth' });
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
+import { getDateToday } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';
 import { z } from 'zod';
 
@@ -31,33 +34,53 @@ const Users = model<User>('User', mUser);
 
 if (!process.env.USERID_SECRET)
     throw new Error('USERID_SECRET env variable must be defined');
-if (!process.env.USERID_IV) throw new Error('IV env variable must be defined');
 
-const encryptionAlgorithm = 'aes-256-cbc';
-const key = scryptSync(process.env.USERID_SECRET, 'salt', 32);
-const iv = Buffer.from(process.env.USERID_IV, 'hex');
+const encryptionAlgorithm: CipherGCMTypes = 'aes-256-gcm';
 
-function encryptUserID(userID: string) {
-    if (!/^[a-fA-F0-9]+$/.test(userID)) {
-        throw new Error(`Invalid userID format: ${userID}`);
-    }
+function encryptUserID(userID: string): string {
+    const salt = randomBytes(16);
+    const iv = randomBytes(12);
+    // biome-ignore lint/style/noNonNullAssertion: it was already checked above
+    const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
     const cipher = createCipheriv(encryptionAlgorithm, key, iv);
-    return cipher.update(userID, 'utf8', 'hex') + cipher.final('hex');
+    const encrypted = Buffer.concat([
+        cipher.update(userID, 'utf8'),
+        cipher.final(),
+    ]);
+    const authTag = cipher.getAuthTag();
+    const res = `${getDateToday()}|${salt.toString('base64')}|${iv.toString('base64')}|${authTag.toString('base64')}|${encrypted.toString('base64')}`;
+    return encodeURIComponent(res);
 }
 
-function decryptUserID(encryptedText: string) {
+function decryptUserID(encryptedData: string): {
+    userID?: string;
+    encryptDate?: string;
+} {
     try {
-        // Ensure the encryptedText is properly sanitized before using it in the decipher
-        if (!/^[a-fA-F0-9]+$/.test(encryptedText)) {
-            throw new Error(`Invalid encrypted text format: ${encryptedText}`);
+        const decryptedUserID = decodeURIComponent(encryptedData);
+        const parts = decryptedUserID.split('|');
+        if (parts.length !== 5) {
+            log.error('Invalid encrypted data format');
+            return {};
         }
-        const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
-        return (
-            decipher.update(encryptedText, 'hex', 'utf8') +
-            decipher.final('utf8')
+        const [encryptDate, salt, iv, authTag, encryptedText] = parts.map(
+            (part) => Buffer.from(part, 'base64'),
         );
+        // biome-ignore lint/style/noNonNullAssertion: it was already checked above
+        const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
+        const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
+        decipher.setAuthTag(authTag);
+        const decrypted = Buffer.concat([
+            decipher.update(encryptedText),
+            decipher.final(),
+        ]);
+        return {
+            userID: decrypted.toString('utf8'),
+            encryptDate: encryptDate.toString('utf8'),
+        };
     } catch (e) {
-        return undefined;
+        log.error(`Error decrypting userID: ${(e as Error)?.message ?? e}`);
+        return {};
     }
 }
 
@@ -121,13 +144,13 @@ export async function setLastAuth(userID: User['userID']) {
 export async function userIDFromReqHeader(req: IncomingMessage) {
     const c = req.headers.cookie;
     if (!c) {
-        return undefined;
+        return {};
     }
     const parsedUserID = cookie.parse(c)['__Host-userID'];
     if (parsedUserID) {
         return decryptUserID(parsedUserID);
     }
-    return undefined;
+    return {};
 }
 
 function userIDtoCookie(userID: User['userID'], deleteCookie = false) {

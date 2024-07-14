@@ -64,6 +64,11 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
+export const getDateToday = () => {
+    const d = new Date();
+    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)
         .map(
