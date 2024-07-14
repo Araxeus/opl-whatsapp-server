@@ -70,6 +70,7 @@ jobs:
       - uses: reviewdog/action-typos@v1
         with:
           reporter: ${{ env.REPORTER_TYPE }}
+          typos_flags: --exclude vendor
 
   stylelint:
     runs-on: ubuntu-latest
