@@ -22,7 +22,7 @@ import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import speech from 'speech';
 import { sse } from 'sse';
-import { CSPfromObj, getRequestBody, pathOfRequest } from 'utils';
+import { CSPfromObj, getDateToday, getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine, refreshAllInstances } from 'whatsapp';
 import { type CarParkingInfo, CarParkingInfoSchema } from 'whatsapp/park-car';
 import {
@@ -50,7 +50,7 @@ logger.info(
 );
 
 const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';
-const PORT = Number(process.env.PORT) ?? 3000;
+const PORT = Number(process.env.PORT ?? 3000);
 
 const defaultHeaders: http.OutgoingHttpHeaders = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
@@ -199,7 +199,7 @@ const server = http.createServer(async (req, res) => {
         );
     }
 
-    const userID = await userIDFromReqHeader(req);
+    const { userID, encryptDate } = await userIDFromReqHeader(req);
     const isUserValid = userID && (await validateUserID(userID));
 
     if (path.is('/login')) {
@@ -222,7 +222,8 @@ const server = http.createServer(async (req, res) => {
     // *********************************
 
     const user = await getUser(userID);
-    const loginCookie = encryptedCookieHeader(userID);
+    const loginCookie =
+        encryptDate !== getDateToday() ? encryptedCookieHeader(userID) : {};
 
     log.info(`Request authenticated as from ${user.name}`);
     log = log.child({ user: user.name });

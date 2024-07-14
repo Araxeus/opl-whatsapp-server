@@ -63,7 +63,6 @@ set TEST_MODE=off
 - The following environment variables are required:
   - `MONGODB_URI` - The URI for the MongoDB database
   - `USERID_SECRET` - The secret for the user tokens
-  - `USERID_IV` - The IV for the user tokens
   - `OPERATE_PHONE_NUMBER` - Phone number of the service the server interacts with
   - `OPENAI_API_KEY` - The API key for OpenAI
   - `REFRESH_KEY` - The key for accepted for API calls to refresh active user sessions

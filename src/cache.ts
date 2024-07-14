@@ -23,7 +23,7 @@ async function loadFileInMemory(path: string, type: ContentType) {
 }
 
 export async function getFile(path: string, contentType?: ContentType) {
-    const type = contentType || (await getAssetType(path));
+    const type = contentType ?? (await getAssetType(path));
     if (!files.has(path)) {
         await loadFileInMemory(path, type);
     }

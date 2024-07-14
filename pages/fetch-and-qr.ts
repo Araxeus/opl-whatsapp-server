@@ -32,12 +32,13 @@ $('a.back-button')?.addEventListener('click', (e) => {
 document.querySelectorAll('.carID').forEach((input) => {
     input.addEventListener('input', (e) => {
         const target = e.target as HTMLInputElement;
-        const cursorPosition = target.selectionStart || 0;
+        const cursorPosition = target.selectionStart ?? 0;
         const originalValue = target.value;
         const x =
-            target.value
-                .replace(/\D/g, '')
-                .match(/(\d{0,3})(\d{0,2})(\d{0,3})/) || [];
+            /(\d{0,3})(\d{0,2})(\d{0,3})/.exec(
+                target.value.replace(/\D/g, ''),
+            ) ?? [];
+
         target.value = !x[2]
             ? x[1]
             : `${x[1]}-${!x[3] ? x[2] : `${x[2]}-${x[3]}`}`;
@@ -156,8 +157,6 @@ function handleQrResponse() {
         document.head.appendChild(script);
         console.log('qrcode.js injected to doc.head'); // DELETE
     }
-
-    return;
 }
 
 function showQrCode() {
