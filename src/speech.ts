@@ -34,6 +34,7 @@ Infer the correct way to write the car number, for example:
 1234-56-7 becomes 123-45-67,
 123.56.432 becomes 123-56-432,
 1 2 34 5 67 becomes 123-45-67,
+320, 437, 02 becomes 320-43-702,
 etc..
 
 Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
@@ -42,13 +43,25 @@ After creating the output, check it to ensure it adheres to the JSON rules above
 
 If the input is invalid or incomplete, return an empty JSON object: {}.
 
-Complete example:
+Complete examples:
 input: "רכב מספר 720 458 0 3 מאילן קרגלס ירושלים לדרך בית לחם 142 קילומטר 703-27"
 output: {
   "carID": "720-45-803",
   "km": 70327,
   "startingPoint": "אילן קארגלס, ירושלים",
   "destination": "דרך בית לחם 142"
+}
+
+input: "מהכוננות לביתה 243, 5-7"
+output: {
+  "startingPoint": "כוננות",
+  "destination": "בית",
+  "carID": "243-57"
+}
+
+input: "24370824"
+output: {
+  "carID": "243-70-824"
 }
 `;
 
