@@ -157,8 +157,6 @@ function handleQrResponse() {
         document.head.appendChild(script);
         console.log('qrcode.js injected to doc.head'); // DELETE
     }
-
-    return;
 }
 
 function showQrCode() {

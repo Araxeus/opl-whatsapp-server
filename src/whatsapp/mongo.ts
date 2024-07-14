@@ -104,7 +104,7 @@ export const getAuthFromDatabase = async (userID: string) => {
                             delete keys[type];
                         } else {
                             Object.assign(
-                                keys[type] as SignalDataSet,
+                                keys[type], //as SignalDataSet,
                                 data[type],
                             );
                         }
