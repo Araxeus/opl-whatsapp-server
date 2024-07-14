@@ -38,12 +38,19 @@ const key = scryptSync(process.env.USERID_SECRET, 'salt', 32);
 const iv = Buffer.from(process.env.USERID_IV, 'hex');
 
 function encryptUserID(userID: string) {
+    if (!/^[a-fA-F0-9]+$/.test(userID)) {
+        throw new Error(`Invalid userID format: ${userID}`);
+    }
     const cipher = createCipheriv(encryptionAlgorithm, key, iv);
     return cipher.update(userID, 'utf8', 'hex') + cipher.final('hex');
 }
 
 function decryptUserID(encryptedText: string) {
     try {
+        // Ensure the encryptedText is properly sanitized before using it in the decipher
+        if (!/^[a-fA-F0-9]+$/.test(encryptedText)) {
+            throw new Error(`Invalid encrypted text format: ${encryptedText}`);
+        }
         const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
         return (
             decipher.update(encryptedText, 'hex', 'utf8') +
@@ -82,13 +89,17 @@ export async function userFromTempToken(token: string | null) {
     return getUser(userID);
 }
 
-export async function validateUserID(userID: User['userID']) {
-    return await Users.exists({ userID });
+export async function validateUserID(userID: string) {
+    return await Users.exists({ userID }).setOptions({
+        sanitizeFilter: true,
+    });
 }
 
 // [IMPORTANT] should only be called with validated userID (from validateUserID(id))
-export async function getUser(userID: User['userID']) {
-    const user = await Users.findOne({ userID });
+export async function getUser(userID: string) {
+    const user = await Users.findOne<User>({ userID }).setOptions({
+        sanitizeFilter: true,
+    });
     if (!user) {
         throw new Error(
             'userID not found in getUser() (should not happen, validateUserID() first)',
