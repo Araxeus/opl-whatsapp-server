@@ -38,7 +38,7 @@ const encryptionAlgorithm: CipherGCMTypes = 'aes-256-gcm';
 
 function encryptUserID(userID: string): string {
     const salt = randomBytes(16);
-    const iv = randomBytes(16);
+    const iv = randomBytes(12);
     // biome-ignore lint/style/noNonNullAssertion: it was already checked above
     const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
     const cipher = createCipheriv(encryptionAlgorithm, key, iv);
@@ -48,31 +48,30 @@ function encryptUserID(userID: string): string {
     ]);
     const authTag = cipher.getAuthTag();
     // Concatenate salt, iv, authTag, and encrypted data into a single string
-    const res = `${salt.toString('base64url')}|${iv.toString('base64url')}|${authTag.toString('base64url')}|${encrypted.toString('base64url')}`;
-    log.info(`encrypted userID: ${res}`); // DELETE
+    const res = `${salt.toString('base64')}|${iv.toString('base64')}|${authTag.toString('base64')}|${encrypted.toString('base64')}`;
     return encodeURIComponent(res);
 }
 
 function decryptUserID(encryptedData: string): string | undefined {
     try {
         const decryptedUserID = decodeURIComponent(encryptedData);
-        log.info(`decrypted userID: ${decryptedUserID}`); // DELETE
         const parts = decryptedUserID.split('|');
         if (parts.length !== 4) {
             log.error('Invalid encrypted data format');
             return undefined;
         }
         const [salt, iv, authTag, encryptedText] = parts.map((part) =>
-            Buffer.from(part, 'base64url'),
+            Buffer.from(part, 'base64'),
         );
         // biome-ignore lint/style/noNonNullAssertion: it was already checked above
         const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
         const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
         decipher.setAuthTag(authTag);
-        return (
-            decipher.update(encryptedText.toString(), 'utf8') +
-            decipher.final('utf8')
-        );
+        const decrypted = Buffer.concat([
+            decipher.update(encryptedText),
+            decipher.final(),
+        ]);
+        return decrypted.toString('utf8');
     } catch (e) {
         log.error(`Error decrypting userID: ${(e as Error)?.message ?? e}`);
         return undefined;
