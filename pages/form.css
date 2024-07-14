@@ -124,7 +124,7 @@ button:hover {
   animation: button-loading-spinner 1s ease infinite;
 }
 
-#audioButton.button-loading::after {
+#audio-button.button-loading::after {
   border-color: rgb(48 52 54) transparent transparent;
 }
 

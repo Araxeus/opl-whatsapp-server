@@ -92,7 +92,7 @@
             }
         }
 
-        #audioButton {
+        #audio-button {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -116,7 +116,7 @@
     <div id="form-container" class="container">
         <h2 dir="rtl">דיווח חנייה</h2>
         <form id="carForm">
-            <div id="audioButton">
+            <div id="audio-button">
                 <svg id="wave" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 38.05"
                     style="display: none;">
                     <title>Audio Wave</title>
@@ -215,7 +215,7 @@
         });
 
 
-        const audioButton = $('audioButton');
+        const audioButton = $('audio-button');
 
         audioButton.addEventListener('click', async () => {
             const { listen } = await import('./vad.js');
