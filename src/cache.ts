@@ -60,6 +60,7 @@ const files404 = await readdir(files404Path);
 export function getRandom404() {
     return joinPath(
         files404Path,
+        // bearer:disable javascript_lang_insufficiently_random_values
         files404[Math.floor(Math.random() * files404.length)],
     );
     // return files404[Math.floor(Math.random() * files404.length)];

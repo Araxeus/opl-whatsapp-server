@@ -119,7 +119,7 @@ jobs:
           format: rdjson
           output: rd.json
           diff: true
-          skip-rule: javascript_lang_logger,javascript_express_https_protocol_missing
+          skip-rule: "javascript_lang_logger,javascript_lang_logger_leak,javascript_express_https_protocol_missing"
       - name: Run reviewdog
         if: always()
         env:
