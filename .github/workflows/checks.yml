@@ -133,6 +133,10 @@ jobs:
     name: njsscan check
     steps:
       - uses: cycodelabs/cimon-action@v0
+        with:
+          prevent: true
+          allowed-hosts: >
+            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - name: Checkout the code
         uses: actions/checkout@v4
       - uses: reviewdog/action-setup@v1
