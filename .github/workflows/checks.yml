@@ -82,6 +82,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun add stylelint stylelint-config-recommended -D
+      - run: 'echo "extends: stylelint-config-recommended" > .stylelintrc.yaml'
       - name: stylelint
         uses: reviewdog/action-stylelint@v1
         with:
