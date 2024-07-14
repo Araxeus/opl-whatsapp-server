@@ -33,7 +33,7 @@ if (!process.env.USERID_SECRET)
     throw new Error('USERID_SECRET env variable must be defined');
 if (!process.env.USERID_IV) throw new Error('IV env variable must be defined');
 
-const encryptionAlgorithm = 'aes-256-cbc';
+const encryptionAlgorithm = 'AES-256-GCM';
 const key = scryptSync(process.env.USERID_SECRET, 'salt', 32);
 const iv = Buffer.from(process.env.USERID_IV, 'hex');
 
