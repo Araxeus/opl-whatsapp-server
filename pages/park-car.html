@@ -221,22 +221,26 @@
         const listen = (options = void 0) => new Promise((resolve, reject) => {
             let t = 0, ended = false;
             const stop = event => {
-                if (event) reject(event);
-                clearTimeout(t);
+                if (event) {
+                    reject(event);
+                    clearTimeout(t);
+                }
                 ended = true;
                 sr.stop();
             };
             const result = ({ results }) => {
-                stop();
                 for (let i = results.length - 1; i >= 0; i--) {
                     const result = results[i];
                     if (result.isFinal) {
                         for (const { transcript } of result) {
+                            stop();
+                            clearTimeout(t);
                             resolve(transcript);
                             return;
                         }
                     }
                 }
+                console.error('No final transcript found');
             };
             const sr = Object.assign(new SpeechRecognition, options, { interimResults: true, continuous: true });
             sr.addEventListener('error', stop, { once: true });
@@ -246,14 +250,13 @@
                 if (ended) {
                     result(event);
                     clearTimeout(t);
-                }
-                else {
+                } else {
                     clearTimeout(t);
                     t = setTimeout(result, 2000, event);
                 }
             });
             sr.start();
-            t = setTimeout(stop, 2500, 'No sound recognized in the 2.5 initial seconds');
+            t = setTimeout(stop, 3000, 'No sound recognized in the 3 initial seconds');
         });
 
         const audioButton = $('audioButton');
