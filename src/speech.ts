@@ -33,6 +33,14 @@ After creating the output, check it to ensure it adheres to the JSON rules above
 If the input is invalid or incomplete, return an empty JSON object: {}.
 `;
 
+// Define an interface for the expected JSON output
+interface CarData {
+    carID?: string; // Optional field
+    km?: number; // Optional field
+    startingPoint?: string; // Optional field
+    destination?: string; // Optional field
+}
+
 function inferCarData(
     text: string,
     parse: true,
