@@ -7,9 +7,9 @@ import {
 console.log('VAD loaded');
 
 export const listen = async (speechEndCallback = () => {}) => {
-    // biome-ignore lint/suspicious/noAsyncPromiseExecutor: Promise executor is needed
-    return new Promise(async (resolve, reject) => {
-        const vad = await MicVAD.new({
+    return new Promise((resolve, reject) => {
+        let vad: MicVAD;
+        MicVAD.new({
             // submitUserSpeechOnPause: true,
             workletURL: '/vad.worklet.bundle.min.js',
             modelURL: '/silero_vad.onnx',
@@ -47,7 +47,8 @@ export const listen = async (speechEndCallback = () => {}) => {
                     .catch(reject);
             },
         })
-            .then((vad) => {
+            .then((_vad) => {
+                vad = _vad;
                 vad.start();
                 return vad;
             })

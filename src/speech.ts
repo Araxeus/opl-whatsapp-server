@@ -90,18 +90,21 @@ export async function speechToCarData(req: IncomingMessage, username: string) {
         throw new Error('Invalid request: Content-Type is not audio/wav');
     }
 
-    const transcription = await openai.audio.transcriptions.create({
-        file: await toFile(req, 'audio.wav', {
-            type: 'audio/wav',
-        }),
-        model: 'whisper-1',
-        language: 'he',
-    });
+    const transcription =
+        (await openai.audio.transcriptions.create({
+            file: await toFile(req, 'audio.wav', {
+                type: 'audio/wav',
+            }),
+            model: 'whisper-1',
+            language: 'he',
+        })) || {};
 
     const log = logger.child({
         module: 'speechToCarData',
         user: username,
     });
+
+    transcription.text ??= '';
 
     log.info(transcription);
 
