@@ -50,7 +50,7 @@ logger.info(
 );
 
 const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';
-const PORT = Number(process.env.PORT) ?? 3000;
+const PORT = Number(process.env.PORT ?? 3000);
 
 const defaultHeaders: http.OutgoingHttpHeaders = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
