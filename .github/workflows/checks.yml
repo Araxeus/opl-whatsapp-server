@@ -124,7 +124,7 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cat rd.json | reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }}
+          reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }} < rd.json
         #-level=error
 
 # https://github.com/Araxeus/opl-whatsapp-server/actions/runs/9923702398
