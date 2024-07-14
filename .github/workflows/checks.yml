@@ -128,12 +128,32 @@ jobs:
           reviewdog -f=rdjson -reporter=${{ env.REPORTER_TYPE }} < rd.json
         #-level=error
 
+  njsscan:
+    runs-on: ubuntu-latest
+    name: njsscan check
+    steps:
+      - uses: cycodelabs/cimon-action@v0
+      - name: Checkout the code
+        uses: actions/checkout@v4
+      - uses: reviewdog/action-setup@v1
+      - name: nodejsscan scan
+        id: njsscan
+        uses: ajinabraham/njsscan-action@v7
+        with:
+          args: '. --sarif --output results.sarif || true'
+      - name: Run reviewdog
+        if: always()
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=sarif -reporter=${{ env.REPORTER_TYPE }} < results.sarif
+
 # https://github.com/Araxeus/opl-whatsapp-server/actions/runs/9923702398
 
-# check:
-#   runs-on: ubuntu-latest
-#   steps:
-#     - uses: actions/checkout@v4
-#     - uses: oven-sh/setup-bun@v2
-#     - run: bun ci
+  bun-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
 
