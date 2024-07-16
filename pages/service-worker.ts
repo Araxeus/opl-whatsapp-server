@@ -53,11 +53,11 @@ async function handleFetch(event: FetchEvent) {
 }
 
 async function fetchAndCache(request: Request) {
-    const response = await fetch(request);
+    const response = await fetch(request).then(cleanResponse);
     await checkLogout(response);
     if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
-        await cache.put(request, await cleanResponse(response));
+        await cache.put(request, response.clone());
     }
     return response;
 }
@@ -76,18 +76,16 @@ async function checkLogout(response: Response) {
 }
 
 function cleanResponse(response: Response) {
-    const clonedResponse = response.clone();
-
-    const bodyPromise = clonedResponse.body
-        ? Promise.resolve(clonedResponse.body)
-        : clonedResponse.blob();
+    const bodyPromise = response.body
+        ? Promise.resolve(response.body)
+        : response.blob();
 
     return bodyPromise.then((body: BodyInit | null | undefined) => {
         // new Response() is happy when passed either a stream or a Blob.
         return new Response(body, {
-            headers: clonedResponse.headers,
-            status: clonedResponse.status,
-            statusText: clonedResponse.statusText,
+            headers: response.headers,
+            status: response.status,
+            statusText: response.statusText,
         });
     });
 }
@@ -97,7 +95,7 @@ function firstTrue<T>(promises: Promise<T | undefined>[]): Promise<T> {
         (p) =>
             new Promise((resolve, reject) =>
                 p.then((v) => {
-                    v ? resolve(v) : reject(v);
+                    v ? resolve(v) : reject();
                 }, reject),
             ) as Promise<T>,
     );
