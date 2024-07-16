@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-self.addEventListener('activate', async (event) => {
+self.addEventListener('activate', (event) => {
     console.log('Service worker activating...');
     event.waitUntil(
         caches.keys().then((cacheNames) =>
@@ -32,9 +32,6 @@ self.addEventListener('activate', async (event) => {
             ),
         ),
     );
-    if (self.registration.navigationPreload) {
-        await self.registration.navigationPreload.enable();
-    }
 });
 
 self.addEventListener('fetch', (event) => {
@@ -44,44 +41,47 @@ self.addEventListener('fetch', (event) => {
     }
 });
 
+// Stale-while-revalidate
 async function handleFetch(event: FetchEvent) {
-    try {
-        // Try to get a preloaded response, if available
-        const preloadResponse = await event.preloadResponse;
-        if (preloadResponse) {
-            await checkLogout(preloadResponse);
-            if (preloadResponse.ok && !preloadResponse.redirected) {
-                await saveResponse(event, preloadResponse);
-            }
-            return preloadResponse;
-        }
+    return firstTrue([
+        caches.match(event.request),
+        fetchAndCache(event.request),
+    ]).catch((error: unknown) => {
+        console.error('Fetch failed; returning offline page instead.', error);
+        return new Response('Offline', { status: 503 });
+    });
+}
 
-        // If no preloaded response, try the network
-        const networkResponse = await fetch(event.request);
-        await checkLogout(networkResponse);
-        if (networkResponse.ok && !networkResponse.redirected) {
-            await saveResponse(event, networkResponse);
-        }
-        return networkResponse;
-    } catch (error) {
-        console.log('Fetch failed; returning offline page instead.', error);
-        const cachedResponse = await caches.match(event.request);
-        return cachedResponse || error;
+async function fetchAndCache(request: Request) {
+    const response = await fetch(request);
+    await checkLogout(response);
+    if (response.ok && !response.redirected) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, response.clone());
+    }
+    return response;
+}
+
+async function checkLogout(response: Response) {
+    if (response.redirected && response.url.endsWith('/login')) {
+        await caches
+            .keys()
+            .then((cacheNames) =>
+                Promise.all(
+                    cacheNames.map((cacheName) => caches.delete(cacheName)),
+                ),
+            );
     }
 }
 
-async function saveResponse(event: FetchEvent, response: Response) {
-    const cache = await caches.open(CACHE_NAME);
-    cache.put(event.request, response.clone());
-}
-
-async function checkLogout(res: Response) {
-    if (res.redirected && res.url.endsWith('/login')) {
-        const cacheNames = await caches.keys();
-        await Promise.all(
-            cacheNames.map((cacheName) => caches.delete(cacheName)),
-        );
-    }
+function firstTrue<T>(promises: Promise<T | undefined>[]): Promise<T> {
+    const newPromises = promises.map(
+        (p) =>
+            new Promise((resolve, reject) =>
+                p.then((v) => (v ? resolve(v) : reject(v)), reject),
+            ),
+    ) as Promise<T>[];
+    return Promise.any(newPromises);
 }
 
 // self.addEventListener('message', (event) => {
