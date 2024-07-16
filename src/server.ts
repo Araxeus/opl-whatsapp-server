@@ -146,6 +146,10 @@ const server = http.createServer(async (req, res) => {
         return streamResponse(`./assets${path.string}`);
     }
 
+    if (path.is('/manifest.json')) {
+        return cachedFileResponse('./pages/manifest.json', ContentType.JSON);
+    }
+
     if (path.is('/service-worker.js')) {
         return cachedFileResponse('./dist/service-worker.js', ContentType.JS);
     }

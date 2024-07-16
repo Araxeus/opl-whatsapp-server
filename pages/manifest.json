@@ -1,0 +1,39 @@
+{
+  "$schema": "https://github.com/SchemaStore/schemastore/raw/master/src/schemas/json/web-manifest.json",
+  "name": "אופרייט דיווחים",
+  "start_url": ".",
+  "display": "standalone",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "type": "image/png",
+      "sizes": "16x16"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "/opl-192x192.jpg",
+      "type": "image/jpg",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/opl-512x512.jpg",
+      "type": "image/jpg",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/opl-960x960.png",
+      "type": "image/jpg",
+      "sizes": "960x960"
+    }
+  ]
+}
