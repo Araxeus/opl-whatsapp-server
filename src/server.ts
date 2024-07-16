@@ -152,7 +152,7 @@ const server = http.createServer(async (req, res) => {
     if (path.is('/form.css'))
         return cachedFileResponse('./pages/form.css', ContentType.CSS);
 
-    if (path.is('/fetch-and-qr.ts')) {
+    if (path.is('/fetch-and-qr.js')) {
         return cachedFileResponse('./dist/fetch-and-qr.js', ContentType.JS);
     }
 
