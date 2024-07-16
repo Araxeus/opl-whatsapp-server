@@ -38,6 +38,8 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
     if (ROUTES_TO_CACHE.includes(new URL(event.request.url).pathname)) {
         event.respondWith(handleFetch(event));
+    } else if (event.request.url.endsWith('logout')) {
+        event.waitUntil(deleteAllCaches());
     }
 });
 
@@ -54,7 +56,10 @@ async function handleFetch(event: FetchEvent) {
 
 async function fetchAndCache(request: Request) {
     const response = await fetch(request).then(cleanResponse);
-    await checkLogout(response);
+    console.log(response); // DELETE !!!!!!! DEBUG
+    if (response.redirected && response.url.endsWith('/login')) {
+        await deleteAllCaches();
+    }
     if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
         await cache.put(request, response.clone());
@@ -62,17 +67,14 @@ async function fetchAndCache(request: Request) {
     return response;
 }
 
-async function checkLogout(response: Response) {
-    console.log(response); // DELETE !!!!!!! DEBUG
-    if (response.redirected && response.url.endsWith('/login')) {
-        await caches
-            .keys()
-            .then((cacheNames) =>
-                Promise.all(
-                    cacheNames.map((cacheName) => caches.delete(cacheName)),
-                ),
-            );
-    }
+function deleteAllCaches() {
+    return caches
+        .keys()
+        .then((cacheNames) =>
+            Promise.all(
+                cacheNames.map((cacheName) => caches.delete(cacheName)),
+            ),
+        );
 }
 
 function cleanResponse(response: Response) {
@@ -95,7 +97,7 @@ function firstTrue<T>(promises: Promise<T | undefined>[]): Promise<T> {
         (p) =>
             new Promise((resolve, reject) =>
                 p.then((v) => {
-                    v ? resolve(v) : reject();
+                    v ? resolve(v) : reject(TypeError);
                 }, reject),
             ) as Promise<T>,
     );
