@@ -55,14 +55,15 @@ async function handleFetch(event: FetchEvent) {
 async function fetchAndCache(request: Request) {
     const response = await fetch(request);
     await checkLogout(response);
-    if (response.ok && !response.redirected) {
+    if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
-        cache.put(request, await cleanResponse(response));
+        await cache.put(request, await cleanResponse(response));
     }
     return response;
 }
 
 async function checkLogout(response: Response) {
+    console.log(response); // DELETE !!!!!!! DEBUG
     if (response.redirected && response.url.endsWith('/login')) {
         await caches
             .keys()
@@ -95,9 +96,11 @@ function firstTrue<T>(promises: Promise<T | undefined>[]): Promise<T> {
     const newPromises = promises.map(
         (p) =>
             new Promise((resolve, reject) =>
-                p.then((v) => (v ? resolve(v) : reject(v)), reject),
-            ),
-    ) as Promise<T>[];
+                p.then((v) => {
+                    v ? resolve(v) : reject(v);
+                }, reject),
+            ) as Promise<T>,
+    );
     return Promise.any(newPromises);
 }
 
