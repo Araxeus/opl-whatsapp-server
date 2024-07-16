@@ -146,6 +146,10 @@ const server = http.createServer(async (req, res) => {
         return streamResponse(`./assets${path.string}`);
     }
 
+    if (path.is('/service-worker.js')) {
+        return cachedFileResponse('./dist/service-worker.js', ContentType.JS);
+    }
+
     if (path.is('/vendor/qrcode.js'))
         return cachedFileResponse('./vendor/qrcode-updated.js', ContentType.JS);
 

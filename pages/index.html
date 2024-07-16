@@ -127,4 +127,18 @@
 <link rel="prefetch" href="/replace-client-car" />
 <link rel="prerender" href="/replace-client-car" />
 
+<script defer>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('😎 Service Worker registered with scope:', registration.scope);
+                })
+                .catch(err => {
+                    console.error('😫 Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
+
 </html>
