@@ -36,9 +36,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
+    console.log('Service worker fetching:', event.request.url); // DELETE
     if (ROUTES_TO_CACHE.includes(new URL(event.request.url).pathname)) {
         event.respondWith(handleFetch(event));
     } else if (event.request.url.endsWith('logout')) {
+        console.log('Logging out; deleting all caches');
         event.waitUntil(deleteAllCaches());
     }
 });
@@ -55,14 +57,14 @@ async function handleFetch(event: FetchEvent) {
 }
 
 async function fetchAndCache(request: Request) {
-    const response = await fetch(request).then(cleanResponse);
+    const response = await fetch(request);
     console.log(response); // DELETE !!!!!!! DEBUG
     if (response.redirected && response.url.endsWith('/login')) {
         await deleteAllCaches();
     }
     if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
-        await cache.put(request, response.clone());
+        await cache.put(request, await cleanResponse(response));
     }
     return response;
 }
@@ -78,16 +80,15 @@ function deleteAllCaches() {
 }
 
 function cleanResponse(response: Response) {
-    const bodyPromise = response.body
-        ? Promise.resolve(response.body)
-        : response.blob();
+    const res = response.clone();
+    const bodyPromise = res.body ? Promise.resolve(res.body) : res.blob();
 
     return bodyPromise.then((body: BodyInit | null | undefined) => {
         // new Response() is happy when passed either a stream or a Blob.
         return new Response(body, {
-            headers: response.headers,
-            status: response.status,
-            statusText: response.statusText,
+            headers: res.headers,
+            status: res.status,
+            statusText: res.statusText,
         });
     });
 }
@@ -97,7 +98,7 @@ function firstTrue<T>(promises: Promise<T | undefined>[]): Promise<T> {
         (p) =>
             new Promise((resolve, reject) =>
                 p.then((v) => {
-                    v ? resolve(v) : reject(TypeError);
+                    v ? resolve(v) : reject(new TypeError());
                 }, reject),
             ) as Promise<T>,
     );
