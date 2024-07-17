@@ -33,7 +33,7 @@
     "@biomejs/biome": "1.8.3",
     "@types/bun": "^1.1.6",
     "@types/cookie": "^0.6.0",
-    "@types/node": "^20.14.10",
+    "@types/node": "^20.14.11",
     "@types/qrcode": "^1.5.5",
     "typescript": "^5.5.3"
   },
