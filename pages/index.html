@@ -106,6 +106,12 @@
         #logout-button:hover {
             background-color: #257186;
         }
+
+        div#buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 6px;
+        }
     </style>
 </head>
 
@@ -122,8 +128,10 @@
     <div class="container">
         <h1 dir="rtl" id="greeting">ברוך הבא לשרת הוואצאפ של אופרייט</h1>
         <p>?מה תרצה לעשות</p>
-        <a dir="rtl" id="carpark" href="/park-car" dir="rtl">דיווח חנייה</a>
-        <a dir="rtl" id="replace" href="/replace-client-car" dir="rtl">מסירת רכב חליפי</a>
+        <div id="buttons">
+            <a dir="rtl" id="replace" href="/replace-client-car" dir="rtl">מסירת רכב חליפי</a>
+            <a dir="rtl" id="carpark" href="/park-car" dir="rtl">דיווח חנייה</a>
+        </div>
     </div>
 </body>
 
