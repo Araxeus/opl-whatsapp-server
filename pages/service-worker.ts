@@ -31,7 +31,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
-    console.log(event.request); // DELETE
+    console.debug(event.request); // DELETE
     // check if the url which the request comes from is / and the request is for /login
     if (
         event.request.url.endsWith('/login') &&
@@ -40,7 +40,7 @@ self.addEventListener('fetch', (event) => {
         new URL(event.request.referrer).origin === self.location.origin
     ) {
         console.info('logout detected');
-        event.waitUntil(deleteAllCaches());
+        event.waitUntil(deleteCache());
         return;
     }
     if (ROUTES_TO_CACHE.includes(new URL(event.request.url).pathname)) {
@@ -61,9 +61,12 @@ async function handleFetch(event: FetchEvent) {
 
 async function fetchAndCache(request: Request) {
     const response = await fetch(request, { redirect: 'manual' });
-    console.log(response); // DELETE !!!!!!! DEBUG
-    if (response.redirected && response.url.endsWith('/login')) {
-        await deleteAllCaches();
+    console.debug(response); // DELETE !!!!!!! DEBUG
+    if (
+        response.type === 'opaqueredirect' &&
+        response.headers.get('location') === '/login'
+    ) {
+        await deleteCache();
     }
     if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
@@ -72,33 +75,21 @@ async function fetchAndCache(request: Request) {
     return response;
 }
 
-function deleteAllCaches() {
-    console.log('Deleting all caches...');
-    setTimeout(() => {
-        for (const route of PROTECTED_ROUTES) {
-            void fetch(route, { cache: 'reload' });
-        }
-    }, 1000);
-    return caches
-        .keys()
-        .then((cacheNames) =>
-            Promise.all(
-                cacheNames.map((cacheName) => caches.delete(cacheName)),
-            ),
-        );
+function deleteCache() {
+    if (!caches.has(CACHE_NAME)) return Promise.resolve();
+    console.debug('Deleting cache');
+    for (const route of PROTECTED_ROUTES) {
+        void fetch(route, { cache: 'reload' });
+    }
+    return caches.delete(CACHE_NAME);
 }
 
-function cleanResponse(response: Response) {
+async function cleanResponse(response: Response) {
     const res = response.clone();
-    const bodyPromise = res.body ? Promise.resolve(res.body) : res.blob();
-
-    return bodyPromise.then((body: BodyInit | null | undefined) => {
-        // new Response() is happy when passed either a stream or a Blob.
-        return new Response(body, {
-            headers: res.headers,
-            status: res.status,
-            statusText: res.statusText,
-        });
+    return new Response(res.body ? res.body : await res.blob(), {
+        headers: res.headers,
+        status: res.status,
+        statusText: res.statusText,
     });
 }
 
