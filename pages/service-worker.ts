@@ -51,7 +51,7 @@ self.addEventListener('fetch', (event) => {
 // Stale-while-revalidate
 async function handleFetch(event: FetchEvent) {
     return firstTrue([
-        caches.match(event.request),
+        caches.match(event.request, { cacheName: CACHE_NAME }),
         fetchAndCache(event.request),
     ]).catch((error: unknown) => {
         console.error('Fetch failed; returning offline page instead.', error);
