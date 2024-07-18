@@ -33,11 +33,11 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
     console.log(event.request); // DELETE
     // check if the url which the request comes from is / and the request is for /login
-    const referer = event.request.headers.get('Referer');
     if (
-        referer &&
         event.request.url.endsWith('/login') &&
-        new URL(referer).pathname === '/'
+        event.request.referrer &&
+        URL.canParse(event.request.referrer) &&
+        new URL(event.request.referrer).pathname === '/'
     ) {
         console.info('logout detected; deleting all caches');
         event.waitUntil(deleteAllCaches());
