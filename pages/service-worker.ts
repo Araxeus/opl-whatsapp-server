@@ -4,13 +4,8 @@ declare let self: ServiceWorkerGlobalScope;
 
 const CACHE_VERSION = 1;
 const CACHE_NAME = `offline-cache-v${CACHE_VERSION}`;
-const ROUTES_TO_CACHE = [
-    '/',
-    '/park-car',
-    '/replace-client-car',
-    '/fetch-and-qr.js',
-    '/form.css',
-];
+const PROTECTED_ROUTES = ['/', '/park-car', '/replace-client-car'];
+const ROUTES_TO_CACHE = [...PROTECTED_ROUTES, '/fetch-and-qr.js', '/form.css'];
 
 self.addEventListener('install', (event) => {
     console.log('Service worker installing...');
@@ -70,6 +65,11 @@ async function fetchAndCache(request: Request) {
 }
 
 function deleteAllCaches() {
+    setTimeout(() => {
+        for (const route of PROTECTED_ROUTES) {
+            fetch(route, { cache: 'reload' });
+        }
+    }, 1000);
     return caches
         .keys()
         .then((cacheNames) =>
