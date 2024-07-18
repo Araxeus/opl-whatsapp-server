@@ -16,6 +16,8 @@ import { getDateToday } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';
 import { z } from 'zod';
 
+const MAX_LAST_AUTH_AGE = 1000 * 60 * 60 * 24 * 7 * 3; // 3 weeks
+
 export interface User {
     name: string;
     companyID: string;
@@ -28,7 +30,7 @@ const mUser = new Schema<User>({
     name: { type: String, required: true },
     companyID: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
-    lastAuth: { type: Number, required: false, expires: 60 * 60 * 24 * 7 * 3 },
+    lastAuth: { type: Number, required: false, expires: MAX_LAST_AUTH_AGE },
 });
 const Users = model<User>('User', mUser);
 
@@ -156,7 +158,7 @@ export async function userIDFromReqHeader(req: IncomingMessage) {
 function userIDtoCookie(userID: User['userID'], deleteCookie = false) {
     return cookie.serialize('__Host-userID', userID, {
         path: '/',
-        maxAge: deleteCookie ? 0 : 60 * 60 * 24 * 7 * 3, // 3 week,
+        maxAge: deleteCookie ? 0 : MAX_LAST_AUTH_AGE,
         secure: true,
         httpOnly: true,
         sameSite: 'lax',
@@ -182,14 +184,12 @@ export async function handleLogin(
     }
     const user = await getUser(data.userID);
     log.info(`user ${user.name} is attempting to login`);
-    // check that lastAuth exist and is not older than 3 weeks
     if (
         skipQr ||
-        (user.lastAuth &&
-            Date.now() - user.lastAuth < 1000 * 60 * 60 * 24 * 7 * 3)
+        (user.lastAuth && Date.now() - user.lastAuth < MAX_LAST_AUTH_AGE)
     ) {
         log.info(
-            `skipQr: ${skipQr}, lastAuth exist and is < 3 weeks: ${user.lastAuth && Date.now() - user.lastAuth < 1000 * 60 * 60 * 24 * 7 * 3}`,
+            `skipQr: ${skipQr}, lastAuth exist and is < 3 weeks: ${user.lastAuth && Date.now() - user.lastAuth < MAX_LAST_AUTH_AGE}`,
         );
         return [{ success: true }, encryptedCookieHeader(data.userID)];
     }
