@@ -37,9 +37,9 @@ self.addEventListener('fetch', (event) => {
         event.request.url.endsWith('/login') &&
         event.request.referrer &&
         URL.canParse(event.request.referrer) &&
-        new URL(event.request.referrer).pathname === '/'
+        new URL(event.request.referrer).origin === self.location.origin
     ) {
-        console.info('logout detected; deleting all caches');
+        console.info('logout detected');
         event.waitUntil(deleteAllCaches());
         return;
     }
@@ -60,7 +60,7 @@ async function handleFetch(event: FetchEvent) {
 }
 
 async function fetchAndCache(request: Request) {
-    const response = await fetch(request, { redirect: 'follow' });
+    const response = await fetch(request, { redirect: 'manual' });
     console.log(response); // DELETE !!!!!!! DEBUG
     if (response.redirected && response.url.endsWith('/login')) {
         await deleteAllCaches();
@@ -73,6 +73,7 @@ async function fetchAndCache(request: Request) {
 }
 
 function deleteAllCaches() {
+    console.log('Deleting all caches...');
     setTimeout(() => {
         for (const route of PROTECTED_ROUTES) {
             void fetch(route, { cache: 'reload' });
