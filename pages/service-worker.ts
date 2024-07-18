@@ -64,9 +64,16 @@ async function fetchAndCache(request: Request) {
     console.debug(response); // DELETE !!!!!!! DEBUG
     if (
         response.type === 'opaqueredirect' &&
-        response.headers.get('location') === '/login'
+        PROTECTED_ROUTES.includes(new URL(request.url).pathname)
     ) {
-        await deleteCache();
+        // We assume that the response is a redirect to the login page
+        // This is a hacky way to detect if the user is logged out
+        // This is done because the request({ redirect: 'manual' })
+        // returns a response with type 'opaqueredirect' if the request is redirected
+        // which means we cant access response.headers.get('location') === '/login'
+        // ps. request({ redirect: 'follow' }) breaks browser navigation
+        // because pass the request to the browser
+        await deleteCache(true);
     }
     if (response.ok && response.status === 200 && !response.redirected) {
         const cache = await caches.open(CACHE_NAME);
@@ -75,13 +82,25 @@ async function fetchAndCache(request: Request) {
     return response;
 }
 
-async function deleteCache() {
+async function deleteCache(opaqueredirect = false) {
+    console.debug('Checking if cache exists before deleting...');
     if (!(await caches.has(CACHE_NAME))) return Promise.resolve();
-    console.debug('Deleting cache');
+    // navigate to /login if the user is logged out
+    console.debug('Cache found, deleting it');
     for (const route of PROTECTED_ROUTES) {
         void fetch(route, { cache: 'reload' });
     }
-    return caches.delete(CACHE_NAME);
+    await caches.delete(CACHE_NAME);
+    if (opaqueredirect) {
+        console.debug(
+            'deleteCache found an opaqueredirect, navigating to /login',
+        );
+        await self.clients.matchAll({ type: 'window' }).then((clients) => {
+            for (const client of clients) {
+                void client.navigate('/login');
+            }
+        });
+    }
 }
 
 async function cleanResponse(response: Response) {
