@@ -75,8 +75,8 @@ async function fetchAndCache(request: Request) {
     return response;
 }
 
-function deleteCache() {
-    if (!caches.has(CACHE_NAME)) return Promise.resolve();
+async function deleteCache() {
+    if (!(await caches.has(CACHE_NAME))) return Promise.resolve();
     console.debug('Deleting cache');
     for (const route of PROTECTED_ROUTES) {
         void fetch(route, { cache: 'reload' });
