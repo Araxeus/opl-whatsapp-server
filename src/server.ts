@@ -318,7 +318,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (path.is('/logout')) {
-        return fileResponse('./pages/login.html', ContentType.HTML, 303, {
+        return response('logout', ContentType.TEXT, 303, {
             location: '/login',
             ...encryptedCookieHeader(userID, true),
         });
