@@ -7,12 +7,12 @@ const CACHE_NAME = `offline-cache-v${CACHE_VERSION}`;
 const PROTECTED_ROUTES = ['/', '/park-car', '/replace-client-car'];
 const ROUTES_TO_CACHE = [...PROTECTED_ROUTES, '/fetch-and-qr.js', '/form.css'];
 
-self.addEventListener('install', (event) => {
-    console.log('Service worker installing...');
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ROUTES_TO_CACHE)),
-    );
-});
+// self.addEventListener('install', (event) => {
+//     console.log('Service worker installing...');
+//     event.waitUntil(
+//         caches.open(CACHE_NAME).then((cache) => cache.addAll(ROUTES_TO_CACHE)),
+//     );
+// });
 
 self.addEventListener('activate', (event) => {
     console.log('Service worker activating...');
