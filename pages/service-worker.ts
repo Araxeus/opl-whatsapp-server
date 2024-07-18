@@ -88,7 +88,7 @@ async function deleteCache(opaqueredirect = false) {
     // navigate to /login if the user is logged out
     console.debug('Cache found, deleting it');
     for (const route of PROTECTED_ROUTES) {
-        void fetch(route, { cache: 'reload' });
+        void fetch(route, { cache: 'reload', redirect: 'manual' });
     }
     await caches.delete(CACHE_NAME);
     if (opaqueredirect) {
