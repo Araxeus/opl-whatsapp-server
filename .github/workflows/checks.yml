@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
-      - uses: EPMatt/reviewdog-action-tsc@v1
+      - uses: EPMatt/reviewdog-action-tsc@v1.8.0
         with:
           reporter: ${{ env.REPORTER_TYPE }}
 
