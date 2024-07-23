@@ -35,7 +35,7 @@
     "@types/cookie": "^0.6.0",
     "@types/node": "^20.14.10",
     "@types/qrcode": "^1.5.5",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.4"
   },
   "trustedDependencies": ["@biomejs/biome", "protobufjs"]
 }
