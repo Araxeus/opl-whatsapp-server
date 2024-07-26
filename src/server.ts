@@ -199,22 +199,6 @@ const server = http.createServer(async (req, res) => {
         );
     }
 
-    if (path.is('/redirect-to-spotifytotidal')) {
-        log.info('Redirecting to Spotify to Tidal');
-        log.info(
-            `Query: ${JSON.stringify(
-                Object.fromEntries([...query.entries()]),
-                null,
-                2,
-            )}`,
-        );
-        // add the query params to the base url
-        const params = new URLSearchParams(query);
-        return response('', ContentType.TEXT, 302, {
-            location: `spotifytotidal://${params.toString()}`,
-        });
-    }
-
     const { userID, encryptDate } = await userIDFromReqHeader(req);
     const isUserValid = userID && (await validateUserID(userID));
 
