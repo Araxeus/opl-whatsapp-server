@@ -102,7 +102,8 @@ button:hover {
   transition: all 0.2s;
 }
 
-.button-loading .button_text {
+.button-loading .button_text,
+.button-loading svg {
   visibility: hidden;
   opacity: 0;
 }
@@ -121,6 +122,10 @@ button:hover {
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: button-loading-spinner 1s ease infinite;
+}
+
+#audio-button.button-loading::after {
+  border-color: rgb(48 52 54) transparent transparent;
 }
 
 @keyframes button-loading-spinner {

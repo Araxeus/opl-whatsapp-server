@@ -92,7 +92,7 @@
             }
         }
 
-        #audioButton {
+        #audio-button {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -116,7 +116,7 @@
     <div id="form-container" class="container">
         <h2 dir="rtl">דיווח חנייה</h2>
         <form id="carForm">
-            <div id="audioButton">
+            <div id="audio-button">
                 <svg id="wave" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 38.05"
                     style="display: none;">
                     <title>Audio Wave</title>
@@ -165,7 +165,7 @@
     </div>
 
     <script type="module">
-        import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
+        import { fetchAndQr, alertSoon } from './fetch-and-qr.js';
 
         const $ = document.getElementById.bind(document);
 
@@ -214,54 +214,12 @@
             });
         });
 
-        let { SpeechRecognition } = globalThis;
-        if (!SpeechRecognition)
-            SpeechRecognition = webkitSpeechRecognition;
 
-        const listen = (options = void 0) => new Promise((resolve, reject) => {
-            let t = 0, ended = false;
-            const stop = event => {
-                if (event) {
-                    reject(event);
-                    clearTimeout(t);
-                }
-                ended = true;
-                sr.stop();
-            };
-            const result = ({ results }) => {
-                for (let i = results.length - 1; i >= 0; i--) {
-                    const result = results[i];
-                    if (result.isFinal) {
-                        for (const { transcript } of result) {
-                            stop();
-                            clearTimeout(t);
-                            resolve(transcript);
-                            return;
-                        }
-                    }
-                }
-                console.error('No final transcript found');
-            };
-            const sr = Object.assign(new SpeechRecognition, options, { interimResults: true, continuous: true });
-            sr.addEventListener('error', stop, { once: true });
-            sr.addEventListener('nomatch', stop, { once: true });
-            sr.addEventListener('audioend', () => stop(), { once: true });
-            sr.addEventListener('result', event => {
-                if (ended) {
-                    result(event);
-                    clearTimeout(t);
-                } else {
-                    clearTimeout(t);
-                    t = setTimeout(result, 2000, event);
-                }
-            });
-            sr.start();
-            t = setTimeout(stop, 3000, 'No sound recognized in the 3 initial seconds');
-        });
-
-        const audioButton = $('audioButton');
+        const audioButton = $('audio-button');
 
         audioButton.addEventListener('click', async () => {
+            const { listen } = await import('./vad.js');
+
             const wave = $('wave');
             const mic = $('mic');
             mic.style.display = 'none';
@@ -269,28 +227,15 @@
 
             // avoid clicks while listenings
             audioButton.disabled = true;
-            listen({
-                lang: 'he-IL'
-            }).then(transcript => {
-                console.log(transcript); // DELETE
-                output(transcript);
-            }).catch(console.error).finally(() => {
+
+            const speechEndCallback = (gotResponse = false) => {
                 audioButton.disabled = false;
                 wave.style.display = 'none';
                 mic.style.display = 'flex';
-            });
-        });
+                audioButton.classList[gotResponse ? 'remove' : 'add']('button-loading');
+            };
 
-        async function transform(text) {
-            const response = await fetch(`/speech`, {
-                method: 'POST',
-                body: text
-            });
-            return await response.json();
-        }
-
-        function output(input) {
-            transform(input).then(data => {
+            listen(speechEndCallback).then(data => {
                 console.log(data); // DELETE
                 for (const key of Object.keys(data)) {
                     const element = $(key);
@@ -298,9 +243,8 @@
                         element.value = data[key];
                     }
                 }
-            });
-        }
-
+            }).catch(console.error).finally(() => speechEndCallback(true));
+        });
     </script>
 
 </body>

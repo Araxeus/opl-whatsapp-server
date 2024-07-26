@@ -9,6 +9,7 @@ export const elapsedTimeSince = (since: number) => {
     return `${days}d ${hours % 24}h ${minutes % 60}m ${seconds % 60}s`;
 };
 
+export type PathOfRequest = ReturnType<typeof pathOfRequest>;
 export function pathOfRequest(req: IncomingMessage) {
     const url = new URL(`http://${req.headers.host}${req?.url || ''}`);
     const pathname = url.pathname;
@@ -72,7 +73,16 @@ export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)
         .map(
             ([k, v]) =>
-                `${k} ${v.map((vv) => (vv.startsWith('http') ? vv : `'${vv}'`)).join(' ')}`,
+                `${k} ${v
+                    .map((vv) =>
+                        vv.startsWith('http') ||
+                        vv.endsWith(':') ||
+                        vv === '*' ||
+                        vv.startsWith('/')
+                            ? vv
+                            : `'${vv}'`,
+                    )
+                    .join(' ')}`,
         )
         .join('; ');
 

@@ -11,16 +11,16 @@ import {
 } from 'auth';
 import {
     ContentType,
-    assets,
     getAssetType,
     getFile,
     getIndexHtml,
     getRandom404,
+    isInFolder,
 } from 'cache';
 import logger from 'logger';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
-import speech from 'speech';
+import { speechToCarData } from 'speech';
 import { sse } from 'sse';
 import { CSPfromObj, getDateToday, getRequestBody, pathOfRequest } from 'utils';
 import { handleWhatsappRoutine, refreshAllInstances } from 'whatsapp';
@@ -57,9 +57,12 @@ const defaultHeaders: http.OutgoingHttpHeaders = {
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cache-Control': 'private',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Embedder-Policy': 'require-corp',
     'Content-Security-Policy': CSPfromObj({
         'default-src': ['self'],
-        'script-src': ['self', 'unsafe-inline'],
+        'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'blob:'],
+        //'worker-src': ['blob:'],
         'style-src': [
             'self',
             'https://fonts.googleapis.com',
@@ -142,7 +145,7 @@ const server = http.createServer(async (req, res) => {
 
     if (path.is('/keepalive')) return response('ty');
 
-    if (path.oneOf(assets)) {
+    if (await isInFolder('assets', path)) {
         return streamResponse(`./assets${path.string}`);
     }
 
@@ -152,7 +155,7 @@ const server = http.createServer(async (req, res) => {
     if (path.is('/form.css'))
         return cachedFileResponse('./pages/form.css', ContentType.CSS);
 
-    if (path.is('/fetch-and-qr.ts')) {
+    if (path.is('/fetch-and-qr.js')) {
         return cachedFileResponse('./dist/fetch-and-qr.js', ContentType.JS);
     }
 
@@ -281,19 +284,30 @@ const server = http.createServer(async (req, res) => {
         return await handleRoutine(ReplaceClientCarSchema);
     }
 
-    //Server Sent Events
+    // Server Sent Events
     if (path.is('/sse')) {
         return sse(req, res, user);
     }
 
+    // VAD
+
+    if (await isInFolder('vendor/vad', path)) {
+        return streamResponse(`./vendor/vad${path.string}`);
+    }
+
+    if (path.is('/vad.js')) {
+        return cachedFileResponse('./dist/vad.js', ContentType.JS);
+    }
+
     if (req.method === 'POST' && path.is('/speech')) {
         try {
-            const body = await getRequestBody(req, true);
-            log.info(`POST request body:\n${body}`);
-            const { result, usage } = await speech.inferCarData(body);
-            log.info(
-                `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
-            );
+            const { result, usage } = await speechToCarData(req, user.name);
+            if (usage)
+                setImmediate(() =>
+                    log.info(
+                        `Completion usage: (total ${usage.total_tokens * 0.000005}$)\n${JSON.stringify(usage, null, 2)}`,
+                    ),
+                );
             return response(result, ContentType.JSON);
         } catch (error) {
             return response(

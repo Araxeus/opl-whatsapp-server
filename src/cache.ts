@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { extname, join as joinPath, resolve as resolvePath } from 'node:path';
 import { ilTime } from 'logger';
+import type { PathOfRequest } from 'utils';
 
 export enum ContentType {
     TEXT = 'text/plain',
@@ -11,6 +12,7 @@ export enum ContentType {
     PNG = 'image/png',
     JPG = 'image/jpeg',
     ICO = 'image/x-icon',
+    WASM = 'application/wasm',
 }
 
 const files = new Map<string, { content: string; type: ContentType }>();
@@ -34,7 +36,24 @@ export async function getFile(path: string, contentType?: ContentType) {
     return file;
 }
 
-export const assets = (await readdir('assets')).map((f) => `/${f}`);
+const folders = new Map<string, string[]>();
+export async function isInFolder(folder: string, path: PathOfRequest['path']) {
+    if (!folders.has(folder)) {
+        folders.set(
+            folder,
+            (await readdir(folder)).map((f) => `/${f}`),
+        );
+    }
+    const files = folders.get(folder);
+    if (!files) {
+        throw new Error(`Folder not found: ${folder}`);
+    }
+    if (path.oneOf(files)) {
+        return true;
+    }
+    return false;
+}
+
 export async function getAssetType(path: string) {
     const ext = extname(path);
     switch (ext) {
@@ -50,6 +69,8 @@ export async function getAssetType(path: string) {
             return ContentType.CSS;
         case '.js':
             return ContentType.JS;
+        case '.wasm':
+            return ContentType.WASM;
         default:
             return ContentType.TEXT;
     }
