@@ -289,10 +289,18 @@ export class WhatsappInstance extends EventEmitter {
                     msgTimeout.clear();
                     msgTimeout.timer = setTimeout(() => {
                         this.log.error('Message timeout');
+                        unsubscribeFromMessages();
                         reject({ success: false, error: 'Message timeout' });
                     }, 1000 * 60); // 1 minute
                 },
-                clear: () => clearTimeout(msgTimeout.timer),
+                clear: () => {
+                    clearTimeout(msgTimeout.timer);
+                },
+            };
+
+            const stop = () => {
+                msgTimeout.clear();
+                unsubscribeFromMessages();
             };
 
             msgTimeout.start();
@@ -319,12 +327,11 @@ export class WhatsappInstance extends EventEmitter {
                     isAlternativeMessage(msg, chatState)
                 ) {
                     if (TEST_MODE) {
+                        stop();
                         reject({
                             success: false,
                             error: 'Got alternative message in TEST_MODE',
                         });
-                        msgTimeout.clear();
-                        unsubscribeFromMessages();
                         return;
                     }
                     gotAlternativeMessage = true;
@@ -342,6 +349,12 @@ export class WhatsappInstance extends EventEmitter {
                     isRequestTypeMessage(msg, chatState, questions) ||
                     msg.message?.conversation === questions[chatState]
                 ) {
+                    if (TEST_MODE) {
+                        // DELETE skip the rest of the routine
+                        stop();
+                        resolve({ success: true });
+                        return;
+                    }
                     readMessage(msg.key);
                     sendMessage(answers[chatState]);
                     chatState++;
@@ -350,8 +363,7 @@ export class WhatsappInstance extends EventEmitter {
                         msg: 'Mismatch error in chatState',
                         expected: questions[chatState],
                     });
-                    msgTimeout.clear();
-                    unsubscribeFromMessages();
+                    stop();
                     reject({
                         success: false,
                         error: 'Mismatch error in chatState',
@@ -363,8 +375,7 @@ export class WhatsappInstance extends EventEmitter {
                     : chatState > questionsLength; // else: We answer the final question
                 if (shouldEnd) {
                     log.info('Finished routine');
-                    msgTimeout.clear();
-                    unsubscribeFromMessages();
+                    stop();
                     resolve({ success: true });
                 }
             }
