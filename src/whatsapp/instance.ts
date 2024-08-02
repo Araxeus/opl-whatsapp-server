@@ -1,5 +1,6 @@
-import EventEmitter from 'node:events';
 import type { Boom } from '@hapi/boom';
+import '@whiskeysockets/baileys';
+import EventEmitter from 'node:events';
 import {
     DisconnectReason,
     WAMessageStubType,
@@ -53,7 +54,7 @@ export class WhatsappInstance extends EventEmitter {
     sock!: ReturnType<typeof makeWASocket>;
     version!: WAVersion;
     log: Logger;
-    loginOnly: boolean;
+    fullSyncNeeded: boolean;
     isConnected = false;
 
     constructor(user: User, loginOnly = false) {
@@ -62,7 +63,7 @@ export class WhatsappInstance extends EventEmitter {
 
         super();
         this.user = user;
-        this.loginOnly = loginOnly;
+        this.fullSyncNeeded = loginOnly;
 
         this.log = logger.child({
             module: `whatsapp/instance of ${user.name}`,
@@ -88,7 +89,7 @@ export class WhatsappInstance extends EventEmitter {
                 : this.user.phoneNumber
         }@s.whatsapp.net`.replace('-', ''); //.replace('+', '')
 
-        const loginOnly = this.loginOnly;
+        const fullSyncNeeded = this.fullSyncNeeded;
 
         this.sock = makeWASocket({
             version: this.version,
@@ -100,7 +101,7 @@ export class WhatsappInstance extends EventEmitter {
             }),
             shouldIgnoreJid(jid) {
                 return (
-                    (!loginOnly &&
+                    (!fullSyncNeeded &&
                         isJidUser(jid) &&
                         jid !== OPERATE_PHONE_NUMBER &&
                         jid !== userPhoneNumber) ||
@@ -110,9 +111,9 @@ export class WhatsappInstance extends EventEmitter {
                     (typeof jid === 'string' && jid.endsWith('@newsletter'))
                 ); // return jid !== OPERATE_PHONE_NUMBER;
             },
-            // shouldSyncHistoryMessage(_msg) {
-            //     return false;
-            // },
+            shouldSyncHistoryMessage(_msg) {
+                return fullSyncNeeded || (_msg.syncType ?? 0) <= 1;
+            },
             syncFullHistory: false,
         });
 
@@ -127,7 +128,6 @@ export class WhatsappInstance extends EventEmitter {
             this.log.info('creds updated');
             saveState().then(() => {
                 this.emit('save');
-                this.log.info('state saved');
             });
         });
 
@@ -176,6 +176,7 @@ export class WhatsappInstance extends EventEmitter {
                 if (qr) {
                     this.log.info('qr code received');
                     this.emit('qr', qr);
+                    this.fullSyncNeeded = true;
                     //qrcodeTerminal.generate(qr, { small: true });
                     const sseConnection = Connection.get(this.user.userID);
                     if (sseConnection) {
@@ -289,10 +290,18 @@ export class WhatsappInstance extends EventEmitter {
                     msgTimeout.clear();
                     msgTimeout.timer = setTimeout(() => {
                         this.log.error('Message timeout');
+                        unsubscribeFromMessages();
                         reject({ success: false, error: 'Message timeout' });
                     }, 1000 * 60); // 1 minute
                 },
-                clear: () => clearTimeout(msgTimeout.timer),
+                clear: () => {
+                    clearTimeout(msgTimeout.timer);
+                },
+            };
+
+            const stop = () => {
+                msgTimeout.clear();
+                unsubscribeFromMessages();
             };
 
             msgTimeout.start();
@@ -319,12 +328,11 @@ export class WhatsappInstance extends EventEmitter {
                     isAlternativeMessage(msg, chatState)
                 ) {
                     if (TEST_MODE) {
+                        stop();
                         reject({
                             success: false,
                             error: 'Got alternative message in TEST_MODE',
                         });
-                        msgTimeout.clear();
-                        unsubscribeFromMessages();
                         return;
                     }
                     gotAlternativeMessage = true;
@@ -342,6 +350,12 @@ export class WhatsappInstance extends EventEmitter {
                     isRequestTypeMessage(msg, chatState, questions) ||
                     msg.message?.conversation === questions[chatState]
                 ) {
+                    if (TEST_MODE) {
+                        // DELETE skip the rest of the routine
+                        stop();
+                        resolve({ success: true });
+                        return;
+                    }
                     readMessage(msg.key);
                     sendMessage(answers[chatState]);
                     chatState++;
@@ -350,8 +364,7 @@ export class WhatsappInstance extends EventEmitter {
                         msg: 'Mismatch error in chatState',
                         expected: questions[chatState],
                     });
-                    msgTimeout.clear();
-                    unsubscribeFromMessages();
+                    stop();
                     reject({
                         success: false,
                         error: 'Mismatch error in chatState',
@@ -363,8 +376,7 @@ export class WhatsappInstance extends EventEmitter {
                     : chatState > questionsLength; // else: We answer the final question
                 if (shouldEnd) {
                     log.info('Finished routine');
-                    msgTimeout.clear();
-                    unsubscribeFromMessages();
+                    stop();
                     resolve({ success: true });
                 }
             }
