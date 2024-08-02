@@ -8,6 +8,7 @@ import {
     initAuthCreds,
 } from '@whiskeysockets/baileys';
 import { Schema, model } from 'mongoose';
+import { debounce } from 'utils';
 
 export interface WhatsappSessionType {
     userID: string;
@@ -51,7 +52,7 @@ export const getAuthFromDatabase = async (userID: string) => {
         creds = initAuthCreds();
     }
 
-    const saveState = async () => {
+    const saveState = debounce(async () => {
         const data = JSON.stringify(
             {
                 creds,
@@ -61,7 +62,7 @@ export const getAuthFromDatabase = async (userID: string) => {
             2,
         );
         await WhatsappSession.updateOne({ userID }, { data });
-    };
+    }, 500);
 
     const clearState = async () => {
         await WhatsappSession.deleteOne({ userID });

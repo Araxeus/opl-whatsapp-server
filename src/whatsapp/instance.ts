@@ -1,5 +1,6 @@
-import EventEmitter from 'node:events';
 import type { Boom } from '@hapi/boom';
+import '@whiskeysockets/baileys';
+import EventEmitter from 'node:events';
 import {
     DisconnectReason,
     WAMessageStubType,
@@ -53,7 +54,7 @@ export class WhatsappInstance extends EventEmitter {
     sock!: ReturnType<typeof makeWASocket>;
     version!: WAVersion;
     log: Logger;
-    loginOnly: boolean;
+    fullSyncNeeded: boolean;
     isConnected = false;
 
     constructor(user: User, loginOnly = false) {
@@ -62,7 +63,7 @@ export class WhatsappInstance extends EventEmitter {
 
         super();
         this.user = user;
-        this.loginOnly = loginOnly;
+        this.fullSyncNeeded = loginOnly;
 
         this.log = logger.child({
             module: `whatsapp/instance of ${user.name}`,
@@ -88,7 +89,7 @@ export class WhatsappInstance extends EventEmitter {
                 : this.user.phoneNumber
         }@s.whatsapp.net`.replace('-', ''); //.replace('+', '')
 
-        const loginOnly = this.loginOnly;
+        const fullSyncNeeded = this.fullSyncNeeded;
 
         this.sock = makeWASocket({
             version: this.version,
@@ -100,7 +101,7 @@ export class WhatsappInstance extends EventEmitter {
             }),
             shouldIgnoreJid(jid) {
                 return (
-                    (!loginOnly &&
+                    (!fullSyncNeeded &&
                         isJidUser(jid) &&
                         jid !== OPERATE_PHONE_NUMBER &&
                         jid !== userPhoneNumber) ||
@@ -110,9 +111,9 @@ export class WhatsappInstance extends EventEmitter {
                     (typeof jid === 'string' && jid.endsWith('@newsletter'))
                 ); // return jid !== OPERATE_PHONE_NUMBER;
             },
-            // shouldSyncHistoryMessage(_msg) {
-            //     return false;
-            // },
+            shouldSyncHistoryMessage(_msg) {
+                return fullSyncNeeded || (_msg.syncType ?? 0) <= 1;
+            },
             syncFullHistory: false,
         });
 
@@ -125,10 +126,8 @@ export class WhatsappInstance extends EventEmitter {
 
         this.sock.ev.on('creds.update', () => {
             this.log.info('creds updated');
-            saveState().then(() => {
-                this.emit('save');
-                this.log.info('state saved');
-            });
+            saveState();
+            this.emit('save');
         });
 
         this.sock.ev.on('messages.upsert', (messages) => {
@@ -176,6 +175,7 @@ export class WhatsappInstance extends EventEmitter {
                 if (qr) {
                     this.log.info('qr code received');
                     this.emit('qr', qr);
+                    this.fullSyncNeeded = true;
                     //qrcodeTerminal.generate(qr, { small: true });
                     const sseConnection = Connection.get(this.user.userID);
                     if (sseConnection) {

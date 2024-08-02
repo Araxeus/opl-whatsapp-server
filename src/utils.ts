@@ -63,6 +63,14 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
+export function debounce(fn: (...args: unknown[]) => void, ms: number) {
+    let timeout: Timer;
+    return (...args: unknown[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn(...args), ms);
+    };
+}
+
 export const getDateToday = () => {
     const d = new Date();
     return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
