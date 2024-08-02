@@ -1,0 +1,7 @@
+{
+    "name": "sweetalert2",
+    "types": "./sweetalert2.d.ts",
+    "module": "./sweetalert2.all.js",
+    "main": "./sweetalert2.all.js",
+    "browser": "./sweetalert2.all.js"
+}

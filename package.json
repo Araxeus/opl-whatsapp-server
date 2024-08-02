@@ -14,7 +14,8 @@
     "fix": "bun lint",
     "updates": "bun update --latest",
     "check_up": "bunx npm-check-updates -p bun --format group",
-    "try": "bun _build test && node --env-file=.env ./dist/test.js"
+    "try": "bun _build test && node --env-file=.env ./dist/test.js",
+    "update_vendors": "bun run vendor up && bun patches/index.ts"
   },
   "author": "",
   "license": "MIT",
@@ -27,7 +28,18 @@
     "pino": "^9.2.0",
     "pino-pretty": "^11.2.1",
     "qrcode": "^1.5.3",
+    "sweetalert2": "file:./vendor/sweetalert2",
     "zod": "^3.23.8"
+  },
+  "vendorDependencies": {
+    "sweetalert2": {
+      "version": "v11.12.4",
+      "repository": "https://github.com/sweetalert2/sweetalert2",
+      "files": [
+        "{release}/sweetalert2.all.js",
+        "sweetalert2.d.ts"
+      ]
+    }
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
@@ -35,7 +47,11 @@
     "@types/cookie": "^0.6.0",
     "@types/node": "^20.14.10",
     "@types/qrcode": "^1.5.5",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vendorfiles": "^1.2.0"
   },
-  "trustedDependencies": ["@biomejs/biome", "protobufjs"]
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "protobufjs"
+  ]
 }

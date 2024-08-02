@@ -2,11 +2,11 @@
 // import { getUser, validateUserID } from 'auth';
 import log from 'logger';
 import mongoose from 'mongoose';
-import {
-    // handleWhatsappRoutine,
-    refreshAllInstances,
-    //startWhatsappTest
-} from 'whatsapp';
+// import {
+//     // handleWhatsappRoutine,
+//     refreshAllInstances,
+//     //startWhatsappTest
+// } from 'whatsapp';
 
 if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI must be defined');
@@ -20,11 +20,11 @@ log.info(
     `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
 );
 
-refreshAllInstances().then(() => {
-    // release resources
-    //setTimeout(mongoose.connection.close, 500);
-    process.exit(0);
-});
+// refreshAllInstances().then(() => {
+//     // release resources
+//     //setTimeout(mongoose.connection.close, 500);
+//     process.exit(0);
+// });
 
 // const rl = readline.createInterface(process.stdin, process.stdout);
 // rl.setPrompt('$ ');

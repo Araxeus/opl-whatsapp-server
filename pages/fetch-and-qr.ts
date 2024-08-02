@@ -4,6 +4,8 @@ import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
 // IMPORTANT: can only import types from src folder since this is compiled to js and run in browser
 
+import notif from 'sweetalert2';
+
 type FetchAndQrData =
     | CarParkingInfo
     | ReplaceClientCarInfo
@@ -98,22 +100,41 @@ export async function fetchAndQr({
                             ? err.message
                             : JSON.stringify(err, null, 2)
                     }`,
+                    'error',
                 );
             });
 
-        const response = await fetch(path, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
+        const response =
+            path !== '/login'
+                ? {
+                      json: async () =>
+                          new Promise((resolve) => {
+                              setTimeout(() => {
+                                  resolve({ success: true });
+                              }, 1500);
+                          }),
+                  }
+                : await fetch(path, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(data),
+                  });
 
-        if (!response.ok) {
-            throw new Error(
-                `${path} failed: ${response.statusText} - ${response.status}`,
-            );
-        }
+        // const response = await fetch(path, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(data),
+        // });
+
+        // if (!response.ok) {
+        //     throw new Error(
+        //         `${path} failed: ${response.statusText} - ${response.status}`,
+        //     );
+        // } // DELETE comment
 
         const json = (await response.json()) as SavedRequest['response'];
         const success = 'success' in json && json.success;
@@ -211,8 +232,22 @@ function showQrCode() {
     });
 }
 
-export function alertSoon(message: string) {
-    setTimeout(() => alert(message), 50);
+export function alertSoon(message: string, alertType?: 'error' | 'success') {
+    setTimeout(
+        () =>
+            void notif.fire({
+                //title: alertType === 'error' ? 'Error' : 'Success',
+                //text: message,
+                title: message,
+                icon: alertType,
+                heightAuto: false,
+                width: '24em',
+                confirmButtonText: 'אישור',
+                // 5c is green 30 is blue
+                confirmButtonColor: '#5cb85c', // '#3085d6',
+            }),
+        50,
+    );
 }
 
 function checkExists(

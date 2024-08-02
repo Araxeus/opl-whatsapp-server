@@ -105,12 +105,12 @@
                 onError: (error) => {
                     stopLoading();
                     console.error(error);
-                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`);
+                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`, 'error');
                 },
                 onSuccess: () => {
                     stopLoading();
                     event.target.reset(); // form.reset();
-                    alertSoon('הבקשה הוגשה בהצלחה');
+                    alertSoon('הבקשה הוגשה בהצלחה', 'success');
                 },
             });
         });

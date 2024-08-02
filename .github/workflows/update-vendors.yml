@@ -1,0 +1,20 @@
+name: Update Vendors
+
+on:
+    schedule:
+        # every day at 07:33
+        - cron: '33 7 * * *'
+    workflow_dispatch: null # allow manual trigger
+
+jobs:
+    update-vendors:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: oven-sh/setup-bun@v2
+            - uses: actions/checkout@v4
+            - name: Run vendor update
+              uses: Araxeus/vendorfiles-action@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  package-manager: bun run
+                  before-pr-command: 'bun patches/index.ts'

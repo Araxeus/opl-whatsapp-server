@@ -170,7 +170,7 @@
                 onError: (error) => {
                     stopLoading();
                     console.error(error);
-                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`);
+                    alertSoon(`Error: ${error?.message || JSON.stringify(error, null, 2)}`, 'error');
                 },
                 onSuccess: () => {
                     window.location.pathname = '/';
@@ -188,14 +188,14 @@
                     if (!res.ok) {
                         stopLoading();
                         console.error(res);
-                        alertSoon(`Error in server: ${res.status}`);
+                        alertSoon(`Error in server: ${res.status}`, 'error');
                     }
                     try {
                         const data = await res.json();
                         if (data.error) {
                             stopLoading();
                             console.error(data.error);
-                            alertSoon(`Error: ${data.error}`);
+                            alertSoon(`Error: ${data.error}`, 'error');
                             return;
                         }
                         if (data.success) {
@@ -208,7 +208,7 @@
                     } catch (error) {
                         stopLoading();
                         console.error(error);
-                        alertSoon(`Error in client: ${error}`);
+                        alertSoon(`Error in client: ${error}`, 'error');
                     }
                 },
             });

@@ -1,0 +1,10 @@
+{
+  "sweetalert2": {
+    "repository": "https://github.com/sweetalert2/sweetalert2",
+    "version": "v11.12.4",
+    "files": {
+      "{release}/sweetalert2.all.js": "sweetalert2.all.js",
+      "sweetalert2.d.ts": "sweetalert2.d.ts"
+    }
+  }
+}
