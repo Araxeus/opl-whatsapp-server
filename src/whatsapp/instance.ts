@@ -126,8 +126,9 @@ export class WhatsappInstance extends EventEmitter {
 
         this.sock.ev.on('creds.update', () => {
             this.log.info('creds updated');
-            saveState();
-            this.emit('save');
+            saveState().then(() => {
+                this.emit('save');
+            });
         });
 
         this.sock.ev.on('messages.upsert', (messages) => {
