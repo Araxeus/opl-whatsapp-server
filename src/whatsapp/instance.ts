@@ -57,13 +57,13 @@ export class WhatsappInstance extends EventEmitter {
     fullSyncNeeded: boolean;
     isConnected = false;
 
-    constructor(user: User, loginOnly = false) {
+    constructor(user: User, fullsync = false) {
         if (activeInstances.has(user.userID))
             throw new Error('Instance already active, check instanceExists()');
 
         super();
         this.user = user;
-        this.fullSyncNeeded = loginOnly;
+        this.fullSyncNeeded = fullsync;
 
         this.log = logger.child({
             module: `whatsapp/instance of ${user.name}`,

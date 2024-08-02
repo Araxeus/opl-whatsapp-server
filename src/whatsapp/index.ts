@@ -219,7 +219,7 @@ async function refreshWhatsappInstance(user: User): Promise<RoutineResult> {
     }
 
     log.info('Refreshing whatsapp instance...');
-    const instance = new WhatsappInstance(user);
+    const instance = new WhatsappInstance(user, true);
 
     instance.on('error', (e) => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
