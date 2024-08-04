@@ -17,11 +17,6 @@ jobs:
   biome:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: mongolyy/reviewdog-action-biome@v1
         with:
@@ -31,11 +26,6 @@ jobs:
   tsc:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
@@ -46,11 +36,6 @@ jobs:
   misspell:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - name: Check out code.
         uses: actions/checkout@v4
       - name: misspell
@@ -61,11 +46,6 @@ jobs:
   typos:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - uses: actions/checkout@v4
       - uses: reviewdog/action-typos@v1
         with:
@@ -75,11 +55,6 @@ jobs:
   stylelint:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun add stylelint stylelint-config-recommended -D
@@ -92,11 +67,6 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com registry.npmjs.org bun.sh
       - uses: actions/checkout@v4
       - uses: reviewdog/action-actionlint@v1
         with:
@@ -105,11 +75,6 @@ jobs:
   bearer:
     runs-on: ubuntu-latest
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - uses: actions/checkout@v4
       - uses: reviewdog/action-setup@v1
       - name: Run Report
@@ -132,11 +97,6 @@ jobs:
     runs-on: ubuntu-latest
     name: njsscan check
     steps:
-      - uses: cycodelabs/cimon-action@v0
-        with:
-          prevent: true
-          allowed-hosts: >
-            api.cycode.com github.com api.github.com codeload.github.com objects.githubusercontent.com raw.githubusercontent.com
       - name: Checkout the code
         uses: actions/checkout@v4
       - uses: reviewdog/action-setup@v1

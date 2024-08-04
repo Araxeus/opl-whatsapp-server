@@ -20,6 +20,5 @@ jobs:
     container:
       image: returntocorp/semgrep
     steps:
-    - uses: cycodelabs/cimon-action@v0
     - uses: actions/checkout@v4
     - run: semgrep ci
