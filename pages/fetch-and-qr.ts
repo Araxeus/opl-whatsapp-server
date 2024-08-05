@@ -2,7 +2,6 @@ import type { toCanvas } from 'qrcode';
 import type { WhatsappLoginResult, WhatsappRoutineResult } from 'whatsapp';
 import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
-// IMPORTANT: can only import types from src folder since this is compiled to js and run in browser
 
 type FetchAndQrData =
     | CarParkingInfo

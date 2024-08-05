@@ -39,8 +39,6 @@ export function sse(
         res.write(`data: ${JSON.stringify(message ?? messageOrEvent)}\n\n`);
     };
 
-    //res.write('\n');
-
     const connection = new Connection({
         userID: user.userID,
         controller: {
