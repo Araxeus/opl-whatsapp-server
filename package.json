@@ -8,6 +8,7 @@
   "scripts": {
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
     "_build": "rm -rf dist && bun ./build.ts",
+    "b": "bun _build",
     "ci": "bun install && bun run biome check && tsc --noEmit && bun _build",
     "check": "bun ci && bun check_up",
     "lint": "bun run biome check --write",
@@ -15,18 +16,19 @@
     "updates": "bun update --latest",
     "check_up": "bunx npm-check-updates -p bun --format group",
     "try": "bun _build test && node --env-file=.env ./dist/test.js",
-    "update_vendors": "bun run vendor up && bun patches/index.ts"
+    "update_vendors": "bun run vendor up && bun patches/index.ts",
+    "preview": "bun preview-branch.ts"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.5",
     "cookie": "^0.6.0",
-    "mongoose": "^8.5.1",
+    "mongoose": "^8.5.2",
     "nanoid": "^5.0.7",
-    "openai": "^4.52.7",
-    "pino": "^9.2.0",
-    "pino-pretty": "^11.2.1",
+    "openai": "^4.54.0",
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2",
     "qrcode": "^1.5.3",
     "sweetalert2": "file:./vendor/sweetalert2",
     "zod": "^3.23.8"
@@ -43,11 +45,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@hapi/boom": "^10.0.1",
     "@types/bun": "^1.1.6",
     "@types/cookie": "^0.6.0",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.1.0",
     "@types/qrcode": "^1.5.5",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "vendorfiles": "^1.2.0"
   },
   "trustedDependencies": [
