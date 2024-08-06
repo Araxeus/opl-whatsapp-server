@@ -1,12 +1,9 @@
+import env from 'env';
 import OpenAI from 'openai';
-
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY must be defined');
-}
 
 // Initialize the OpenAI client with the API key from environment variables
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Ensure to set the API key in environment variables
+    apiKey: env.required.OPENAI_API_KEY, // Ensure to set the API key in environment variables
 });
 
 const systemPrompt = `

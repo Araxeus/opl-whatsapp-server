@@ -1,4 +1,5 @@
 import type { IncomingMessage } from 'node:http';
+import env from 'env';
 
 export const elapsedTimeSince = (since: number) => {
     const diff = Date.now() - since;
@@ -77,4 +78,4 @@ export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
         .join('; ');
 
 // We are in test mode unless explicitly turned off
-export const TEST_MODE = process.env.TEST_MODE !== 'off';
+export const TEST_MODE = env.optional.TEST_MODE !== 'off';

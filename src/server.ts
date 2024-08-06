@@ -17,6 +17,7 @@ import {
     getIndexHtml,
     getRandom404,
 } from 'cache';
+import env from 'env';
 import logger from 'logger';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
@@ -31,26 +32,16 @@ import {
 } from 'whatsapp/replace-client-car';
 import type { z } from 'zod';
 
-if (!process.env.REFRESH_KEY) {
-    throw new Error('REFRESH_KEY must be defined');
-}
-
-const REFRESH_KEY = process.env.REFRESH_KEY;
-
-if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI must be defined');
-}
-
 logger.info('connecting to mongo');
-await mongoose.connect(process.env.MONGODB_URI, {
+await mongoose.connect(env.required.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
 logger.info(
     `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
 );
 
-const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';
-const PORT = Number(process.env.PORT ?? 3000);
+const HOST = env.optional.HOST || '127.0.0.1'; // || 0.0.0.0 || 'localhost';
+const PORT = Number(env.optional.PORT || 3000);
 
 const defaultHeaders: http.OutgoingHttpHeaders = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
@@ -191,7 +182,7 @@ const server = http.createServer(async (req, res) => {
     // API call to refresh user sessions
     if (
         path.is('/refresh-active-user-sessions') &&
-        query.get('refresh_key') === REFRESH_KEY
+        query.get('refresh_key') === env.required.REFRESH_KEY
     ) {
         refreshAllInstances();
         return response(

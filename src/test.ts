@@ -1,3 +1,4 @@
+import env from 'env';
 // import readline from 'node:readline';
 // import { getUser, validateUserID } from 'auth';
 import log from 'logger';
@@ -8,12 +9,8 @@ import {
     //startWhatsappTest
 } from 'whatsapp';
 
-if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI must be defined');
-}
-
 log.info('connecting to mongo');
-await mongoose.connect(process.env.MONGODB_URI, {
+await mongoose.connect(env.required.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
 log.info(
@@ -30,11 +27,11 @@ refreshAllInstances().then(() => {
 // rl.setPrompt('$ ');
 // rl.prompt();
 
-// if (!process.env.TEST_USERID || !validateUserID(process.env.TEST_USERID)) {
+// if (!env.optional.TEST_USERID || !validateUserID(env.optional.TEST_USERID)) {
 //     throw new Error('TEST_USERID env variable must be defined and valid');
 // }
 
-// const testUser = await getUser(process.env.TEST_USERID);
+// const testUser = await getUser(env.optional.TEST_USERID);
 
 // import speech from 'speech';
 

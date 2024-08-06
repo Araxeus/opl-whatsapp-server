@@ -1,3 +1,4 @@
+import env from 'env';
 import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
 import { z } from 'zod';
@@ -9,10 +10,7 @@ export const CarId = z
         message: 'carId must be in the format 398-35-902 or 39853902',
     });
 
-if (!process.env.OPERATE_PHONE_NUMBER) {
-    throw new Error('env.OPERATE_PHONE_NUMBER must be defined');
-}
-export const OPERATE_PHONE_NUMBER = process.env.OPERATE_PHONE_NUMBER;
+export const OPERATE_PHONE_NUMBER = env.required.OPERATE_PHONE_NUMBER;
 
 export function isCarParkingInfo(
     data: CarParkingInfo | ReplaceClientCarInfo,

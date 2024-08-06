@@ -39,5 +39,10 @@
     "@types/qrcode": "^1.5.5",
     "typescript": "^5.5.4"
   },
-  "trustedDependencies": ["@biomejs/biome", "protobufjs"]
+  "trustedDependencies": ["@biomejs/biome", "protobufjs"],
+  "packageManager": "bun@1.1.21",
+  "engines": {
+    "node": ">>=22.0.0",
+    "bun": ">>=1.1.20"
+  }
 }
