@@ -14,7 +14,8 @@
     "fix": "bun lint",
     "updates": "bun update --latest",
     "check_up": "bunx npm-check-updates -p bun --format group",
-    "try": "bun _build test && node --env-file=.env ./dist/test.js"
+    "try": "bun _build test && node --env-file=.env ./dist/test.js",
+    "preview": "bun preview-branch.ts"
   },
   "author": "",
   "license": "MIT",
