@@ -30,7 +30,7 @@
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
     "qrcode": "^1.5.3",
-    "sweetalert2": "file:./vendor/sweetalert2",
+    "sweetalert2": "./vendor/sweetalert2",
     "zod": "^3.23.8"
   },
   "vendorDependencies": {
