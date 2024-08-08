@@ -30,7 +30,7 @@ Run using:
 node ./dist/server.js
 ```
 
- To disable testing mode set the environment variable `TEST_MODE` to `off` aka:
+To disable testing mode set the environment variable `TEST_MODE` to `off` aka:
 
 Bash:
 
@@ -48,12 +48,6 @@ Powershell:
 
 ```powershell
 $env:TEST_MODE = "off"
-```
-
-CMD:
-
-```cmd
-set TEST_MODE=off
 ```
 
 ## Requirements
