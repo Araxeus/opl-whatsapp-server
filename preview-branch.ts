@@ -1,10 +1,12 @@
 import { $ } from 'bun';
 
 const ENV = {
-    COOLIFY_URL: 'https://cool.karearl.com',
-    API_TOKEN: '1|4mEEdbJ3dX32D69TblRSHK8SUJqcgslI7S5IXtTa472a931a',
-    PR_PREVIEW_UUID: 'dwso88s',
-    PROJECT_UUID: 'kswg8ks',
+    COOLIFY_URL: process.env.COOLIFY_URL,
+    PR_PREVIEW_URL: process.env.COOLIFY_PR_PREVIEW_URL,
+    API_TOKEN: process.env.COOLIFY_API_TOKEN,
+    PR_PREVIEW_UUID: process.env.COOLIFY_PR_PREVIEW_UUID,
+    PROJECT_UUID: process.env.COOLIFY_PROJECT_UUID,
+    PROJECT_NAME: 'pr-preview',
 };
 
 const currentBranch = await $`git branch --show-current`.text();
@@ -20,13 +22,14 @@ const patchRes = await fetch(appUrl, {
     },
     body: JSON.stringify({
         git_branch: currentBranch,
+        domains: [ENV.PR_PREVIEW_URL],
     }),
 });
 
 if (patchRes.ok && patchRes.status === 200) {
     console.log(`Set preview branch to ${currentBranch}
 Access it at:
-https://opl-pr-preview.karearl.com`);
+${ENV.PR_PREVIEW_URL}`);
     await deploy();
 } else {
     console.error('Failed to set preview branch');
@@ -41,7 +44,7 @@ async function deploy() {
 
     if (deployRes.ok && deployRes.status === 200) {
         const { deployment_uuid } = await deployRes.json();
-        const deployUrl = `${ENV.COOLIFY_URL}/project/${ENV.PROJECT_UUID}/pr-preview/application/${ENV.PR_PREVIEW_UUID}/deployment/${deployment_uuid}`;
+        const deployUrl = `${ENV.COOLIFY_URL}/project/${ENV.PROJECT_UUID}/${ENV.PROJECT_NAME}/application/${ENV.PR_PREVIEW_UUID}/deployment/${deployment_uuid}`;
         console.log(`Deployment started, check its progress at:\n${deployUrl}`);
     } else {
         console.error('Failed to deploy');
