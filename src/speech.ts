@@ -1,4 +1,13 @@
 import OpenAI from 'openai';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import z from 'zod';
+
+const expectedResults = z.object({
+    carID: z.string().optional(),
+    km: z.number().optional(),
+    startingPoint: z.string().optional(),
+    destination: z.string().optional(),
+});
 
 if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY must be defined');
@@ -34,59 +43,20 @@ After creating the output, check it to ensure it adheres to the JSON rules above
 If the input is invalid or incomplete, return an empty JSON object: {}.
 `;
 
-// Define an interface for the expected JSON output
-interface CarData {
-    carID?: string; // Optional field
-    km?: number; // Optional field
-    startingPoint?: string; // Optional field
-    destination?: string; // Optional field
-}
-
-function inferCarData(
-    text: string,
-    parse: true,
-): Promise<{
-    result: CarData;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-function inferCarData(
-    text: string,
-    parse?: false,
-): Promise<{
-    result: string;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-async function inferCarData(text: string, parse = false) {
+async function inferCarData(text: string) {
     try {
-        const completion = await openai.chat.completions.create({
+        const completion = await openai.beta.chat.completions.parse({
+            model: 'gpt-4o-2024-08-06', //'gpt-3.5-turbo',
             messages: [
-                {
-                    role: 'system',
-                    content: systemPrompt,
-                },
-                {
-                    role: 'user',
-                    content: text,
-                },
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: text },
             ],
-            model: 'gpt-4o', //'gpt-3.5-turbo',
-            response_format: { type: 'json_object' },
+            response_format: zodResponseFormat(expectedResults, 'parking_data'),
         });
-        const output = completion.choices[0].message.content?.trim() ?? '';
-
-        // Try to parse the response as JSON
-        // const jsonResponse: CarData = output ? JSON.parse(output) : {};
-        // Additional validation to ensure carID format if present
-        // if (
-        //     jsonResponse.carID &&
-        //     !/^\d{3}-\d{2}-\d{3}$/.test(jsonResponse.carID)
-        // ) {
-        //     // throw new Error('Invalid carID format');
-        //     console.error('Invalid carID format');
-        // }
+        const output = completion.choices[0].message.parsed;
 
         return {
-            result: parse ? (JSON.parse(output) as CarData) : output,
+            result: output,
             usage: completion.usage,
         };
     } catch (error) {
