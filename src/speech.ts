@@ -29,18 +29,14 @@ You will act as an interpreter between the output of a hebrew speech recognition
 
 You will try to infer this data from the input in hebrew, USE ONLY EXISTING DATA - if the user didn't specify a key then don't include it.
 (for example user might only provide startingPoint, or he might only provide km and destination, etc..)
-input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
 
 Simplify the name of places and remove prefixes - for example:
 "מהכוננות" should become "כוננות"
 "מאילן קארגלאס" should become "אילן קארגלאס"
 "הביתה" should become "בית"
 
-Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
-
-After creating the output, check it to ensure it adheres to the JSON rules above, especially the car number format.
-
-If the input is invalid or incomplete, return an empty JSON object: {}.
+input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
+input: "323 45 702 מאילן קרגלס לבן אליעזר 82 קילומטר 42,730" -> output: {"carID":"323-45-702","km":42730,"startingPoint":"אילן קרגלס","destination":"בן אליעזר 82"}
 `;
 
 async function inferCarData(text: string) {
