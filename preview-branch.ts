@@ -9,6 +9,13 @@ const ENV = {
     PROJECT_NAME: 'pr-preview',
 };
 
+for (const key in ENV) {
+    if (!ENV[key as keyof typeof ENV]) {
+        console.error(`Missing environment variable: ${key}`);
+        process.exit(1);
+    }
+}
+
 const currentBranch = await $`git branch --show-current`.text();
 
 const appUrl = `${ENV.COOLIFY_URL}/api/v1/applications/${ENV.PR_PREVIEW_UUID}`;
@@ -22,7 +29,7 @@ const patchRes = await fetch(appUrl, {
     },
     body: JSON.stringify({
         git_branch: currentBranch,
-        domains: [ENV.PR_PREVIEW_URL],
+        domains: ENV.PR_PREVIEW_URL,
     }),
 });
 
