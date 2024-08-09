@@ -12,6 +12,7 @@ import logger from 'logger';
 import { Schema, model } from 'mongoose';
 const log = logger.child({ module: 'auth' });
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
+import env from 'env';
 import { getDateToday } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';
 import { z } from 'zod';
@@ -32,16 +33,12 @@ const mUser = new Schema<User>({
 });
 const Users = model<User>('User', mUser);
 
-if (!process.env.USERID_SECRET)
-    throw new Error('USERID_SECRET env variable must be defined');
-
 const encryptionAlgorithm: CipherGCMTypes = 'aes-256-gcm';
 
 function encryptUserID(userID: string): string {
     const salt = randomBytes(16);
     const iv = randomBytes(12);
-    // biome-ignore lint/style/noNonNullAssertion: it was already checked above
-    const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
+    const key = scryptSync(env.required.USERID_SECRET, salt, 32);
     const cipher = createCipheriv(encryptionAlgorithm, key, iv);
     const encrypted = Buffer.concat([
         cipher.update(userID, 'utf8'),
@@ -66,8 +63,7 @@ function decryptUserID(encryptedData: string): {
         const [encryptDate, salt, iv, authTag, encryptedText] = parts.map(
             (part) => Buffer.from(part, 'base64'),
         );
-        // biome-ignore lint/style/noNonNullAssertion: it was already checked above
-        const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
+        const key = scryptSync(env.required.USERID_SECRET, salt, 32);
         const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
         decipher.setAuthTag(authTag);
         const decrypted = Buffer.concat([

@@ -1,5 +1,12 @@
 const test = process.argv[2] === 'test';
 
+const external = [
+    '@whiskeysockets/baileys',
+    'openai',
+    'mongoose',
+    '@bitwarden/sdk-napi',
+];
+
 if (test) {
     console.log('Building test.js...');
     await Bun.build({
@@ -8,7 +15,7 @@ if (test) {
         target: 'node',
         //minify: true,
         sourcemap: 'linked', //external',
-        external: ['@whiskeysockets/baileys', 'openai', 'mongoose'],
+        external,
     });
     console.log('test.js build complete');
 } else {
@@ -19,7 +26,7 @@ if (test) {
         target: 'node',
         minify: true,
         sourcemap: 'external', // external
-        external: ['@whiskeysockets/baileys', 'openai', 'mongoose'],
+        external,
     });
     console.log('server.js build complete');
     console.log(serverRes);
