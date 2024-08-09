@@ -41,9 +41,9 @@
     "typescript": "^5.5.4"
   },
   "trustedDependencies": ["@biomejs/biome", "protobufjs"],
-  "packageManager": "bun@1.1.21",
+  "packageManager": "bun@1.1.22",
   "engines": {
-    "node": ">>=22.0.0",
-    "bun": ">>=1.1.20"
+    "node": ">=22.6.0",
+    "bun": ">=1.1.22"
   }
 }
