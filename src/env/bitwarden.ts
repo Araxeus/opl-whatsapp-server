@@ -8,12 +8,12 @@ import {
 } from './env-list';
 
 export class BitwardenSecrets {
-    private client: BitwardenClient | undefined;
+    private client?: BitwardenClient;
     private secretsIdMap: BWSecrets = {};
 
     private constructor(
-        private token: string,
-        private orgId: string,
+        private token?: string,
+        private orgId?: string,
     ) {
         if (!token) return;
         if (!orgId) {
@@ -23,17 +23,14 @@ export class BitwardenSecrets {
         this.client = new BitwardenClient();
     }
 
-    static async new(
-        token: string | undefined = '',
-        orgId: string | undefined = '',
-    ) {
+    static async new(token?: string, orgId?: string) {
         const bw = new BitwardenSecrets(token, orgId);
         await bw.init();
         return bw;
     }
 
     private async init() {
-        if (!this.client) return;
+        if (!this.client || !this.token || !this.orgId) return;
         await this.client.loginWithAccessToken(this.token).then((result) => {
             if (!result.success) {
                 throw Error(
