@@ -1,4 +1,13 @@
 import OpenAI from 'openai';
+import { zodResponseFormat } from 'openai/helpers/zod';
+import z from 'zod';
+
+const expectedResults = z.object({
+    carID: z.string().optional(),
+    km: z.number().optional(),
+    startingPoint: z.string().optional(),
+    destination: z.string().optional(),
+});
 
 if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY must be defined');
@@ -20,73 +29,30 @@ You will act as an interpreter between the output of a hebrew speech recognition
 
 You will try to infer this data from the input in hebrew, USE ONLY EXISTING DATA - if the user didn't specify a key then don't include it.
 (for example user might only provide startingPoint, or he might only provide km and destination, etc..)
-input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
 
 Simplify the name of places and remove prefixes - for example:
 "מהכוננות" should become "כוננות"
 "מאילן קארגלאס" should become "אילן קארגלאס"
 "הביתה" should become "בית"
 
-Output only valid parsable JSON in the specified format. The JSON must start with { and end with }.
-
-After creating the output, check it to ensure it adheres to the JSON rules above, especially the car number format.
-
-If the input is invalid or incomplete, return an empty JSON object: {}.
+input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
+input: "323 45 702 מאילן קרגלס לבן אליעזר 82 קילומטר 42,730" -> output: {"carID":"323-45-702","km":42730,"startingPoint":"אילן קרגלס","destination":"בן אליעזר 82"}
 `;
 
-// Define an interface for the expected JSON output
-interface CarData {
-    carID?: string; // Optional field
-    km?: number; // Optional field
-    startingPoint?: string; // Optional field
-    destination?: string; // Optional field
-}
-
-function inferCarData(
-    text: string,
-    parse: true,
-): Promise<{
-    result: CarData;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-function inferCarData(
-    text: string,
-    parse?: false,
-): Promise<{
-    result: string;
-    usage: OpenAI.Completions.CompletionUsage;
-}>;
-async function inferCarData(text: string, parse = false) {
+async function inferCarData(text: string) {
     try {
-        const completion = await openai.chat.completions.create({
+        const completion = await openai.beta.chat.completions.parse({
+            model: 'gpt-4o-2024-08-06', //'gpt-3.5-turbo',
             messages: [
-                {
-                    role: 'system',
-                    content: systemPrompt,
-                },
-                {
-                    role: 'user',
-                    content: text,
-                },
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: text },
             ],
-            model: 'gpt-4o', //'gpt-3.5-turbo',
-            response_format: { type: 'json_object' },
+            response_format: zodResponseFormat(expectedResults, 'parking_data'),
         });
-        const output = completion.choices[0].message.content?.trim() ?? '';
-
-        // Try to parse the response as JSON
-        // const jsonResponse: CarData = output ? JSON.parse(output) : {};
-        // Additional validation to ensure carID format if present
-        // if (
-        //     jsonResponse.carID &&
-        //     !/^\d{3}-\d{2}-\d{3}$/.test(jsonResponse.carID)
-        // ) {
-        //     // throw new Error('Invalid carID format');
-        //     console.error('Invalid carID format');
-        // }
+        const output = completion.choices[0].message.parsed;
 
         return {
-            result: parse ? (JSON.parse(output) as CarData) : output,
+            result: output,
             usage: completion.usage,
         };
     } catch (error) {
