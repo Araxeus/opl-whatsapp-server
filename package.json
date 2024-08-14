@@ -20,7 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.5",
+    "@whiskeysockets/baileys": "^6.7.6",
     "cookie": "^0.6.0",
     "mongoose": "^8.5.3",
     "nanoid": "^5.0.7",
