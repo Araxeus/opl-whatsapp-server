@@ -46,7 +46,7 @@ await mongoose.connect(process.env.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
 logger.info(
-    `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
+    `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db?.databaseName}"`,
 );
 
 const HOST = process.env.HOST ?? '127.0.0.1'; // ?? 0.0.0.0 ?? 'localhost';

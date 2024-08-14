@@ -17,7 +17,7 @@ await mongoose.connect(process.env.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
 log.info(
-    `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db.databaseName}"`,
+    `MongoDB connected to:\n\t${mongoose.connection.host}:${mongoose.connection.port}\n\tDatabase name = "${mongoose.connection.db?.databaseName}"`,
 );
 
 refreshAllInstances().then(() => {
