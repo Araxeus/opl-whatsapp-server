@@ -21,17 +21,17 @@ export function isCarParkingInfo(
     return (data as CarParkingInfo).carID !== undefined;
 }
 
-export type Question = {
+export interface Question {
     question: string;
     answer: string;
     selector?: (msg: WAProto.IWebMessageInfo) => string | null | undefined;
-};
+}
 
-export type QuestionsMap = {
+export interface QuestionsMap {
     '1': Question;
     '2': Question;
     [x: number]: Question;
-};
+}
 
 export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.buttonsMessage?.contentText;
