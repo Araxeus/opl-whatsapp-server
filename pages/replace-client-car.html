@@ -48,6 +48,8 @@
                 12345678.</span>
             <label dir="rtl" for="replacementCarKM">ק"מ ברכב החלופי</label>
             <input dir="rtl" type="number" id="replacementCarKM" name="replacementCarKM" dir="rtl" placeholder="אחרון">
+            <label dir="rtl" for="replacementCarOrigin">מקור הרכב החלופי</label>
+            <input dir="rtl" type="text" id="replacementCarOrigin" name="replacementCarOrigin" dir="rtl" placeholder="חנייה">
 
             <button type="submit"><span dir="rtl" class="button_text">שלח</span></button>
         </form>
@@ -91,11 +93,13 @@
             };
 
             const replacementCarKM = $('replacementCarKM').value;
+            const replacementCarOrigin = $('replacementCarOrigin').value;
 
             const data = {
                 clientCarID,
                 replacementCarID,
-                replacementCarKM: replacementCarKM ? Number(replacementCarKM) : undefined
+                replacementCarKM: replacementCarKM ? Number(replacementCarKM) : undefined,
+                replacementCarOrigin
             };
 
             fetchAndQr({

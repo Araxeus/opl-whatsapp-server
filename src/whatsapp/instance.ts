@@ -21,14 +21,12 @@ import { TEST_MODE } from 'utils';
 import {
     type CarParkingInfo,
     type QuestionType as QuestionType_ParkCar,
-    answersMap as answersMapParkCar,
     customAnswerParkCar,
     questions as questionsParkCar,
 } from 'whatsapp/park-car';
 import {
     type QuestionType as QuestionType_RequestCar,
     type ReplaceClientCarInfo,
-    answersMap as answersMapReplaceClientCar,
     customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
@@ -252,15 +250,13 @@ export class WhatsappInstance extends EventEmitter {
     async routine(data: CarParkingInfo | ReplaceClientCarInfo) {
         if (!activeInstances.has(this.user.userID))
             throw new Error('Instance not active');
-        const { questions, answers, customAnswer } = isCarParkingInfo(data)
+        const { questions, customAnswer } = isCarParkingInfo(data)
             ? {
-                  questions: questionsParkCar,
-                  answers: answersMapParkCar(this.user, data),
+                  questions: questionsParkCar(this.user, data),
                   customAnswer: customAnswerParkCar(this.user, data),
               }
             : {
-                  questions: questionsReplaceClientCar,
-                  answers: answersMapReplaceClientCar(this.user, data),
+                  questions: questionsReplaceClientCar(this.user, data),
                   customAnswer: customAnswerReplaceClientCar(this.user, data),
               };
 
@@ -346,18 +342,20 @@ export class WhatsappInstance extends EventEmitter {
                     sendMessage(customAnswer);
                     chatState = questionsLength + 1;
                 } else if (
-                    isGreetingMessage(msg, chatState, answers) ||
+                    isGreetingMessage(msg, chatState, questions) ||
                     isRequestTypeMessage(msg, chatState, questions) ||
-                    msg.message?.conversation === questions[chatState]
+                    (questions[chatState].selector?.(msg) ||
+                        msg.message?.conversation) ===
+                        questions[chatState].question
                 ) {
-                    if (TEST_MODE) {
-                        // DELETE skip the rest of the routine
-                        stop();
-                        resolve({ success: true });
-                        return;
-                    }
+                    // if (TEST_MODE) {
+                    //     // DELETE skip the rest of the routine
+                    //     stop();
+                    //     resolve({ success: true });
+                    //     return;
+                    // }
                     readMessage(msg.key);
-                    sendMessage(answers[chatState]);
+                    sendMessage(questions[chatState].answer);
                     chatState++;
                 } else {
                     log.error({
@@ -397,13 +395,13 @@ type ChatState = QuestionType_ParkCar | QuestionType_RequestCar;
 function isGreetingMessage(
     msg: WAProto.IWebMessageInfo,
     chatState: ChatState,
-    answers: QuestionsMap,
+    questions: QuestionsMap,
 ) {
     return (
         chatState === QuestionType.GREETING && //
         msg.message?.listMessage?.buttonText === 'לחצו כאן לבחירה' &&
         msg.message.listMessage.sections?.[0].rows?.some(
-            (row) => row.title === answers[QuestionType.GREETING],
+            (row) => row.title === questions[QuestionType.GREETING].answer,
         )
         //.at(-1).title === questions[QuestionType.GREETING]
         //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
@@ -438,8 +436,8 @@ function isRequestTypeMessage(
 ) {
     return (
         chatState === QuestionType.REQUEST_TYPE &&
-        msg.message?.buttonsMessage?.contentText ===
-            questions[QuestionType.REQUEST_TYPE]
+        msg.message?.listMessage?.description ===
+            questions[QuestionType.REQUEST_TYPE].question
     );
 }
 
