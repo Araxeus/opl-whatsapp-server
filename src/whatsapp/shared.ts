@@ -1,3 +1,4 @@
+import type { WAProto } from '@whiskeysockets/baileys';
 import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
 import { z } from 'zod';
@@ -20,8 +21,17 @@ export function isCarParkingInfo(
     return (data as CarParkingInfo).carID !== undefined;
 }
 
-export type QuestionsMap = {
-    '1': string;
-    '2': string;
-    [x: number]: string;
+export type Question = {
+    question: string;
+    answer: string;
+    selector?: (msg: WAProto.IWebMessageInfo) => string | null | undefined;
 };
+
+export type QuestionsMap = {
+    '1': Question;
+    '2': Question;
+    [x: number]: Question;
+};
+
+export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>
+    msg.message?.buttonsMessage?.contentText;
