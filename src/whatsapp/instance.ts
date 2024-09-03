@@ -348,12 +348,12 @@ export class WhatsappInstance extends EventEmitter {
                         msg.message?.conversation) ===
                         questions[chatState].question
                 ) {
-                    if (TEST_MODE) {
-                        // DELETE skip the rest of the routine
-                        stop();
-                        resolve({ success: true });
-                        return;
-                    }
+                    // if (TEST_MODE) {
+                    //     // DELETE skip the rest of the routine
+                    //     stop();
+                    //     resolve({ success: true });
+                    //     return;
+                    // }
                     readMessage(msg.key);
                     sendMessage(questions[chatState].answer);
                     chatState++;
