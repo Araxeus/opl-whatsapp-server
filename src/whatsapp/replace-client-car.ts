@@ -1,5 +1,10 @@
 import type { User } from 'auth';
-import { CarId, type QuestionsMap, buttonSelector } from 'whatsapp/shared';
+import {
+    CarId,
+    type Question,
+    type QuestionsMap,
+    buttonSelector,
+} from 'whatsapp/shared';
 import { z } from 'zod';
 
 export const ReplaceClientCarSchema = z.object({
@@ -32,7 +37,7 @@ export const questions = (
         replacementCarKM,
         replacementCarOrigin,
     }: ReplaceClientCarInfo,
-): QuestionsMap => ({
+): { [keyof in QuestionType]: Question } => ({
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',

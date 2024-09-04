@@ -1,5 +1,5 @@
 import type { User } from 'auth';
-import { CarId, type QuestionsMap } from 'whatsapp/shared';
+import { CarId, type Question } from 'whatsapp/shared';
 import { z } from 'zod';
 
 export const CarParkingInfoSchema = z.object({
@@ -27,7 +27,7 @@ export enum QuestionType {
 export const questions = (
     user: User,
     { carID, km, startingPoint, destination }: CarParkingInfo,
-): QuestionsMap => ({
+): { [keyof in QuestionType]: Question } => ({
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
@@ -35,6 +35,10 @@ export const questions = (
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'לדיווח תנועה',
+    },
+    [QuestionType.REQUEST_SPECIFIC_TYPE]: {
+        question: 'נא לבחור את סוג הדיווח:',
+        answer: 'חנייה',
     },
     [QuestionType.NAME]: {
         question: 'נא להזין את שמך',
