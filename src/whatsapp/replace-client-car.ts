@@ -24,9 +24,9 @@ export enum QuestionType {
     NAME = 4,
     COMPANY_ID = 5,
     replacementCarID = 6,
-    replacementCarKM = 7,
-    replacementCarOrigin = 8,
-    clientCarID = 9,
+    replacementCarOrigin = 7,
+    clientCarID = 8,
+    replacementCarKM = 9,
     nameCheck = 10,
 }
 
@@ -66,10 +66,6 @@ export const questions = (
         question: 'אנא הזן מספר רכב חלופי',
         answer: replacementCarID,
     },
-    [QuestionType.replacementCarKM]: {
-        question: 'אנא עדכן ק"מ עדכני ברכב החלופי',
-        answer: replacementCarKM?.toString() || 'אחרון',
-    },
     [QuestionType.replacementCarOrigin]: {
         question: 'אנא הזן מקור נסיעה',
         answer: replacementCarOrigin || 'חנייה',
@@ -77,6 +73,10 @@ export const questions = (
     [QuestionType.clientCarID]: {
         question: 'אנא הזן מספר רכב מקורי',
         answer: clientCarID,
+    },
+    [QuestionType.replacementCarKM]: {
+        question: 'אנא עדכן ק"מ עדכני ברכב החלופי',
+        answer: replacementCarKM?.toString() || 'אחרון',
     },
     [QuestionType.nameCheck]: {
         question: `האם שמך הוא ${user.name}?`,
