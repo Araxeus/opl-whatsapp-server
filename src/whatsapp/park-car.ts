@@ -1,5 +1,5 @@
 import type { User } from 'auth';
-import { CarId, type Question } from 'whatsapp/shared';
+import { CarId, type Question, buttonSelector } from 'whatsapp/shared';
 import { z } from 'zod';
 
 export const CarParkingInfoSchema = z.object({
@@ -35,6 +35,7 @@ export const questions = (
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'לדיווח תנועה',
+        selector: buttonSelector,
     },
     [QuestionType.REQUEST_SPECIFIC_TYPE]: {
         question: 'נא לבחור את סוג הדיווח:',
