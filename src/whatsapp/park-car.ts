@@ -20,14 +20,14 @@ export type CarParkingInfo = z.infer<typeof CarParkingInfoSchema>;
 export enum QuestionType {
     GREETING = 1,
     REQUEST_TYPE = 2,
-    REQUEST_SPECIFIC_TYPE = 3,
-    NAME = 4,
-    COMPANY_ID = 5,
-    CAR_ID = 6,
-    KM = 7,
-    STARTING_POINT = 8,
-    DESTINATION = 9,
-    TIME = 10,
+    NAME = 3,
+    COMPANY_ID = 4,
+    CAR_ID = 5,
+    KM = 6,
+    STARTING_POINT = 7,
+    DESTINATION = 8,
+    TIME = 9,
+    REQUEST_SPECIFIC_TYPE = 10,
 }
 
 export const questions = (
@@ -43,11 +43,6 @@ export const questions = (
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'לדיווח תנועה',
         selector: listMessageDescriptionSelector,
-    },
-    [QuestionType.REQUEST_SPECIFIC_TYPE]: {
-        question: 'נא לבחור את סוג הדיווח:',
-        answer: 'חנייה',
-        selector: buttonSelector,
     },
     [QuestionType.NAME]: {
         question: 'נא להזין את שמך',
@@ -76,6 +71,11 @@ export const questions = (
     [QuestionType.TIME]: {
         question: 'נא להזין שעת נסיעה',
         answer: 'עכשיו',
+    },
+    [QuestionType.REQUEST_SPECIFIC_TYPE]: {
+        question: 'נא לבחור את סוג הדיווח:',
+        answer: 'חנייה',
+        selector: buttonSelector,
     },
 });
 

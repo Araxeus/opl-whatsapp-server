@@ -386,23 +386,6 @@ export class WhatsappInstance extends EventEmitter {
 
 type ChatState = QuestionType_ParkCar | QuestionType_RequestCar;
 
-// function isGreetingMessage(
-//     msg: WAProto.IWebMessageInfo,
-//     chatState: ChatState,
-//     questions: QuestionsMap,
-// ) {
-//     return (
-//         chatState === QuestionType.GREETING && //
-//         msg.message?.listMessage?.buttonText === 'לחצו כאן לבחירה' &&
-//         msg.message.listMessage.sections?.[0].rows?.some(
-//             (row) => row.title === questions[QuestionType.GREETING].answer,
-//         )
-//         //.at(-1).title === questions[QuestionType.GREETING]
-//         //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
-//     );
-//     //log(`isGreetingMessage: ${res},msg.type: ${msg.type} | list.title: ${msg.rawData.list?.title}`,); // DELETE
-// }
-
 function isAlternativeMessage(
     msg: WAProto.IWebMessageInfo,
     chatState: ChatState,
