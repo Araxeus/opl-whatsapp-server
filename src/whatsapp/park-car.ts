@@ -24,10 +24,10 @@ export enum QuestionType {
     COMPANY_ID = 4,
     CAR_ID = 5,
     KM = 6,
-    STARTING_POINT = 7,
-    DESTINATION = 8,
-    TIME = 9,
-    REQUEST_SPECIFIC_TYPE = 10,
+    TIME = 7,
+    STARTING_POINT = 8,
+    REQUEST_SPECIFIC_TYPE = 9,
+    DESTINATION = 10,
 }
 
 export const questions = (
@@ -60,22 +60,22 @@ export const questions = (
         question: 'נא הזן ק"מ עדכני ברכב',
         answer: km.toString(),
     },
-    [QuestionType.STARTING_POINT]: {
-        question: 'אנא הזן מקור נסיעה',
-        answer: startingPoint,
-    },
-    [QuestionType.DESTINATION]: {
-        question: 'אנא הזן יעד נסיעה',
-        answer: destination,
-    },
     [QuestionType.TIME]: {
         question: 'נא להזין שעת נסיעה',
         answer: 'עכשיו',
+    },
+    [QuestionType.STARTING_POINT]: {
+        question: 'אנא הזן מקור נסיעה',
+        answer: startingPoint,
     },
     [QuestionType.REQUEST_SPECIFIC_TYPE]: {
         question: 'נא לבחור את סוג הדיווח:',
         answer: 'חנייה',
         selector: buttonSelector,
+    },
+    [QuestionType.DESTINATION]: {
+        question: 'אנא הזן יעד נסיעה',
+        answer: destination,
     },
 });
 
