@@ -30,11 +30,7 @@ import {
     customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
-import {
-    OPERATE_PHONE_NUMBER,
-    type QuestionsMap,
-    isCarParkingInfo,
-} from 'whatsapp/shared';
+import { OPERATE_PHONE_NUMBER, isCarParkingInfo } from 'whatsapp/shared';
 import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';
@@ -342,11 +338,9 @@ export class WhatsappInstance extends EventEmitter {
                     sendMessage(customAnswer);
                     chatState = questionsLength + 1;
                 } else if (
-                    isGreetingMessage(msg, chatState, questions) ||
-                    isRequestTypeMessage(msg, chatState, questions) ||
                     (questions[chatState].selector?.(msg) ||
                         msg.message?.conversation) ===
-                        questions[chatState].question
+                    questions[chatState].question
                 ) {
                     // if (TEST_MODE) {
                     //     // DELETE skip the rest of the routine
@@ -392,22 +386,22 @@ export class WhatsappInstance extends EventEmitter {
 
 type ChatState = QuestionType_ParkCar | QuestionType_RequestCar;
 
-function isGreetingMessage(
-    msg: WAProto.IWebMessageInfo,
-    chatState: ChatState,
-    questions: QuestionsMap,
-) {
-    return (
-        chatState === QuestionType.GREETING && //
-        msg.message?.listMessage?.buttonText === 'לחצו כאן לבחירה' &&
-        msg.message.listMessage.sections?.[0].rows?.some(
-            (row) => row.title === questions[QuestionType.GREETING].answer,
-        )
-        //.at(-1).title === questions[QuestionType.GREETING]
-        //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
-    );
-    //log(`isGreetingMessage: ${res},msg.type: ${msg.type} | list.title: ${msg.rawData.list?.title}`,); // DELETE
-}
+// function isGreetingMessage(
+//     msg: WAProto.IWebMessageInfo,
+//     chatState: ChatState,
+//     questions: QuestionsMap,
+// ) {
+//     return (
+//         chatState === QuestionType.GREETING && //
+//         msg.message?.listMessage?.buttonText === 'לחצו כאן לבחירה' &&
+//         msg.message.listMessage.sections?.[0].rows?.some(
+//             (row) => row.title === questions[QuestionType.GREETING].answer,
+//         )
+//         //.at(-1).title === questions[QuestionType.GREETING]
+//         //msg.message?.listMessage?.title === questions[QuestionType.GREETING]
+//     );
+//     //log(`isGreetingMessage: ${res},msg.type: ${msg.type} | list.title: ${msg.rawData.list?.title}`,); // DELETE
+// }
 
 function isAlternativeMessage(
     msg: WAProto.IWebMessageInfo,
@@ -426,18 +420,6 @@ function isAgentGreeting(msg: WAProto.IWebMessageInfo) {
         typeof conv === 'string' &&
         conv.startsWith('היי') &&
         conv.endsWith('ואני אטפל בקריאתך.')
-    );
-}
-
-function isRequestTypeMessage(
-    msg: WAProto.IWebMessageInfo,
-    chatState: ChatState,
-    questions: QuestionsMap,
-) {
-    return (
-        chatState === QuestionType.REQUEST_TYPE &&
-        msg.message?.listMessage?.description ===
-            questions[QuestionType.REQUEST_TYPE].question
     );
 }
 

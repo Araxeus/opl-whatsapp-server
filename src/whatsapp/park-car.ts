@@ -1,5 +1,11 @@
 import type { User } from 'auth';
-import { CarId, type Question, buttonSelector } from 'whatsapp/shared';
+import {
+    CarId,
+    type Question,
+    buttonSelector,
+    listMessageDescriptionSelector,
+    listMessageTitleSelector,
+} from 'whatsapp/shared';
 import { z } from 'zod';
 
 export const CarParkingInfoSchema = z.object({
@@ -31,15 +37,17 @@ export const questions = (
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
+        selector: listMessageTitleSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'לדיווח תנועה',
-        selector: buttonSelector,
+        selector: listMessageDescriptionSelector,
     },
     [QuestionType.REQUEST_SPECIFIC_TYPE]: {
         question: 'נא לבחור את סוג הדיווח:',
         answer: 'חנייה',
+        selector: buttonSelector,
     },
     [QuestionType.NAME]: {
         question: 'נא להזין את שמך',
