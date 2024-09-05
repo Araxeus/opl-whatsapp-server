@@ -24,7 +24,7 @@
     "cookie": "^0.6.0",
     "mongoose": "^8.6.1",
     "nanoid": "^5.0.7",
-    "openai": "^4.57.1",
+    "openai": "^4.57.3",
     "pino": "^9.4.0",
     "pino-pretty": "^11.2.2",
     "qrcode": "^1.5.4",
