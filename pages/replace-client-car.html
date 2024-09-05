@@ -46,8 +46,8 @@
                 pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" inputmode="numeric" required>
             <span dir="rtl" id="replacementCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
-            <label dir="rtl" for="replacementCarKM">ק"מ ברכב החלופי</label>
-            <input dir="rtl" type="number" id="replacementCarKM" name="replacementCarKM" dir="rtl" placeholder="אחרון">
+            <label dir="rtl" for="nameOfClientCompany">שם חברה של הלקוח</label>
+            <input dir="rtl" type="text" id="nameOfClientCompany" name="nameOfClientCompany" dir="rtl">
             <label dir="rtl" for="replacementCarOrigin">מקור הרכב החלופי</label>
             <input dir="rtl" type="text" id="replacementCarOrigin" name="replacementCarOrigin" dir="rtl" placeholder="חנייה">
 
@@ -92,13 +92,13 @@
                 button.disabled = false;
             };
 
-            const replacementCarKM = $('replacementCarKM').value;
+            const nameOfClientCompany = $('nameOfClientCompany').value;
             const replacementCarOrigin = $('replacementCarOrigin').value;
 
             const data = {
                 clientCarID,
                 replacementCarID,
-                replacementCarKM: replacementCarKM ? Number(replacementCarKM) : undefined,
+                nameOfClientCompany,
                 replacementCarOrigin
             };
 

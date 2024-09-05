@@ -11,7 +11,7 @@ import { z } from 'zod';
 export const ReplaceClientCarSchema = z.object({
     clientCarID: CarId,
     replacementCarID: CarId,
-    replacementCarKM: z.number().optional(),
+    nameOfClientCompany: z.string(),
     replacementCarOrigin: z.string().optional(),
 });
 
@@ -26,8 +26,7 @@ export enum QuestionType {
     replacementCarID = 6,
     replacementCarOrigin = 7,
     clientCarID = 8,
-    replacementCarKM = 9,
-    nameCheck = 10,
+    nameOfClientCompany = 9,
 }
 
 export const questions = (
@@ -35,7 +34,7 @@ export const questions = (
     {
         clientCarID,
         replacementCarID,
-        replacementCarKM,
+        nameOfClientCompany,
         replacementCarOrigin,
     }: ReplaceClientCarInfo,
 ): { [keyof in QuestionType]: Question } => ({
@@ -60,7 +59,7 @@ export const questions = (
     },
     [QuestionType.COMPANY_ID]: {
         question: `${user.name}, אנא הזן מספר עובד`,
-        answer: user.companyID.toString(),
+        answer: user.companyID,
     },
     [QuestionType.replacementCarID]: {
         question: 'אנא הזן מספר רכב חלופי',
@@ -74,14 +73,9 @@ export const questions = (
         question: 'אנא הזן מספר רכב מקורי',
         answer: clientCarID,
     },
-    [QuestionType.replacementCarKM]: {
-        question: 'אנא עדכן ק"מ עדכני ברכב החלופי',
-        answer: replacementCarKM?.toString() || 'אחרון',
-    },
-    [QuestionType.nameCheck]: {
-        question: `האם שמך הוא ${user.name}?`,
-        answer: 'כן',
-        selector: buttonSelector,
+    [QuestionType.nameOfClientCompany]: {
+        question: 'אנא הזן שם חברה (לקוח)',
+        answer: nameOfClientCompany,
     },
 });
 

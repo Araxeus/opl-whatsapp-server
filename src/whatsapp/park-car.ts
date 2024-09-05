@@ -50,7 +50,7 @@ export const questions = (
     },
     [QuestionType.COMPANY_ID]: {
         question: `${user.name}, אנא הזן מספר עובד`,
-        answer: user.companyID.toString(),
+        answer: user.companyID,
     },
     [QuestionType.CAR_ID]: {
         question: 'אנא הזן מספר רכב',
