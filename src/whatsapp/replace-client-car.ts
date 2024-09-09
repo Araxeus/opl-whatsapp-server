@@ -1,11 +1,17 @@
 import type { User } from 'auth';
-import { CarId, type Question, buttonSelector } from 'whatsapp/shared';
+import {
+    CarId,
+    type Question,
+    buttonSelector,
+    listMessageDescriptionSelector,
+    listMessageTitleSelector,
+} from 'whatsapp/shared';
 import { z } from 'zod';
 
 export const ReplaceClientCarSchema = z.object({
     clientCarID: CarId,
     replacementCarID: CarId,
-    replacementCarKM: z.number().optional(),
+    nameOfClientCompany: z.string(),
     replacementCarOrigin: z.string().optional(),
 });
 
@@ -18,10 +24,9 @@ export enum QuestionType {
     NAME = 4,
     COMPANY_ID = 5,
     replacementCarID = 6,
-    replacementCarKM = 7,
-    replacementCarOrigin = 8,
-    clientCarID = 9,
-    nameCheck = 10,
+    replacementCarOrigin = 7,
+    clientCarID = 8,
+    nameOfClientCompany = 9,
 }
 
 export const questions = (
@@ -29,17 +34,19 @@ export const questions = (
     {
         clientCarID,
         replacementCarID,
-        replacementCarKM,
+        nameOfClientCompany,
         replacementCarOrigin,
     }: ReplaceClientCarInfo,
 ): { [keyof in QuestionType]: Question } => ({
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
+        selector: listMessageTitleSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'מסירת / החזרת חלופי',
+        selector: listMessageDescriptionSelector,
     },
     [QuestionType.REQUEST_SPECIFIC_TYPE]: {
         question: 'נא לבחור את סוג הדיווח:',
@@ -51,16 +58,12 @@ export const questions = (
         answer: user.name,
     },
     [QuestionType.COMPANY_ID]: {
-        question: 'אנא הזן מספר עובד',
-        answer: user.companyID.toString(),
+        question: `${user.name}, אנא הזן מספר עובד`,
+        answer: user.companyID,
     },
     [QuestionType.replacementCarID]: {
         question: 'אנא הזן מספר רכב חלופי',
         answer: replacementCarID,
-    },
-    [QuestionType.replacementCarKM]: {
-        question: 'אנא עדכן ק"מ עדכני ברכב החלופי',
-        answer: replacementCarKM?.toString() || 'אחרון',
     },
     [QuestionType.replacementCarOrigin]: {
         question: 'אנא הזן מקור נסיעה',
@@ -70,10 +73,9 @@ export const questions = (
         question: 'אנא הזן מספר רכב מקורי',
         answer: clientCarID,
     },
-    [QuestionType.nameCheck]: {
-        question: `האם שמך הוא ${user.name}?`,
-        answer: 'כן',
-        selector: buttonSelector,
+    [QuestionType.nameOfClientCompany]: {
+        question: 'אנא הזן שם חברה (לקוח)',
+        answer: nameOfClientCompany,
     },
 });
 

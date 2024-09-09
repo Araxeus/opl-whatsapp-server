@@ -27,11 +27,11 @@ export interface Question {
     selector?: (msg: WAProto.IWebMessageInfo) => string | null | undefined;
 }
 
-export interface QuestionsMap {
-    '1': Question;
-    '2': Question;
-    [x: number]: Question;
-}
-
 export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.buttonsMessage?.contentText;
+
+export const listMessageTitleSelector = (msg: WAProto.IWebMessageInfo) =>
+    msg.message?.listMessage?.title;
+
+export const listMessageDescriptionSelector = (msg: WAProto.IWebMessageInfo) =>
+    msg.message?.listMessage?.description;
