@@ -19,14 +19,15 @@ export type ReplaceClientCarInfo = z.infer<typeof ReplaceClientCarSchema>;
 
 export enum QuestionType {
     GREETING = 1,
-    REQUEST_TYPE = 2,
-    REQUEST_SPECIFIC_TYPE = 3,
-    NAME = 4,
-    COMPANY_ID = 5,
-    replacementCarID = 6,
-    replacementCarOrigin = 7,
-    clientCarID = 8,
-    nameOfClientCompany = 9,
+    REQUEST_TYPE_NEW = 2,
+    REQUEST_TYPE = 3,
+    REQUEST_SPECIFIC_TYPE = 4,
+    NAME = 5,
+    COMPANY_ID = 6,
+    replacementCarID = 7,
+    replacementCarOrigin = 8,
+    clientCarID = 9,
+    nameOfClientCompany = 10,
 }
 
 export const questions = (
@@ -42,6 +43,11 @@ export const questions = (
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
         selector: listMessageTitleSelector,
+    },
+    [QuestionType.REQUEST_TYPE_NEW]: {
+        question: 'יש לבחור אחת מן האפשרויות הבאות:',
+        answer: 'מחלקת שינוע',
+        selector: buttonSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
