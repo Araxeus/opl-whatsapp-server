@@ -19,15 +19,16 @@ export type CarParkingInfo = z.infer<typeof CarParkingInfoSchema>;
 
 export enum QuestionType {
     GREETING = 1,
-    REQUEST_TYPE = 2,
-    NAME = 3,
-    COMPANY_ID = 4,
-    CAR_ID = 5,
-    KM = 6,
-    TIME = 7,
-    STARTING_POINT = 8,
-    REQUEST_SPECIFIC_TYPE = 9,
-    DESTINATION = 10,
+    REQUEST_TYPE_NEW = 2,
+    REQUEST_TYPE = 3,
+    NAME = 4,
+    COMPANY_ID = 5,
+    CAR_ID = 6,
+    KM = 7,
+    TIME = 8,
+    STARTING_POINT = 9,
+    REQUEST_SPECIFIC_TYPE = 10,
+    DESTINATION = 11,
 }
 
 export const questions = (
@@ -38,6 +39,11 @@ export const questions = (
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
         selector: listMessageTitleSelector,
+    },
+    [QuestionType.REQUEST_TYPE_NEW]: {
+        question: 'יש לבחור אחת מן האפשרויות הבאות:',
+        answer: 'מחלקת שינוע',
+        selector: buttonSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',

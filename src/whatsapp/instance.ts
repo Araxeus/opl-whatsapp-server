@@ -40,7 +40,8 @@ const activeInstances = new Map<UserID, WhatsappInstance>();
 
 enum QuestionType {
     GREETING = 1,
-    REQUEST_TYPE = 2,
+    REQUEST_TYPE_NEW = 2,
+    REQUEST_TYPE = 3,
 }
 
 export class WhatsappInstance extends EventEmitter {
@@ -391,7 +392,7 @@ function isAlternativeMessage(
     chatState: ChatState,
 ) {
     return (
-        chatState === QuestionType.REQUEST_TYPE &&
+        chatState === QuestionType.REQUEST_TYPE_NEW &&
         msg.message?.conversation ===
             'מה מספר הטלפון שלך לצורכי זיהוי שרשומה במערכת'
     );
@@ -437,6 +438,6 @@ function isE2ENotification(
 function isGreetingOrRequestType(chatState: ChatState) {
     return (
         chatState === QuestionType.GREETING ||
-        chatState === QuestionType.REQUEST_TYPE
+        chatState === QuestionType.REQUEST_TYPE_NEW
     );
 }

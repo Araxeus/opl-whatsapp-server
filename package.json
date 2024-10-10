@@ -9,11 +9,10 @@
     "start": "bun run biome check && bun _build && node --env-file=.env ./dist/server.js",
     "_build": "rm -rf dist && bun ./build.ts",
     "ci": "bun install && bun run biome check && tsc --noEmit && bun _build",
-    "check": "bun ci && bun check_up",
+    "check": "bun ci",
     "lint": "bun run biome check --write",
     "fix": "bun lint",
     "updates": "bun update --latest",
-    "check_up": "bunx npm-check-updates -p bun --format group",
     "try": "bun _build test && node --env-file=.env ./dist/test.js",
     "preview": "bun preview-branch.ts"
   },
