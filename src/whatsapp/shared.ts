@@ -29,7 +29,7 @@ export interface Question {
 
 export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.buttonsMessage?.contentText;
-    
+
 export const buttonTitleSelector = (msg: WAProto.IWebMessageInfo) =>
     buttonSelector(msg)?.split('\n')[0];
 
