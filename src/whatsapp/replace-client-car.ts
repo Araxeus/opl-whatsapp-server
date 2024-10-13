@@ -42,7 +42,7 @@ export const questions = (
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
-        selector: listMessageTitleSelector,
+        selector: buttonSelector,
     },
     [QuestionType.REQUEST_TYPE_NEW]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
