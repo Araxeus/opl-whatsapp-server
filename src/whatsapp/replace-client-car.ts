@@ -3,8 +3,8 @@ import {
     CarId,
     type Question,
     buttonSelector,
+    buttonTitleSelector
     listMessageDescriptionSelector,
-    //listMessageTitleSelector,
 } from 'whatsapp/shared';
 import { z } from 'zod';
 
@@ -42,7 +42,7 @@ export const questions = (
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
         answer: 'אני עובד אופרייט',
-        selector: buttonSelector,
+        selector: buttonTitleSelector,
     },
     [QuestionType.REQUEST_TYPE_NEW]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
