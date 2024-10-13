@@ -31,7 +31,7 @@ export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.buttonsMessage?.contentText;
     
 export const buttonTitleSelector = (msg: WAProto.IWebMessageInfo) =>
-  buttonSelector(msg)?.split('\n')[0];
+    buttonSelector(msg)?.split('\n')[0];
 
 export const listMessageTitleSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.listMessage?.title;
