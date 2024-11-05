@@ -102,7 +102,7 @@ jobs:
       - uses: reviewdog/action-setup@v1
       - name: nodejsscan scan
         id: njsscan
-        uses: ajinabraham/njsscan-action@v7
+        uses: ajinabraham/njsscan-action@v8
         with:
           args: '. --sarif --output results.sarif || true'
       - name: Run reviewdog
