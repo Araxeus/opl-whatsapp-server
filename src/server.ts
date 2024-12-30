@@ -41,7 +41,9 @@ if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI must be defined');
 }
 
-logger.info('connecting to mongo');
+logger.info('fetching public ip');
+const publicIp = await fetch('https://api.ipify.org').then(r => r.text());
+logger.info(`connecting to mongo via public ip: ${publicIp}`);
 await mongoose.connect(process.env.MONGODB_URI, {
     dbName: 'operate-whatsapp-server',
 });
