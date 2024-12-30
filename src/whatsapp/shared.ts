@@ -6,7 +6,7 @@ import { z } from 'zod';
 // Check if carId is in the format 398-35-902 or 39853902
 export const CarId = z
     .string()
-    .refine((val) => /^\d{3}-?\d{2}-?\d{3}$/.test(val), {
+    .refine(val => /^\d{3}-?\d{2}-?\d{3}$/.test(val), {
         message: 'carId must be in the format 398-35-902 or 39853902',
     });
 

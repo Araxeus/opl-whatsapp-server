@@ -97,7 +97,7 @@ export class Connection {
 
     static async listAll() {
         return Object.keys(connections)
-            .map(async (userID) => {
+            .map(async userID => {
                 const user = await getUser(userID);
                 const elapsedTime = elapsedTimeSince(
                     connections[userID].createdAt,

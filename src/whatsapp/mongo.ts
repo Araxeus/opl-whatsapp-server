@@ -95,7 +95,7 @@ export const getAuthFromDatabase = async (userID: string) => {
                         },
                     );
                 },
-                set: (data) => {
+                set: data => {
                     for (const type of Object.keys(
                         data,
                     ) as (keyof SignalDataSet)[]) {

@@ -16,16 +16,16 @@ export async function startWhatsappTest(user: User) {
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 
-    instance.on('error', (e) => {
+    instance.on('error', e => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
     });
 
-    instance.on('qr', (_qrCode) => {
+    instance.on('qr', _qrCode => {
         log.info('QR code received');
         //qrcodeTerminal.generate(qrCode, { small: true });
     });
 
-    return new Promise<WhatsappInstance>((resolve) => {
+    return new Promise<WhatsappInstance>(resolve => {
         instance.once('open', () => {
             log.info('Instance opened');
             resolve(instance);
@@ -53,11 +53,11 @@ export async function whatsappLogin(user: User): Promise<WhatsappLoginResult> {
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user, true);
 
-    instance.on('error', (e) => {
+    instance.on('error', e => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
     });
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         instance.once('qr', (qrCode: string) => {
             log.info('QR code received');
             //qrcodeTerminal.generate(qrCode, { small: true });
@@ -95,11 +95,11 @@ export async function handleWhatsappRoutine(
     log.info('Starting whatsapp instance...');
     const instance = new WhatsappInstance(user);
 
-    instance.on('error', (e) => {
+    instance.on('error', e => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
     });
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         instance.once('qr', (qrCode: string) => {
             log.info('QR code received');
             resolve({ qrCode });
@@ -109,10 +109,10 @@ export async function handleWhatsappRoutine(
                 setLastAuth(user.userID);
                 instance
                     .routine(data)
-                    .then((res) => {
+                    .then(res => {
                         resolve(res);
                     })
-                    .catch((e) => {
+                    .catch(e => {
                         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
                         resolve({ success: false, error: e });
                     })
@@ -192,7 +192,7 @@ export async function refreshAllInstances() {
     const users = await getUsersWithFreshLastAuth();
 
     log.info(
-        `Refreshing all instances for users: [${users.map((user) => user.name).join(', ')}]`,
+        `Refreshing all instances for users: [${users.map(user => user.name).join(', ')}]`,
     );
     // const instances = users.map((user) => new WhatsappInstance(user));
 
@@ -221,11 +221,11 @@ async function refreshWhatsappInstance(user: User): Promise<RoutineResult> {
     log.info('Refreshing whatsapp instance...');
     const instance = new WhatsappInstance(user, true);
 
-    instance.on('error', (e) => {
+    instance.on('error', e => {
         log.error(`Error: ${JSON.stringify(e, null, 2)}`);
     });
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         instance.once('qr', () => {
             resolve({ success: false, error: 'Instance asked for QR code' });
         });

@@ -20,7 +20,7 @@ export function pathOfRequest(req: IncomingMessage) {
         path: {
             string,
             is: (p: string) => string === p,
-            oneOf: (paths: string[]) => paths.some((p) => string === p),
+            oneOf: (paths: string[]) => paths.some(p => string === p),
         },
         query: url.searchParams,
     };
@@ -50,7 +50,7 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
         let data = '';
         req.on('error', reject);
         //req.on('close', () => reject(new Error('Connection closed')));
-        req.on('data', (chunk) => {
+        req.on('data', chunk => {
             data += chunk;
         });
         req.on('end', () => {
@@ -72,7 +72,7 @@ export const CSPfromObj = (obj: { [key: string]: string[] }): string =>
     Object.entries(obj)
         .map(
             ([k, v]) =>
-                `${k} ${v.map((vv) => (vv.startsWith('http') ? vv : `'${vv}'`)).join(' ')}`,
+                `${k} ${v.map(vv => (vv.startsWith('http') ? vv : `'${vv}'`)).join(' ')}`,
         )
         .join('; ');
 

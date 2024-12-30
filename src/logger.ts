@@ -15,6 +15,6 @@ export default P({
 });
 
 export const rtlC = (s: string) =>
-    s.replace(/(\p{Script=Hebrew}[^a-zA-Z\d]*\p{Script=Hebrew})/gu, (match) =>
+    s.replace(/(\p{Script=Hebrew}[^a-zA-Z\d]*\p{Script=Hebrew})/gu, match =>
         [...match].reverse().join(''),
     );

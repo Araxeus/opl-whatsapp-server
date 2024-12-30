@@ -34,7 +34,7 @@ export async function getFile(path: string, contentType?: ContentType) {
     return file;
 }
 
-export const assets = (await readdir('assets')).map((f) => `/${f}`);
+export const assets = (await readdir('assets')).map(f => `/${f}`);
 export async function getAssetType(path: string) {
     const ext = extname(path);
     switch (ext) {

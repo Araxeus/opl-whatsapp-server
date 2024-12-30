@@ -126,7 +126,7 @@ export class WhatsappInstance extends EventEmitter {
             });
         });
 
-        this.sock.ev.on('messages.upsert', (messages) => {
+        this.sock.ev.on('messages.upsert', messages => {
             if (!messages) return; // || messages.type !== 'notify'
 
             const isAppend = messages.type === 'append';

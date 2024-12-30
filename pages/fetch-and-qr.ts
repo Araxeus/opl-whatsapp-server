@@ -28,8 +28,8 @@ const $ = document.querySelector.bind(document) as (
 // });
 
 // biome-ignore lint/complexity/noForEach: forEach is better for NodeList
-document.querySelectorAll('.carID').forEach((input) => {
-    input.addEventListener('input', (e) => {
+document.querySelectorAll('.carID').forEach(input => {
+    input.addEventListener('input', e => {
         const target = e.target as HTMLInputElement;
         const cursorPosition = target.selectionStart ?? 0;
         const originalValue = target.value;
@@ -89,7 +89,7 @@ export async function fetchAndQr({
     try {
         req.onError =
             onError ||
-            ((err) => {
+            (err => {
                 console.error(err);
                 alertSoon(
                     `Error: ${
@@ -171,7 +171,7 @@ function showQrCode() {
     console.log('injecting QR code'); // DELETE
     checkExists(QRCode, 'QRCode global variable');
 
-    QRCode.toCanvas(canvas, qrCode, (err) => {
+    QRCode.toCanvas(canvas, qrCode, err => {
         if (err) throw err;
         console.log('QR code injected'); // DELETE
         checkExists(canvas.parentElement, 'canvas.parentElement');
@@ -186,10 +186,10 @@ function showQrCode() {
         'tempToken' in req.response ? `?token=${req.response.tempToken}` : '';
 
     const Server = new EventSource(`/sse${tempToken}`);
-    Server.addEventListener('qr', (event) => {
+    Server.addEventListener('qr', event => {
         console.log('qr event received'); // DELETE
         const qrCode = JSON.parse(event.data);
-        QRCode.toCanvas(canvas, qrCode, (err) => {
+        QRCode.toCanvas(canvas, qrCode, err => {
             if (err) throw err;
             console.log('QR code updated'); // DELETE
         });
@@ -205,7 +205,7 @@ function showQrCode() {
         setTimeout(() => onQrSuccess(req.response), 50);
     });
 
-    Server.addEventListener('error', (event) => {
+    Server.addEventListener('error', event => {
         console.error('EventSource error:', JSON.stringify(event, null, 2));
     });
 }

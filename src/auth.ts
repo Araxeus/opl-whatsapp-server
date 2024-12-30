@@ -64,7 +64,7 @@ function decryptUserID(encryptedData: string): {
             return {};
         }
         const [encryptDate, salt, iv, authTag, encryptedText] = parts.map(
-            (part) => Buffer.from(part, 'base64'),
+            part => Buffer.from(part, 'base64'),
         );
         // biome-ignore lint/style/noNonNullAssertion: it was already checked above
         const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
