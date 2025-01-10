@@ -30,13 +30,13 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.0",
+    "@biomejs/biome": "1.9.4",
     "@hapi/boom": "^10.0.1",
-    "@types/bun": "^1.1.9",
-    "@types/cookie": "^0.6.0",
-    "@types/node": "^22.5.4",
+    "@types/bun": "^1.1.15",
+    "@types/cookie": "^1.0.0",
+    "@types/node": "^22.10.5",
     "@types/qrcode": "^1.5.5",
-    "typescript": "^5.6.2"
+    "typescript": "^5.7.2"
   },
   "trustedDependencies": ["@biomejs/biome", "protobufjs"]
 }
