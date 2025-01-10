@@ -1,14 +1,15 @@
 # Build Stage
-FROM node:22-slim as builder
+FROM node:22-slim AS builder
 
 # Install necessary tools and dependencies
 RUN apt-get update && apt-get --no-install-recommends install -y \
-    curl \
-    git \
+    
     build-essential \
     ca-certificates \
-    zip \
+    curl \
     unzip \
+    git \
+    zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Bun
@@ -27,7 +28,7 @@ RUN bun install --production && npm install libsignal \
     && bun _build
 
 # Runtime Stage
-FROM node:22-alpine as runtime
+FROM node:22-alpine AS runtime
 
 # Copy built app and dependencies from builder
 WORKDIR /app
