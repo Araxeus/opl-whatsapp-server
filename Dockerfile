@@ -1,29 +1,43 @@
-# Use an official Node.js image as the base
-FROM node:22
+# Build Stage
+FROM node:22-slim as builder
+
+# Install necessary tools and dependencies
+RUN apt-get update && apt-get --no-install-recommends install -y \
+    curl \
+    git \
+    build-essential \
+    ca-certificates \
+    zip \
+    unzip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Bun
 RUN curl --proto "=https" -fsSL https://bun.sh/install | bash \
-    && mv /root/.bun/bin/bun /usr/local/bin/ \
-    && rm -rf /root/.bun
+    && mv /root/.bun/bin/bun /usr/local/bin/
 
 # Set the working directory
 WORKDIR /app
 
 # Clone the repository
-RUN apt-get update && apt-get --no-install-recommends install -y git \
-    && git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
-    && rm -rf /var/lib/apt/lists/*
+RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
+    && rm -rf .git
 
-# Install dependencies using Bun
-RUN bun install --production --frozen-lockfile
+# Install dependencies and build the app
+RUN bun install --production && npm install libsignal \
+    && bun _build
 
-# Build the application
-RUN bun _build
+# Runtime Stage
+FROM node:22-alpine as runtime
 
-# Switch to a non-root user
-USER node
+# Copy built app and dependencies from builder
+WORKDIR /app
+COPY --from=builder /app /app
 
-# Expose the port the app runs on (adjust if needed)
+# Use a non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Expose the port
 EXPOSE 3000
 
 # Start the application
