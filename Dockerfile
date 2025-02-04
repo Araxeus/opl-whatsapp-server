@@ -19,14 +19,10 @@ RUN curl --proto "=https" -fsSL https://bun.sh/install | bash \
 WORKDIR /app
 
 # Clone the repository and capture the latest commit hash
-ARG REPO_URL=https://github.com/Araxeus/opl-whatsapp-server.git
-RUN git clone $REPO_URL . \
+RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
     && export COMMIT_HASH=$(git rev-parse --short HEAD) \
+    && echo $COMMIT_HASH > commit_hash.txt \
     && rm -rf .git
-
-# Set the commit hash as a build argument
-ARG COMMIT_HASH
-ENV COMMIT_HASH=$COMMIT_HASH
 
 # Install dependencies and build the app
 RUN bun install --production && npm install libsignal \
@@ -38,9 +34,11 @@ FROM node:22-alpine AS runtime
 # Set the working directory
 WORKDIR /app
 
-# Copy built app and environment variable from builder
+# Copy built app and commit hash from builder
 COPY --from=builder /app /app
-ENV COMMIT_HASH=$COMMIT_HASH
+
+# Set the commit hash as an environment variable
+ENV COMMIT_HASH=$(cat /app/commit_hash.txt)
 
 # Use a non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
