@@ -38,7 +38,7 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Set the commit hash as an environment variable
-ENV COMMIT_HASH=$(cat /app/commit_hash.txt)
+ENV COMMIT_HASH="unknown"  # Set a default value
 
 # Use a non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -47,5 +47,5 @@ USER appuser
 # Expose the port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "./dist/server.js"]
+# Start the application with the commit hash exported
+ENTRYPOINT ["/bin/sh", "-c", "export COMMIT_HASH=$(cat /app/commit_hash.txt) && exec node ./dist/server.js"]
