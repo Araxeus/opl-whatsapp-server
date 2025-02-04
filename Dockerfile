@@ -38,7 +38,7 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Set the commit hash as an environment variable
-ENV COMMIT_HASH="unknown"  # Set a default value
+ENV COMMIT_HASH="unknown"
 
 # Use a non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
