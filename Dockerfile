@@ -27,7 +27,10 @@ RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
 RUN bun install --production && npm install libsignal \
     && bun _build
 
+###############
 # Runtime Stage
+###############
+
 FROM node:22-alpine AS runtime
 
 # Copy built app and dependencies from builder
