@@ -3,7 +3,6 @@ FROM node:22-slim AS builder
 
 # Install necessary tools and dependencies
 RUN apt-get update && apt-get --no-install-recommends install -y \
-    
     build-essential \
     ca-certificates \
     curl \
@@ -19,9 +18,15 @@ RUN curl --proto "=https" -fsSL https://bun.sh/install | bash \
 # Set the working directory
 WORKDIR /app
 
-# Clone the repository
-RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
+# Clone the repository and capture the latest commit hash
+ARG REPO_URL=https://github.com/Araxeus/opl-whatsapp-server.git
+RUN git clone $REPO_URL . \
+    && export COMMIT_HASH=$(git rev-parse --short HEAD) \
     && rm -rf .git
+
+# Set the commit hash as a build argument
+ARG COMMIT_HASH
+ENV COMMIT_HASH=$COMMIT_HASH
 
 # Install dependencies and build the app
 RUN bun install --production && npm install libsignal \
@@ -30,9 +35,12 @@ RUN bun install --production && npm install libsignal \
 # Runtime Stage
 FROM node:22-alpine AS runtime
 
-# Copy built app and dependencies from builder
+# Set the working directory
 WORKDIR /app
+
+# Copy built app and environment variable from builder
 COPY --from=builder /app /app
+ENV COMMIT_HASH=$COMMIT_HASH
 
 # Use a non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
