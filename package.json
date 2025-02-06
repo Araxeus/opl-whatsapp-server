@@ -21,9 +21,9 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.12",
     "cookie": "^1.0.2",
-    "mongoose": "^8.9.6",
+    "mongoose": "^8.10.0",
     "nanoid": "^5.0.9",
-    "openai": "^4.82.0",
+    "openai": "^4.83.0",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "qrcode": "^1.5.4",
