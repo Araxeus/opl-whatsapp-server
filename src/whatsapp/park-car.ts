@@ -43,7 +43,7 @@ export const questions = (
     [QuestionType.REQUEST_TYPE_NEW]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'מחלקת שינוע',
-        selector: buttonSelector,
+        selector: listMessageDescriptionSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
