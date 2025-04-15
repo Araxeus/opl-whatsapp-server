@@ -30,7 +30,11 @@ import {
     customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
-import { OPERATE_PHONE_NUMBER, WAIT_FOR_USER_INPUT, isCarParkingInfo } from 'whatsapp/shared';
+import {
+    OPERATE_PHONE_NUMBER,
+    WAIT_FOR_USER_INPUT,
+    isCarParkingInfo,
+} from 'whatsapp/shared';
 import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';
@@ -90,7 +94,6 @@ export class WhatsappInstance extends EventEmitter {
             version: this.version,
             printQRInTerminal: false,
             auth: state,
-            // @ts-expect-error baileys types are wrong
             logger: logger.child({
                 module: `baileys instance of ${this.user.name}`,
             }),
@@ -347,7 +350,7 @@ export class WhatsappInstance extends EventEmitter {
                     if (questions[chatState].answer === WAIT_FOR_USER_INPUT) {
                         msgTimeout.start(1000 * 60 * 3); // 3 minutes
                         return;
-                    };
+                    }
                     readMessage(msg.key);
                     sendMessage(questions[chatState].answer);
                 } else {

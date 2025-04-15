@@ -1,5 +1,5 @@
-import type { WAProto } from '@whiskeysockets/baileys';
 import { randomUUID } from 'node:crypto';
+import type { WAProto } from '@whiskeysockets/baileys';
 import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
 import { z } from 'zod';
