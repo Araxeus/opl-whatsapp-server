@@ -1,4 +1,5 @@
 import type { WAProto } from '@whiskeysockets/baileys';
+import { randomUUID } from 'node:crypto';
 import type { CarParkingInfo } from 'whatsapp/park-car';
 import type { ReplaceClientCarInfo } from 'whatsapp/replace-client-car';
 import { z } from 'zod';
@@ -38,3 +39,5 @@ export const listMessageTitleSelector = (msg: WAProto.IWebMessageInfo) =>
 
 export const listMessageDescriptionSelector = (msg: WAProto.IWebMessageInfo) =>
     msg.message?.listMessage?.description;
+
+export const WAIT_FOR_USER_INPUT = randomUUID();

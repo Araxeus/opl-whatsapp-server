@@ -30,7 +30,7 @@ import {
     customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
-import { OPERATE_PHONE_NUMBER, isCarParkingInfo } from 'whatsapp/shared';
+import { OPERATE_PHONE_NUMBER, WAIT_FOR_USER_INPUT, isCarParkingInfo } from 'whatsapp/shared';
 import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';
@@ -279,13 +279,13 @@ export class WhatsappInstance extends EventEmitter {
 
             const msgTimeout = {
                 timer: undefined as Timer | undefined,
-                start: () => {
+                start: (ms = 1000 * 60) => {
                     msgTimeout.clear();
                     msgTimeout.timer = setTimeout(() => {
                         this.log.error('Message timeout');
                         unsubscribeFromMessages();
                         reject({ success: false, error: 'Message timeout' });
-                    }, 1000 * 60); // 1 minute
+                    }, ms);
                 },
                 clear: () => {
                     clearTimeout(msgTimeout.timer);
@@ -343,15 +343,13 @@ export class WhatsappInstance extends EventEmitter {
                         msg.message?.conversation) ===
                     questions[chatState].question
                 ) {
-                    // if (TEST_MODE) {
-                    //     // DELETE skip the rest of the routine
-                    //     stop();
-                    //     resolve({ success: true });
-                    //     return;
-                    // }
+                    chatState++;
+                    if (questions[chatState].answer === WAIT_FOR_USER_INPUT) {
+                        msgTimeout.start(1000 * 60 * 3); // 3 minutes
+                        return;
+                    };
                     readMessage(msg.key);
                     sendMessage(questions[chatState].answer);
-                    chatState++;
                 } else {
                     log.error({
                         msg: 'Mismatch error in chatState',
