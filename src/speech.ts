@@ -13,13 +13,12 @@ const systemPrompt = `
 You will act as an interpreter between the output of a hebrew speech recognition, and a program that receive json data with the following fields:
 {
   carID: string, // MUST BE of format 123-45-678 (can be missing numbers but must have the dashes after the first 3 and 5 digits)
-  km: number
   startingPoint: string
   destination: string
 }
 
 You will try to infer this data from the input in hebrew, USE ONLY EXISTING DATA - if the user didn't specify a key then don't include it.
-(for example user might only provide startingPoint, or he might only provide km and destination, etc..)
+(for example user might only provide startingPoint, or he might only provide startingPoint and destination, etc..)
 input: "דיווח על רכב 320 43 702" -> output: {"carID": "320-43-702"}
 
 Simplify the name of places and remove prefixes - for example:
@@ -37,7 +36,6 @@ If the input is invalid or incomplete, return an empty JSON object: {}.
 // Define an interface for the expected JSON output
 interface CarData {
     carID?: string; // Optional field
-    km?: number; // Optional field
     startingPoint?: string; // Optional field
     destination?: string; // Optional field
 }

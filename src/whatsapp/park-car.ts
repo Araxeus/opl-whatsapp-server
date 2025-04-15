@@ -10,7 +10,6 @@ import { z } from 'zod';
 
 export const CarParkingInfoSchema = z.object({
     carID: CarId,
-    km: z.number(),
     startingPoint: z.string(),
     destination: z.string(),
 });
@@ -33,7 +32,7 @@ export enum QuestionType {
 
 export const questions = (
     user: User,
-    { carID, km, startingPoint, destination }: CarParkingInfo,
+    { carID, startingPoint, destination }: CarParkingInfo,
 ): { [keyof in QuestionType]: Question } => ({
     [QuestionType.GREETING]: {
         question: 'שלום ותודה רבה שפנית לשירות הדיגיטל של אופרייט',
@@ -43,7 +42,7 @@ export const questions = (
     [QuestionType.REQUEST_TYPE_NEW]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
         answer: 'מחלקת שינוע',
-        selector: buttonSelector,
+        selector: listMessageDescriptionSelector,
     },
     [QuestionType.REQUEST_TYPE]: {
         question: 'יש לבחור אחת מן האפשרויות הבאות:',
@@ -63,8 +62,9 @@ export const questions = (
         answer: carID,
     },
     [QuestionType.KM]: {
-        question: 'נא הזן ק"מ עדכני ברכב',
-        answer: km.toString(),
+        question: 'צילום מד אוץ (ק"מ)',
+        answer: '',
+        waitForUserInput: true,
     },
     [QuestionType.TIME]: {
         question: 'נא להזין שעת נסיעה',
@@ -87,10 +87,9 @@ export const questions = (
 
 export const customAnswerParkCar = (
     user: User,
-    { carID, km, startingPoint, destination }: CarParkingInfo,
+    { carID, startingPoint, destination }: CarParkingInfo,
 ) => `דיווח חנייה:
 ${carID}
 מקור: ${startingPoint}
 יעד: ${destination}
-ק"מ: ${km}
 ${user.name} ${user.companyID}`;

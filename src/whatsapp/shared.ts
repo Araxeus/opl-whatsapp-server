@@ -25,6 +25,7 @@ export interface Question {
     question: string;
     answer: string;
     selector?: (msg: WAProto.IWebMessageInfo) => string | null | undefined;
+    waitForUserInput?: boolean;
 }
 
 export const buttonSelector = (msg: WAProto.IWebMessageInfo) =>

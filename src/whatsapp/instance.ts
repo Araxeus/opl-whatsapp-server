@@ -90,7 +90,6 @@ export class WhatsappInstance extends EventEmitter {
             version: this.version,
             printQRInTerminal: false,
             auth: state,
-            // @ts-expect-error baileys types are wrong
             logger: logger.child({
                 module: `baileys instance of ${this.user.name}`,
             }),
@@ -279,13 +278,13 @@ export class WhatsappInstance extends EventEmitter {
 
             const msgTimeout = {
                 timer: undefined as Timer | undefined,
-                start: () => {
+                start: (ms = 1000 * 60) => {
                     msgTimeout.clear();
                     msgTimeout.timer = setTimeout(() => {
                         this.log.error('Message timeout');
                         unsubscribeFromMessages();
                         reject({ success: false, error: 'Message timeout' });
-                    }, 1000 * 60); // 1 minute
+                    }, ms);
                 },
                 clear: () => {
                     clearTimeout(msgTimeout.timer);
@@ -343,15 +342,13 @@ export class WhatsappInstance extends EventEmitter {
                         msg.message?.conversation) ===
                     questions[chatState].question
                 ) {
-                    // if (TEST_MODE) {
-                    //     // DELETE skip the rest of the routine
-                    //     stop();
-                    //     resolve({ success: true });
-                    //     return;
-                    // }
+                    chatState++;
+                    if (questions[chatState].waitForUserInput) {
+                        msgTimeout.start(1000 * 60 * 3); // 3 minutes
+                        return;
+                    }
                     readMessage(msg.key);
                     sendMessage(questions[chatState].answer);
-                    chatState++;
                 } else {
                     log.error({
                         msg: 'Mismatch error in chatState',
