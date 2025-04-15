@@ -30,11 +30,7 @@ import {
     customAnswerReplaceClientCar,
     questions as questionsReplaceClientCar,
 } from 'whatsapp/replace-client-car';
-import {
-    OPERATE_PHONE_NUMBER,
-    WAIT_FOR_USER_INPUT,
-    isCarParkingInfo,
-} from 'whatsapp/shared';
+import { OPERATE_PHONE_NUMBER, isCarParkingInfo } from 'whatsapp/shared';
 import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';
@@ -347,7 +343,7 @@ export class WhatsappInstance extends EventEmitter {
                     questions[chatState].question
                 ) {
                     chatState++;
-                    if (questions[chatState].answer === WAIT_FOR_USER_INPUT) {
+                    if (questions[chatState].waitForUserInput) {
                         msgTimeout.start(1000 * 60 * 3); // 3 minutes
                         return;
                     }

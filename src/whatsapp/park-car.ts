@@ -2,7 +2,6 @@ import type { User } from 'auth';
 import {
     CarId,
     type Question,
-    WAIT_FOR_USER_INPUT,
     buttonSelector,
     buttonTitleSelector,
     listMessageDescriptionSelector,
@@ -64,7 +63,8 @@ export const questions = (
     },
     [QuestionType.KM]: {
         question: 'צילום מד אוץ (ק"מ)',
-        answer: WAIT_FOR_USER_INPUT,
+        answer: '',
+        waitForUserInput: true,
     },
     [QuestionType.TIME]: {
         question: 'נא להזין שעת נסיעה',
