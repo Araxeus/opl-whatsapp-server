@@ -66,6 +66,10 @@ function decryptUserID(encryptedData: string): {
         const [encryptDate, salt, iv, authTag, encryptedText] = parts.map(
             part => Buffer.from(part, 'base64'),
         );
+        if (authTag.length !== 16) {
+            log.error('Invalid authTag length');
+            return {};
+        };
         // biome-ignore lint/style/noNonNullAssertion: it was already checked above
         const key = scryptSync(process.env.USERID_SECRET!, salt, 32);
         const decipher = createDecipheriv(encryptionAlgorithm, key, iv);
