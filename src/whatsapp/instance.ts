@@ -342,13 +342,13 @@ export class WhatsappInstance extends EventEmitter {
                         msg.message?.conversation) ===
                     questions[chatState].question
                 ) {
-                    chatState++;
                     if (questions[chatState].waitForUserInput) {
                         msgTimeout.start(1000 * 60 * 3); // 3 minutes
-                        return;
+                    } else {
+                      readMessage(msg.key);
+                      sendMessage(questions[chatState].answer);
                     }
-                    readMessage(msg.key);
-                    sendMessage(questions[chatState].answer);
+                    chatState++;
                 } else {
                     log.error({
                         msg: 'Mismatch error in chatState',
