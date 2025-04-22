@@ -19,6 +19,8 @@ RUN curl --proto "=https" -fsSL https://bun.sh/install | bash \
 # Set the working directory
 WORKDIR /app
 
+# Should disable cache for next step
+RUN date +%s
 # Clone the repository
 RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
     && rm -rf .git
