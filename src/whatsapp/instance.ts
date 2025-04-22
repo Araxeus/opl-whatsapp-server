@@ -345,6 +345,7 @@ export class WhatsappInstance extends EventEmitter {
                     if (questions[chatState].waitForUserInput) {
                         msgTimeout.start(1000 * 60 * 3); // 3 minutes
                     } else {
+                        log.info(`sending answer for chatState[${chatState}]`);
                         readMessage(msg.key);
                         sendMessage(questions[chatState].answer);
                     }
