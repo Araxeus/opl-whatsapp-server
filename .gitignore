@@ -130,3 +130,4 @@ dist
 .pnp.*
 /dist
 /baileys_auth_info
+rebuild_server.bat
