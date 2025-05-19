@@ -148,13 +148,21 @@ const server = http.createServer(async (req, res) => {
         return streamResponse(`./assets${path.string}`);
     }
 
+    if (path.is('/manifest.json')) {
+        return cachedFileResponse('./pages/manifest.json', ContentType.JSON);
+    }
+
+    if (path.is('/service-worker.js')) {
+        return cachedFileResponse('./dist/service-worker.js', ContentType.JS);
+    }
+
     if (path.is('/vendor/qrcode.js'))
         return cachedFileResponse('./vendor/qrcode-updated.js', ContentType.JS);
 
     if (path.is('/form.css'))
         return cachedFileResponse('./pages/form.css', ContentType.CSS);
 
-    if (path.is('/fetch-and-qr.ts')) {
+    if (path.is('/fetch-and-qr.js')) {
         return cachedFileResponse('./dist/fetch-and-qr.js', ContentType.JS);
     }
 
@@ -312,7 +320,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (path.is('/logout')) {
-        return fileResponse('./pages/login.html', ContentType.HTML, 303, {
+        return response('logout', ContentType.TEXT, 303, {
             location: '/login',
             ...encryptedCookieHeader(userID, true),
         });
