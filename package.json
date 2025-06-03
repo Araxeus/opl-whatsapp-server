@@ -23,7 +23,7 @@
     "cookie": "^1.0.2",
     "mongoose": "^8.15.1",
     "nanoid": "^5.1.5",
-    "openai": "^5.0.2",
+    "openai": "^5.1.0",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
     "qrcode": "^1.5.4",
