@@ -311,6 +311,7 @@ export class WhatsappInstance extends EventEmitter {
                     isGreetingImage,
                     isNotificationTemplate,
                     isE2ENotification,
+                    isBuggedAnswer,
                 ]) {
                     if (validator(msg, chatState)) return;
                 }
@@ -412,7 +413,7 @@ function isNotificationTemplate(
     // TODO implement better when more info is available
     msg: WAProto.IWebMessageInfo,
     chatState: ChatState,
-) {
+): boolean {
     const res =
         isGreetingOrRequestType(chatState) &&
         //msg.type === 'notification_template' &&
@@ -424,7 +425,7 @@ function isE2ENotification(
     // TODO implement when more info is available
     _msg: WAProto.IWebMessageInfo,
     _chatState: ChatState,
-) {
+): boolean {
     // return (
     //     isGreetingOrRequestType(chatState) && msg.messageStubType === WAMessageStubType.E2E_ENCRYPTED
     //     isGreetingOrRequestType(chatState) && msg.type === 'e2e_notification'
@@ -432,7 +433,18 @@ function isE2ENotification(
     return false;
 }
 
-function isGreetingOrRequestType(chatState: ChatState) {
+function isBuggedAnswer(
+    msg: WAProto.IWebMessageInfo,
+    _chatState: ChatState,
+): boolean {
+    return (
+        msg.message?.conversation ===
+            'ההודעה ששלחת כוללת קובץ או מדיה שאינם נתמכים כרגע.' ||
+        !!msg.message?.conversation?.startsWith('תשובתך אינה חוקית')
+    );
+}
+
+function isGreetingOrRequestType(chatState: ChatState): boolean {
     return (
         chatState === QuestionType.GREETING ||
         chatState === QuestionType.REQUEST_TYPE_NEW
