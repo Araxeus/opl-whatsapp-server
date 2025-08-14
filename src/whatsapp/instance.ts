@@ -3,15 +3,15 @@ import '@whiskeysockets/baileys';
 import EventEmitter from 'node:events';
 import {
     DisconnectReason,
-    WAMessageStubType,
-    type WAProto,
-    type WAVersion,
     fetchLatestBaileysVersion,
     isJidBroadcast,
     isJidGroup,
     isJidStatusBroadcast,
     isJidUser,
     makeWASocket,
+    WAMessageStubType,
+    type WAProto,
+    type WAVersion,
 } from '@whiskeysockets/baileys';
 import type { User } from 'auth';
 import logger from 'logger';
@@ -20,17 +20,17 @@ import { Connection } from 'sse/connections-manager';
 import { TEST_MODE } from 'utils';
 import {
     type CarParkingInfo,
-    type QuestionType as QuestionType_ParkCar,
     customAnswerParkCar,
+    type QuestionType as QuestionType_ParkCar,
     questions as questionsParkCar,
 } from 'whatsapp/park-car';
 import {
-    type QuestionType as QuestionType_RequestCar,
-    type ReplaceClientCarInfo,
     customAnswerReplaceClientCar,
+    type QuestionType as QuestionType_RequestCar,
     questions as questionsReplaceClientCar,
+    type ReplaceClientCarInfo,
 } from 'whatsapp/replace-client-car';
-import { OPERATE_PHONE_NUMBER, isCarParkingInfo } from 'whatsapp/shared';
+import { isCarParkingInfo, OPERATE_PHONE_NUMBER } from 'whatsapp/shared';
 import { getAuthFromDatabase } from './mongo';
 
 //import qrcodeTerminal from 'qrcode-terminal';

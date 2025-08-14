@@ -1,5 +1,3 @@
-import cookie from 'cookie';
-
 import {
     type CipherGCMTypes,
     createCipheriv,
@@ -8,9 +6,12 @@ import {
     randomUUID,
     scryptSync,
 } from 'node:crypto';
+import cookie from 'cookie';
 import logger from 'logger';
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
+
 const log = logger.child({ module: 'auth' });
+
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
 import { getDateToday } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';

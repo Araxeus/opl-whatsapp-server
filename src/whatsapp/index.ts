@@ -1,8 +1,8 @@
 import {
-    type User,
     generateTempToken,
     getUsersWithFreshLastAuth,
     setLastAuth,
+    type User,
 } from 'auth';
 import logger from 'logger';
 //import qrcodeTerminal from 'qrcode-terminal';

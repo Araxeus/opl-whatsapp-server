@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { extname, join as joinPath, resolve as resolvePath } from 'node:path';
 import { ilTime } from 'logger';
 

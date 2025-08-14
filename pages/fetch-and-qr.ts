@@ -27,7 +27,6 @@ const $ = document.querySelector.bind(document) as (
 //     }
 // });
 
-// biome-ignore lint/complexity/noForEach: forEach is better for NodeList
 document.querySelectorAll('.carID').forEach(input => {
     input.addEventListener('input', e => {
         const target = e.target as HTMLInputElement;

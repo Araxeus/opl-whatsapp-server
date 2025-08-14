@@ -10,8 +10,8 @@ import {
     validateUserID,
 } from 'auth';
 import {
-    ContentType,
     assets,
+    ContentType,
     getAssetType,
     getFile,
     getIndexHtml,
@@ -254,7 +254,7 @@ const server = http.createServer(async (req, res) => {
         );
     }
 
-    const handleRoutine = async (validator: z.AnyZodObject) => {
+    const handleRoutine = async (validator: z.ZodObject) => {
         try {
             const body = validator.parse(await getRequestBody(req)) as
                 | CarParkingInfo

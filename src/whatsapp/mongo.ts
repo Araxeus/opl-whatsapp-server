@@ -1,13 +1,13 @@
 import {
     type AuthenticationCreds,
     BufferJSON,
+    initAuthCreds,
     type SignalDataSet,
     type SignalDataTypeMap,
     type SignalKeyStore,
     WAProto,
-    initAuthCreds,
 } from '@whiskeysockets/baileys';
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 export interface WhatsappSessionType {
     userID: string;
