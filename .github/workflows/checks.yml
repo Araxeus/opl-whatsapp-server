@@ -17,7 +17,7 @@ jobs:
   biome:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: mongolyy/reviewdog-action-biome@v1
         with:
           fail_on_error: true
@@ -26,7 +26,7 @@ jobs:
   tsc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - uses: EPMatt/reviewdog-action-tsc@v1.8.0
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code.
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:
@@ -46,7 +46,7 @@ jobs:
   typos:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: reviewdog/action-typos@v1
         with:
           reporter: ${{ env.REPORTER_TYPE }}
@@ -55,7 +55,7 @@ jobs:
   stylelint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun add stylelint stylelint-config-recommended -D
       - run: 'echo "extends: stylelint-config-recommended" > .stylelintrc.yaml'
@@ -67,7 +67,7 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: reviewdog/action-actionlint@v1
         with:
           reporter: ${{ env.REPORTER_TYPE }}
@@ -75,7 +75,7 @@ jobs:
   bearer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: reviewdog/action-setup@v1
       - name: Run Report
         id: report
@@ -98,7 +98,7 @@ jobs:
     name: njsscan check
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: reviewdog/action-setup@v1
       - name: nodejsscan scan
         id: njsscan
@@ -117,7 +117,7 @@ jobs:
   bun-ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun ci
 
