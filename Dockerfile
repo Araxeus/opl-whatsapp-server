@@ -1,9 +1,8 @@
 # Build Stage
-FROM node:22-slim AS builder
+FROM node:24-alpine AS builder
 
 # Install necessary tools and dependencies
 RUN apt-get update && apt-get --no-install-recommends install -y \
-    
     build-essential \
     ca-certificates \
     curl \
@@ -26,14 +25,15 @@ RUN git clone https://github.com/Araxeus/opl-whatsapp-server.git . \
     && rm -rf .git
 
 # Install dependencies and build the app
-RUN bun install --production && npm install libsignal \
-    && bun _build
+RUN bun install --production \
+&& npm install WhiskeySockets/libsignal-node --legacy-peer-deps \
+&& bun _build
 
 ###############
 # Runtime Stage
 ###############
 
-FROM node:22-alpine AS runtime
+FROM node:24-alpine AS runtime
 
 # Copy built app and dependencies from builder
 WORKDIR /app

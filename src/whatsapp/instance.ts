@@ -439,7 +439,7 @@ function isBuggedAnswer(
 ): boolean {
     return (
         msg.message?.conversation ===
-            'ההודעה ששלחת כוללת קובץ או מדיה שאינם נתמכים כרגע.' ||
+            'ההודעה ששלחת כוללת קובץ או מדיה שאינם נתמכים כרגע.' ||
         !!msg.message?.conversation?.startsWith('תשובתך אינה חוקית')
     );
 }
