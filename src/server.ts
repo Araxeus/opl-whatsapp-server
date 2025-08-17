@@ -41,7 +41,7 @@ if (!process.env.MONGODB_URI) {
     throw new Error('MONGODB_URI must be defined');
 }
 
-logger.info('fetching public ip (v14.08.25)');
+logger.info('fetching public ip (v17.08.25)');
 const publicIp = await fetch('https://api.ipify.org').then(r => r.text());
 logger.info(`connecting to mongo via public ip: ${publicIp}`);
 await mongoose.connect(process.env.MONGODB_URI, {
