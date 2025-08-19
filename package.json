@@ -21,7 +21,7 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.18",
     "cookie": "^1.0.2",
-    "mongoose": "^8.17.1",
+    "mongoose": "^8.17.2",
     "nanoid": "^5.1.5",
     "openai": "^5.12.2",
     "pino": "^9.9.0",
