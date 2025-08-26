@@ -96,14 +96,14 @@ export class Connection {
     }
 
     static async listAll() {
-        return Object.keys(connections)
-            .map(async userID => {
+        return await Promise.all(
+            Object.keys(connections).map(async userID => {
                 const user = await getUser(userID);
                 const elapsedTime = elapsedTimeSince(
                     connections[userID].createdAt,
                 );
                 return `${userID} (${user.name}) uptime: ${elapsedTime}`;
-            })
-            .join('\n');
+            }),
+        ).then(res => res.join('\n'));
     }
 }
