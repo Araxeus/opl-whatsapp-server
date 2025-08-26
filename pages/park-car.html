@@ -151,7 +151,8 @@
                 inputmode="numeric" required>
             <span dir="rtl" id="carIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
-
+            <label dir="rtl" for="km">קמ נוכחי</label>
+            <input dir="rtl" type="number" id="km" name="km" required>
             <label dir="rtl" for="startingPoint">מקור נסיעה</label>
             <input dir="rtl" type="text" id="startingPoint" name="startingPoint" dir="rtl" required>
 
@@ -190,6 +191,7 @@
 
             const data = {
                 carID,
+                km: Number($('km').value),
                 startingPoint: $('startingPoint').value,
                 destination: $('destination').value
             };
