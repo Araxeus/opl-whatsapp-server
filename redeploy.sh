@@ -1,6 +1,10 @@
 #!/bin/bash
 # redeploy.sh
-# pm2 start dist/server.js --name opl --node-args="--env-file=.env" --time --attach
+
+# pm2 start dist/server.js --name opl --node-args="--env-file=.env" --time
+# pm2 start bun --name opl --time --interpreter none -- dist/server.js
+
+# pm2 start pm2-log-forwarder.js --name log-forwarder --time --interpreter ~/.bun/bin/bun -- <SYSLOG_IP:PORT>
 
 git pull origin main
 
