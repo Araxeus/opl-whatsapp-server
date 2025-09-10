@@ -8,4 +8,5 @@ bun install --production
 
 bun _build
 
+pm2 restart log-forwarder --update-env
 pm2 restart opl --update-env
