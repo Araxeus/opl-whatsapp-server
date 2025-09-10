@@ -54,11 +54,7 @@ function flushLogs() {
 setInterval(flushLogs, FLUSH_INTERVAL).unref();
 
 function forwardLog(appName, level, message) {
-    const cleanMsg =
-        typeof message === 'string'
-            ? message.replace(/[\r\n]+$/, '')
-            : String(message); // ensure message is string and remove trailing newlines
-    logBuffer.push(formatSyslog(appName, level, cleanMsg));
+    logBuffer.push(formatSyslog(appName, level, message));
     if (logBuffer.length >= BATCH_SIZE) flushLogs();
 }
 
