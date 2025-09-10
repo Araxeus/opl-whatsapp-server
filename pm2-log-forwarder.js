@@ -1,5 +1,6 @@
 // pm2-log-forwarder.js
 
+import { randomUUID } from 'node:crypto';
 import dgram from 'node:dgram';
 import os from 'node:os';
 import pm2 from 'pm2';
