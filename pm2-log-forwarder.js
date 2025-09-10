@@ -23,44 +23,26 @@ if (!SYSLOG_IP || !SYSLOG_PORT) {
 console.log(`🚀 Forwarding PM2 logs to ${SYSLOG_IP}:${SYSLOG_PORT}`);
 
 const BATCH_SIZE = 20;
-const FLUSH_INTERVAL = 1000;
+const FLUSH_INTERVAL = 1000; // ms
 
 const HOSTNAME = os.hostname();
 const client = dgram.createSocket('udp4');
 const logBuffer = [];
 
-/**
- * Syslog severity levels (RFC 5424)
- * 0 = Emergency, 1 = Alert, 2 = Critical, 3 = Error
- * 4 = Warning, 5 = Notice, 6 = Informational, 7 = Debug
- */
-function getPri(severity) {
-    const FACILITY = 16; // local0
-    return FACILITY * 8 + severity;
-}
-
-function formatSyslog(appName, severity, message) {
-    const PRI = getPri(severity);
+// Build RFC 5424 syslog message
+function formatSyslog(appName, _level, message) {
+    const PRI = 134; // <134> = facility:local0, severity:informational
     const timestamp = new Date().toISOString();
     const pid = process.pid;
-    const structuredData = '-';
-
-    // Build JSON payload for easier parsing
-    const payload = JSON.stringify({
-        timestamp,
-        host: HOSTNAME,
-        app: appName,
-        pid,
-        severity,
-        message: message.trim(),
-    });
-
-    return `<${PRI}>1 ${timestamp} ${HOSTNAME} ${appName} ${pid} - ${structuredData} ${payload}`;
+    const structuredData = '-'; // no structured data
+    return `<${PRI}>1 ${timestamp} ${HOSTNAME} ${appName} ${pid} - ${structuredData} ${message.trim()}`;
 }
 
+// Send logs in buffer
 function flushLogs() {
     if (logBuffer.length === 0) return;
     const batch = logBuffer.splice(0, BATCH_SIZE);
+
     for (const log of batch) {
         client.send(Buffer.from(log), SYSLOG_PORT, SYSLOG_IP, err => {
             if (err) console.error('❌ Failed to send log:', err.message);
@@ -68,14 +50,16 @@ function flushLogs() {
     }
 }
 
+// Periodic flushing
 setInterval(flushLogs, FLUSH_INTERVAL).unref();
 
-function forwardLog(appName, severity, message) {
-    const cleanMsg = message.replace(/\n+$/, '');
-    logBuffer.push(formatSyslog(appName, severity, cleanMsg));
+function forwardLog(appName, level, message) {
+    const cleanMsg = message.replace(/\n+$/, ''); // remove trailing newlines
+    logBuffer.push(formatSyslog(appName, level, cleanMsg));
     if (logBuffer.length >= BATCH_SIZE) flushLogs();
 }
 
+// Connect to PM2 and start listening
 function start() {
     pm2.connect(err => {
         if (err) {
@@ -91,39 +75,65 @@ function start() {
                 return;
             }
 
-            console.log(
-                '✅ PM2 → SolarWinds log forwarder started (JSON mode).',
+            console.log('✅ PM2 → SolarWinds log forwarder started.');
+
+            bus.on('log:out', packet =>
+                forwardLog(packet.process.name, 'INFO', packet.data),
             );
 
-            bus.on(
-                'log:out',
-                packet => forwardLog(packet.process.name, 6, packet.data), // Informational
+            bus.on('log:err', packet =>
+                forwardLog(packet.process.name, 'ERR', packet.data),
             );
 
-            bus.on(
-                'log:err',
-                packet => forwardLog(packet.process.name, 3, packet.data), // Error
-            );
+            bus.on('process:event', packet => {
+                const {
+                    event,
+                    manually,
+                    at,
+                    process: {
+                        name,
+                        pm_id,
+                        status,
+                        restart_time,
+                        unstable_restarts,
+                        exit_code,
+                        pm_uptime,
+                        version,
+                        node_version,
+                    } = {},
+                } = packet;
 
-            bus.on(
-                'process:event',
-                packet =>
-                    forwardLog(packet.process.name, 5, JSON.stringify(packet)), // Notice
-            );
+                const cleanEvent = {
+                    timestamp: new Date(at).toISOString(),
+                    event,
+                    manually,
+                    app: name,
+                    pm_id,
+                    status,
+                    restart_time,
+                    unstable_restarts,
+                    exit_code,
+                    pm_uptime,
+                    version,
+                    node_version,
+                };
+
+                forwardLog(
+                    name || 'unknown-app',
+                    5,
+                    JSON.stringify(cleanEvent),
+                );
+            });
         });
     });
 }
 
-// Capture forwarder issues as well
+// Handle uncaught errors gracefully
 process.on('uncaughtException', err => {
-    forwardLog(
-        'log-forwarder',
-        2,
-        `Uncaught exception: ${err.stack || err.message || err}`,
-    );
+    console.error('❌ Uncaught exception:', err);
 });
 process.on('unhandledRejection', reason => {
-    forwardLog('log-forwarder', 4, `Unhandled rejection: ${reason}`);
+    console.error('❌ Unhandled rejection:', reason);
 });
 
 start();
