@@ -1,3 +1,5 @@
+#!/bin/bash
+# redeploy.sh
 # pm2 start dist/server.js --name opl --node-args="--env-file=.env" --attach
 
 git pull origin main
