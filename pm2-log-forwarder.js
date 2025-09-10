@@ -25,28 +25,27 @@ console.log(`🚀 Forwarding PM2 logs to ${SYSLOG_IP}:${SYSLOG_PORT}`);
 const HOSTNAME = os.hostname();
 const client = dgram.createSocket('udp4');
 
-/** Send a single line as a syslog message with optional blockId */
+/** Send a single PM2 log line as a syslog message, optionally with blockId */
 function sendLine(appName, line, blockId = null) {
     if (!line) return;
 
     const pri = 134; // local0.info
     const timestamp = new Date().toISOString();
-    const msg = blockId ? `${line} [blockId:${blockId}]` : line;
+    const prefix = blockId ? `[${blockId}] ` : '';
+    const syslog = `<${pri}>1 ${timestamp} ${HOSTNAME} ${appName} - - - ${prefix}${line}`;
 
-    const syslog = `<${pri}>1 ${timestamp} ${HOSTNAME} ${appName} - - - ${msg}`;
     client.send(Buffer.from(syslog), SYSLOG_PORT, SYSLOG_IP, err => {
         if (err) console.error('Failed to send log:', err.message);
     });
 }
 
-/** Split multi-line PM2 packet and assign blockId if needed */
+/** Split multi-line PM2 log into separate messages and add blockId to multi-line blocks */
 function forwardPacket(appName, packetData) {
     const lines = String(packetData)
         .split(/\r?\n/)
         .filter(l => l.trim() !== '');
     if (lines.length === 0) return;
 
-    // Only assign blockId for multi-line blocks
     const blockId = lines.length > 1 ? randomUUID().slice(0, 8) : null;
 
     for (const line of lines) {
@@ -54,6 +53,7 @@ function forwardPacket(appName, packetData) {
     }
 }
 
+/** Connect to PM2 bus and forward logs */
 function start() {
     pm2.connect(err => {
         if (err) {
@@ -70,7 +70,7 @@ function start() {
             }
 
             console.log(
-                '✅ PM2 → SolarWinds forwarder started (multi-line safe).',
+                '✅ PM2 → SolarWinds forwarder started (multi-line safe with subtle tag).',
             );
 
             bus.on('log:out', packet =>
