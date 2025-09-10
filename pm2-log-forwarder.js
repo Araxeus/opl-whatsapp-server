@@ -25,26 +25,47 @@ console.log(`🚀 Forwarding PM2 logs to ${SYSLOG_IP}:${SYSLOG_PORT}`);
 const HOSTNAME = os.hostname();
 const client = dgram.createSocket('udp4');
 
-/** Send a single line as a syslog message */
-function sendLine(appName, line) {
+/**
+ * Send a single line as a syslog message
+ * Optionally include a blockId to group multi-line logs
+ */
+function sendLine(appName, line, blockId = null) {
     if (!line) return;
+
     const pri = 134; // local0.info
     const timestamp = new Date().toISOString();
-    const syslog = `<${pri}>1 ${timestamp} ${HOSTNAME} ${appName} - - - ${line}`;
+    let payload = line;
+
+    if (blockId) {
+        payload = `[${blockId}] ${line}`;
+    }
+
+    const syslog = `<${pri}>1 ${timestamp} ${HOSTNAME} ${appName} - - - ${payload}`;
     client.send(Buffer.from(syslog), SYSLOG_PORT, SYSLOG_IP, err => {
         if (err) console.error('Failed to send log:', err.message);
     });
 }
 
-/** Split multi-line PM2 packet into separate syslog messages */
+/**
+ * Forward a PM2 log packet, splitting multi-line messages
+ * Each multi-line block gets a unique blockId
+ */
 function forwardPacket(appName, packetData) {
-    const lines = String(packetData).split(/\r?\n/);
+    const lines = String(packetData)
+        .split(/\r?\n/)
+        .filter(l => l.trim() !== '');
+    if (lines.length === 0) return;
+
+    const blockId = lines.length > 1 ? randomUUID().slice(0, 8) : null;
+
     for (const line of lines) {
-        if (line.trim() !== '') sendLine(appName, line);
+        sendLine(appName, line, blockId);
     }
 }
 
-/** Hook PM2 bus and forward logs */
+/**
+ * Connect to PM2 bus and start forwarding logs
+ */
 function start() {
     pm2.connect(err => {
         if (err) {
@@ -61,7 +82,7 @@ function start() {
             }
 
             console.log(
-                '✅ PM2 → SolarWinds forwarder started (split multi-line).',
+                '✅ PM2 → SolarWinds forwarder started (split & grouped multi-line).',
             );
 
             bus.on('log:out', packet =>
@@ -72,7 +93,6 @@ function start() {
                 forwardPacket(packet.process?.name || 'pm2-app', packet.data),
             );
 
-            // Optional: forward PM2 events
             bus.on('process:event', packet =>
                 sendLine(
                     packet.process?.name || 'pm2-app',
