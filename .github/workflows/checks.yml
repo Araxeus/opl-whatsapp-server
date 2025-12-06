@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
-      - run: bun install
+      - run: bun ci
       - uses: EPMatt/reviewdog-action-tsc@v1.8.0
         with:
           reporter: ${{ env.REPORTER_TYPE }}
@@ -84,7 +84,7 @@ jobs:
           format: rdjson
           output: rd.json
           diff: true
-          skip-rule: "javascript_lang_logger,javascript_lang_logger_leak,javascript_express_https_protocol_missing"
+          skip-rule: 'javascript_lang_logger,javascript_lang_logger_leak,javascript_express_https_protocol_missing'
       - name: Run reviewdog
         if: always()
         env:
@@ -112,12 +112,12 @@ jobs:
         run: |
           reviewdog -f=sarif -reporter=${{ env.REPORTER_TYPE }} < results.sarif
 
-# https://github.com/Araxeus/opl-whatsapp-server/actions/runs/9923702398
-
   bun-ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
       - run: bun ci
-
+      - run: bun run biome ci
+      - run: bun run tsc --noEmit
+      - run: bun _build
