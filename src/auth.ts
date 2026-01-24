@@ -13,23 +13,25 @@ import { model, Schema } from 'mongoose';
 const log = logger.child({ module: 'auth' });
 
 import type { IncomingMessage, OutgoingHttpHeaders } from 'node:http';
-import { getDateToday } from 'utils';
+import { getDateToday, secondsNow } from 'utils';
 import { type WhatsappLoginResult, whatsappLogin } from 'whatsapp';
 import { z } from 'zod';
+
+const MAX_AUTH_AGE_SECONDS = 60 * 60 * 24 * 7 * 3; // 3 weeks
 
 export interface User {
     name: string;
     companyID: string;
     userID: string;
     phoneNumber: string;
-    lastAuth?: ReturnType<typeof Date.now>;
+    lastAuth?: number; // in seconds
 }
 const mUser = new Schema<User>({
     userID: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     companyID: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
-    lastAuth: { type: Number, required: false, expires: 60 * 60 * 24 * 7 * 3 },
+    lastAuth: { type: Number, required: false, expires: MAX_AUTH_AGE_SECONDS },
 });
 const Users = model<User>('User', mUser);
 
@@ -138,12 +140,12 @@ export async function getUser(userID: string) {
 
 export async function getUsersWithFreshLastAuth() {
     return await Users.find({
-        lastAuth: { $gt: Date.now() - 1000 * 60 * 60 * 24 * 10 }, // 10 days
+        lastAuth: { $gt: secondsNow() - 60 * 60 * 24 * 10 }, // 10 days
     });
 }
 
 export async function setLastAuth(userID: User['userID']) {
-    return await Users.updateOne({ userID }, { lastAuth: Date.now() });
+    return await Users.updateOne({ userID }, { lastAuth: secondsNow() });
 }
 
 export async function userIDFromReqHeader(req: IncomingMessage) {
@@ -161,7 +163,7 @@ export async function userIDFromReqHeader(req: IncomingMessage) {
 function userIDtoCookie(userID: User['userID'], deleteCookie = false) {
     return cookie.serialize('__Host-userID', userID, {
         path: '/',
-        maxAge: deleteCookie ? 0 : 60 * 60 * 24 * 7 * 3, // 3 week,
+        maxAge: deleteCookie ? 0 : MAX_AUTH_AGE_SECONDS,
         secure: true,
         httpOnly: true,
         sameSite: 'lax',
@@ -187,14 +189,12 @@ export async function handleLogin(
     }
     const user = await getUser(data.userID);
     log.info(`user ${user.name} is attempting to login`);
-    // check that lastAuth exist and is not older than 3 weeks
     if (
         skipQr ||
-        (user.lastAuth &&
-            Date.now() - user.lastAuth < 1000 * 60 * 60 * 24 * 7 * 3)
+        (user.lastAuth && secondsNow() - user.lastAuth < MAX_AUTH_AGE_SECONDS)
     ) {
         log.info(
-            `skipQr: ${skipQr}, lastAuth exist and is < 3 weeks: ${user.lastAuth && Date.now() - user.lastAuth < 1000 * 60 * 60 * 24 * 7 * 3}`,
+            `skipQr: ${skipQr}, lastAuth exist and is < 3 weeks: ${user.lastAuth && secondsNow() - user.lastAuth < MAX_AUTH_AGE_SECONDS}`,
         );
         return [{ success: true }, encryptedCookieHeader(data.userID)];
     }

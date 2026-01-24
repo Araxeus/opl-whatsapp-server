@@ -14,6 +14,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/opl-192x192.jpg">
     <link rel="apple-touch-icon" sizes="192x192" href="/opl-192x192.jpg">
     <link rel="shortcut icon" type="image/jpeg" sizes="192x192" href="/opl-192x192.jpg">
+    <link rel="icon" type="image/png" sizes="512x512" href="/opl-512x512.jpg">
+    <link rel="apple-touch-icon" sizes="512x512" href="/opl-512x512.jpg">
+    <link rel="shortcut icon" type="image/jpeg" sizes="512x512" href="/opl-512x512.jpg">
     <link rel="shortcut icon" type="image/png" href="/favicon.png">
 
     <title>אופרייט דיווחים</title>
@@ -22,6 +25,8 @@
     <meta property="og:description" content="שליחת דיווחים באמצעות האתר במקום בוואצאפ" />
     <meta property="og:url" content="https://operate.karearl.com/" />
     <meta property="og:image" content="https://operate.karearl.com/opl-960x960.jpg">
+
+    <link rel="manifest" href="/manifest.json" />
 
     <style>
         html,
@@ -101,6 +106,12 @@
         #logout-button:hover {
             background-color: #257186;
         }
+
+        div#buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 6px;
+        }
     </style>
 </head>
 
@@ -117,8 +128,10 @@
     <div class="container">
         <h1 dir="rtl" id="greeting">ברוך הבא לשרת הוואצאפ של אופרייט</h1>
         <p>?מה תרצה לעשות</p>
-        <a dir="rtl" id="carpark" href="/park-car" dir="rtl">דיווח חנייה</a>
-        <a dir="rtl" id="replace" href="/replace-client-car" dir="rtl">מסירת רכב חליפי</a>
+        <div id="buttons">
+            <a dir="rtl" id="replace" href="/replace-client-car" dir="rtl">מסירת רכב חליפי</a>
+            <a dir="rtl" id="carpark" href="/park-car" dir="rtl">דיווח חנייה</a>
+        </div>
     </div>
 </body>
 
@@ -126,5 +139,19 @@
 <link rel="prerender" href="/park-car" />
 <link rel="prefetch" href="/replace-client-car" />
 <link rel="prerender" href="/replace-client-car" />
+
+<script defer>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('😎 Service Worker registered with scope:', registration.scope);
+                })
+                .catch(err => {
+                    console.error('😫 Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
 
 </html>

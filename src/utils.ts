@@ -63,6 +63,8 @@ export async function getRequestBody(req: IncomingMessage, raw = false) {
     });
 }
 
+export const secondsNow = () => Math.floor(Date.now() / 1000);
+
 export const getDateToday = () => {
     const d = new Date();
     return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
