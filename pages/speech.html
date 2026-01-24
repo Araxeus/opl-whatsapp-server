@@ -251,7 +251,7 @@
     </div>
     <script type="module">
         const inputField = document.getElementById("input")
-        inputField.addEventListener("keydown", function (e) {
+        inputField.addEventListener("keydown", (e) => {
             if (e.code === "Enter") {
                 const input = inputField.value;
                 inputField.value = "";

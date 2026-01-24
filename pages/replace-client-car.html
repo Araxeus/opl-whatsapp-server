@@ -47,16 +47,16 @@
             <span dir="rtl" id="replacementCarIDError" class="error">מספר רכב לא תקין, מצופה מספר בפורמט 123-45-678 או
                 12345678.</span>
             <label dir="rtl" for="nameOfClientCompany">שם חברה של הלקוח</label>
-            <input dir="rtl" type="text" id="nameOfClientCompany" name="nameOfClientCompany" dir="rtl">
+            <input dir="rtl" type="text" id="nameOfClientCompany" name="nameOfClientCompany">
             <label dir="rtl" for="replacementCarOrigin">מקור הרכב החלופי</label>
-            <input dir="rtl" type="text" id="replacementCarOrigin" name="replacementCarOrigin" dir="rtl" placeholder="חנייה">
+            <input dir="rtl" type="text" id="replacementCarOrigin" name="replacementCarOrigin" placeholder="חנייה">
 
             <button type="submit"><span dir="rtl" class="button_text">שלח</span></button>
         </form>
     </div>
 
     <script type="module">
-        import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
+        import { alertSoon, fetchAndQr } from './fetch-and-qr.ts';
 
         const $ = document.getElementById.bind(document);
         $('carForm').addEventListener('submit', async (event) => {

@@ -142,18 +142,15 @@ export async function fetchAndQr({
 
 function handleQrResponse() {
     // inject new script from /vendor/qrcode.js
-    console.log('qrCode response found, handling it...'); // DELETE
     if ('QRCode' in window) {
         showQrCode();
     } else {
         const script = document.createElement('script');
         script.src = '/vendor/qrcode.js';
         script.onload = () => {
-            console.log('qrcode.js loaded'); // DELETE
             showQrCode();
         };
         document.head.appendChild(script);
-        console.log('qrcode.js injected to doc.head'); // DELETE
     }
 }
 
@@ -167,12 +164,10 @@ function showQrCode() {
     const canvas = $('canvas');
     checkExists(canvas, 'canvas');
 
-    console.log('injecting QR code'); // DELETE
     checkExists(QRCode, 'QRCode global variable');
 
     QRCode.toCanvas(canvas, qrCode, err => {
         if (err) throw err;
-        console.log('QR code injected'); // DELETE
         checkExists(canvas.parentElement, 'canvas.parentElement');
 
         // hide login form
@@ -186,17 +181,13 @@ function showQrCode() {
 
     const Server = new EventSource(`/sse${tempToken}`);
     Server.addEventListener('qr', event => {
-        console.log('qr event received'); // DELETE
         const qrCode = JSON.parse(event.data);
         QRCode.toCanvas(canvas, qrCode, err => {
             if (err) throw err;
-            console.log('QR code updated'); // DELETE
         });
     });
 
     Server.addEventListener('authenticated', () => {
-        console.log('Successfully authenticated'); // DELETE
-
         checkExists(canvas.parentElement, 'canvas.parentElement');
         mainContainer.style.display = 'initial';
         canvas.parentElement.style.display = 'none';

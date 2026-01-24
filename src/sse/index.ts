@@ -18,7 +18,7 @@ export function sse(
     user: User,
 ) {
     if (Connection.connectionExists(user.userID)) {
-        log.error('[SSE ERROR] Connection for the same userID already exists'); // DELETE
+        log.error('[SSE ERROR] Connection for the same userID already exists');
         res.writeHead(400, {
             'Content-Type': 'text/plain',
         });

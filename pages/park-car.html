@@ -154,17 +154,17 @@
             <label dir="rtl" for="km">קמ נוכחי</label>
             <input dir="rtl" type="number" id="km" name="km" required>
             <label dir="rtl" for="startingPoint">מקור נסיעה</label>
-            <input dir="rtl" type="text" id="startingPoint" name="startingPoint" dir="rtl" required>
+            <input dir="rtl" type="text" id="startingPoint" name="startingPoint" required>
 
             <label dir="rtl" for="destination">יעד נסיעה</label>
-            <input dir="rtl" type="text" id="destination" name="destination" dir="rtl" required>
+            <input dir="rtl" type="text" id="destination" name="destination" required>
 
             <button type="submit"><span dir="rtl" class="button_text">שלח</span></button>
         </form>
     </div>
 
     <script type="module">
-        import { fetchAndQr, alertSoon } from './fetch-and-qr.ts';
+        import { alertSoon, fetchAndQr } from './fetch-and-qr.ts';
 
         const $ = document.getElementById.bind(document);
 
@@ -271,7 +271,6 @@
             listen({
                 lang: 'he-IL'
             }).then(transcript => {
-                console.log(transcript); // DELETE
                 output(transcript);
             }).catch(console.error).finally(() => {
                 audioButton.disabled = false;
@@ -290,7 +289,6 @@
 
         function output(input) {
             transform(input).then(data => {
-                console.log(data); // DELETE
                 for (const key of Object.keys(data)) {
                     const element = $(key);
                     if (element) {
